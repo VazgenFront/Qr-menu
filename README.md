@@ -1,1 +1,1 @@
-# Qr-menu
+Qr-menu application
