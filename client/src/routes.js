@@ -1,22 +1,62 @@
-import { Switch, Route } from "react-router-dom";
-import { MainPage,AdminAuth } from "./screens/index";
+import { useMemo } from "react";
+import { Route } from "react-router-dom";
+import { MainPage, AdminAuth } from "./screens/index";
 
-export const routes = {
-  homePage: "/",
-  adminSide: "/admin-panel",
-  adminAuth: "/admin-panel/:cafeName",
-  userSide: "/:cafeName/:seatId",
-  userCard: "/:cafeName/:seatId/card",
+export const appRoutes = [
+  {
+    path: "/",
+    name: "main_page",
+    component: MainPage,
+  },
+  {
+    path: "/admin-panel/:cafeName",
+    name: "admin_panel_cafe",
+    exact: true,
+    component: AdminAuth,
+  },
+  {
+    path: "/",
+    name: "mainPage",
+    exact: true,
+    component: MainPage,
+  },
+  {
+    path: "/",
+    name: "mainPage",
+    exact: true,
+    component: MainPage,
+  },
+  {
+    path: "/",
+    name: "mainPage",
+    exact: true,
+    component: MainPage,
+  },
+];
+
+export const renderRoutes = (routeProps = {}) => {
+  return appRoutes.map((route) => {
+    return (
+      <Route
+        key={`structure-route-${route.name}`}
+        path={route.path}
+        exact={route.exact}
+        render={(props) => {
+          if (route.component) {
+            return (
+              <route.component
+                {...routeProps}
+                {...props}
+                routes={route.routes}
+              />
+            );
+          }
+
+          return null;
+        }}
+      />
+    );
+  });
 };
 
-export const switchingRoutes = () => {
-  return (
-    <Switch>
-      <Route exact path={routes.homePage} render={() => <MainPage />} />
-      <Route exact path={routes.adminSide} render={() => <AdminAuth />} />
-      <Route exact path={routes.adminAuth} render={() => <MainPage />} />
-      <Route exact path={routes.userSide} render={() => <MainPage />} />
-      <Route exact path={routes.userCard} render={() => <MainPage />} />
-    </Switch>
-  );
-};
+export const useRoutes = () => useMemo(() => renderRoutes(), []);
