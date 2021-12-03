@@ -1,8 +1,16 @@
 import "./App.css";
-import { switchingRoutes } from "./routes";
+import { Navbar } from "./componenets/index";
+import { Switch } from "react-router-dom";
+import { useRoutes } from "./routes";
 
 function App() {
-  return <div>{switchingRoutes()}</div>;
+  const routes = useRoutes();
+  return (
+    <div>
+      <Navbar />
+      <Switch>{routes}</Switch>
+    </div>
+  );
 }
 
 export default App;
