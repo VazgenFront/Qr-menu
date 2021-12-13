@@ -6,14 +6,16 @@ const { Schema } = mongoose;
 
 autoIncrement.initialize(connection);
 
-const OrderSchema = new Schema({
+const TableSchema = new Schema({
 	accountId: { type: Number, required: true },
 	tableId: { type: Number, required: true },
-	menuItemId: { type: Number, required: true },
-	itemCount: { type: Number, required: true },
+	seatCount: { type: Number, required: true },
+	reserved: { type: Boolean, required: true },
 	notes: { type: String, required: true },
 }, {versionKey: false});
 
-OrderSchema.plugin(autoIncrement.plugin, { model: 'Order', startAt: 1 });
+TableSchema.index({ accountId: 1, tableId: 1 }, { unique: true });
 
-module.exports = connection.model('Order', OrderSchema);
+TableSchema.plugin(autoIncrement.plugin, { model: 'Table', startAt: 1 });
+
+module.exports = connection.model('Table', TableSchema);

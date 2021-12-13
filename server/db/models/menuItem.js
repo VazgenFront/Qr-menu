@@ -17,6 +17,6 @@ const MenuItemSchema = new Schema({
     isMainDish: { type: Boolean },
 }, {versionKey: false});
 
-MenuItemSchema.plugin(autoIncrement.plugin, { model: 'MenuItem' });
+MenuItemSchema.plugin(autoIncrement.plugin, { model: 'MenuItem', startAt: 1 });
 
 module.exports = connection.model('MenuItem', MenuItemSchema);

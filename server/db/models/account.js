@@ -30,6 +30,6 @@ const AccountSchema = new Schema({
 
 AccountSchema.index({ email: 1, username: 1 }, { unique: true });
 
-AccountSchema.plugin(autoIncrement.plugin, { model: 'Account' });
+AccountSchema.plugin(autoIncrement.plugin, { model: 'Account', startAt: 1 });
 
 module.exports = connection.model('Account', AccountSchema);

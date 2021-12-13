@@ -1,12 +1,14 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLString, GraphQLID, GraphQLFloat, GraphQLInputObjectType, GraphQLBoolean} = require("graphql");
+const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLID } = require("graphql");
 const Account = require("../db/models/account");
 const Style = require("../db/models/style");
 const MenuItem = require("../db/models/menuItem");
 const Order = require("../db/models/order");
+const Table = require("../db/models/table");
 const {AccountType, AccountMutations} = require("./accountSchemas");
 const {StyleType, StyleMutations} = require("./styleSchemas");
 const {MenuItemType, MenuItemMutations} = require("./menuItemSchemas");
 const {OrderType, OrderMutations} = require("./orderSchemas");
+const {TableType, TableMutations} = require("./tableSchemas");
 
 const RootQuery = new GraphQLObjectType({
 	name: 'RootQueryType',
@@ -47,6 +49,15 @@ const RootQuery = new GraphQLObjectType({
 				return order;
 			}
 		},
+		table: {
+			type: TableType,
+			args: { _id: { type: GraphQLID } },
+			async resolve(parent, args) {
+				const _id = args._id;
+				const table = await Table.findOne({_id}).lean();
+				return table;
+			}
+		},
 	}
 })
 
@@ -57,6 +68,7 @@ const Mutation = new GraphQLObjectType({
 		...StyleMutations,
 		...MenuItemMutations,
 		...OrderMutations,
+		...TableMutations,
 	}),
 })
 

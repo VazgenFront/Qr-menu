@@ -14,6 +14,6 @@ const StyleSchema = new Schema({
     fontFamily: { type: String, required: true },
 }, {versionKey: false});
 
-StyleSchema.plugin(autoIncrement.plugin, { model: 'Style' });
+StyleSchema.plugin(autoIncrement.plugin, { model: 'Style', startAt: 1 });
 
 module.exports = connection.model('Style', StyleSchema);
