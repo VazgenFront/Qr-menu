@@ -1,9 +1,12 @@
 import React from "react";
-import { ExampleText } from "./MainPage.styles";
+import { useParams } from "react-router-dom"
 const MainPage = () => {
+  const { cafeName } = useParams();
   return (
     <div>
-      <ExampleText>Our Home Page</ExampleText>
+      <h1 style={{ fontSize: "22px", color: "red" }}>
+        Our Home Page {cafeName}
+      </h1>
     </div>
   );
 };
