@@ -4,31 +4,14 @@ import { MainPage, AdminAuth } from "./screens/index";
 
 export const appRoutes = [
   {
-    path: "/",
-    name: "main_page",
-    component: MainPage,
-  },
-  {
-    path: "/admin-panel/:cafeName",
+    path: "/:cafeName/admin-panel",
     name: "admin_panel_cafe",
     exact: true,
     component: AdminAuth,
   },
   {
-    path: "/",
-    name: "mainPage",
-    exact: true,
-    component: MainPage,
-  },
-  {
-    path: "/",
-    name: "mainPage",
-    exact: true,
-    component: MainPage,
-  },
-  {
-    path: "/",
-    name: "mainPage",
+    path: "/:cafeName",
+    name: "main_page",
     exact: true,
     component: MainPage,
   },

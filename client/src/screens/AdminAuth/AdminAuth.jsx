@@ -1,10 +1,11 @@
 import React from "react";
-import { AdminAuthWrapper } from "./AdminAuth.styles";
 import { useParams } from "react-router-dom";
+import "./Admin.css";
+
 const AdminAuth = () => {
   const { cafeName } = useParams();
   return (
-    <AdminAuthWrapper>
+    <div className="admin-auth">
       <span
         style={{
           color: "#fff",
@@ -13,7 +14,7 @@ const AdminAuth = () => {
       >
         {cafeName} Admin-Panel
       </span>
-    </AdminAuthWrapper>
+    </div>
   );
 };
 

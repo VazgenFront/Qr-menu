@@ -1,5 +1,5 @@
 import "./App.css";
-import { Navbar } from "./componenets/index";
+import Navbar from "./components/Navbar/Navbar";
 import { Switch } from "react-router-dom";
 import { useRoutes } from "./routes";
 
