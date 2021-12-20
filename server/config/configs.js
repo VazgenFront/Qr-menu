@@ -8,4 +8,5 @@ module.exports = {
 		keepAlive: true,
 	},
 	secret: 'v3yi39ng7aR6vb11ib9ga7',
+	tokenExpirationTimeInMinutes: 480,
 };

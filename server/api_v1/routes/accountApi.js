@@ -9,11 +9,19 @@ const {
 	renderGraphiQL,
 	shouldRenderGraphiQL
 } = require('graphql-helix');
+const AccountController = require("../controlers/accountController");
+const verifyToken = require("../../helpers/verifyToken")
 
 module.exports = (express) => {
 	const apiRouter = express.Router();
 
-	// apiRouter.use(verifyToken);
+	apiRouter.post("/authenticate", AccountController.authenticate)
+
+	apiRouter.use(verifyToken);
+
+	apiRouter.get("/checkAuth", async (req, res)=>{
+		res.send(req.decoded);
+	})
 
 	const schema = new GraphQLSchema({
 		query: new GraphQLObjectType({
