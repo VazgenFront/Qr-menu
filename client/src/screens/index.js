@@ -1,4 +1,6 @@
-import MainPage from "./MainPage/index";
-import AdminAuth from "./AdminAuth/AdminAuth";
+import AboutUs from "./AboutUs/AboutUs.js";
+import AdminAuh from "./AdminAuh/AdminAuh.js";
+import Cafe from "./Cafe/Cafe.js";
+import MenuType from "./MenuType/MenuType.js";
 
-export { MainPage, AdminAuth };
+export { AboutUs, AdminAuh, Cafe, MenuType };
