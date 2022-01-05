@@ -1,0 +1,34 @@
+.cafeInfo__box {
+  width: 80%;
+  height: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.cafeInfo__title {
+  font-size: 24px;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+.cafeInfo__recommended {
+  width: 90%;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.cafeInfo__menuItem {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.cafeInfo__menuItem__img{
+  width: 150px;
+  height: 150px;
+}

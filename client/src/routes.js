@@ -1,20 +1,55 @@
 import { useMemo } from "react";
 import { Route } from "react-router-dom";
-import { MainPage, AdminAuth } from "./screens/index";
+import { AboutUs, AdminAuh, Cafe, MenuType } from "./screens/index";
 
 export const appRoutes = [
+  // About Our Company page
   {
-    path: "/:cafeName/admin-panel",
-    name: "admin_panel_cafe",
+    path: "/",
+    name: "aboutUs",
     exact: true,
-    component: AdminAuth,
+    component: AboutUs,
   },
+  // About Our Company page
+
+  // Cafe Admin Page
+  {
+    path: "/:id/:cafeName/admin-panel",
+    name: "AdminAuh",
+    component: AdminAuh,
+  },
+  // Cafe Admin Page
+
+  // Cafe Client Page
   {
     path: "/:cafeName",
-    name: "main_page",
+    name: "aboutUs",
     exact: true,
-    component: MainPage,
+    component: Cafe,
   },
+  // Cafe Client Page
+
+  {
+    path: "/:cafeName/menu/:menuType",
+    name: "menuType",
+    exact: true,
+    component: MenuType,
+  },
+
+  // {
+  //   path: "/:id/:cafeName/menu/:menuType/:id",
+  //   name: "menu_item",
+  //   exact: true,
+  //   page: MenuItem,
+  // },
+
+  // {
+  //   path: "/:id/:cafeName/:tableId/card",
+  //   name: "main_page",
+  //   exact: true,
+  //   page: Card,
+  // },
+  // Client Side
 ];
 
 export const renderRoutes = (routeProps = {}) => {
