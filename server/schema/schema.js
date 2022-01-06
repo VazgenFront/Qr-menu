@@ -22,15 +22,6 @@ const RootQuery = new GraphQLObjectType({
         return account;
       },
     },
-    style: {
-      type: StyleType,
-      args: { _id: { type: GraphQLID } },
-      async resolve(parent, args) {
-        const _id = args._id;
-        const style = await Style.findOne({_id}).lean();
-        return style
-      }
-    },
     menuItem: {
       type: MenuItemType,
       args: { _id: { type: GraphQLID } },

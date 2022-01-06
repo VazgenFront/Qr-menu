@@ -14,7 +14,6 @@ export const GET_CAFFEE = gql`
       status
       menuTypes {
         name
-        url
       }
       style {
         _id

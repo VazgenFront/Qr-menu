@@ -28,6 +28,14 @@ const AccountType = new GraphQLObjectType({
 				return parent.menuTypes;
 			}
 		},
+		style: {
+			type: StyleType,
+			async resolve(parent, args) {
+				const styleId = parent.styleId;
+				const style = await Style.findOne({_id: styleId}).lean();
+				return style;
+			}
+		},
 		menuItems: {
 			type: new GraphQLList(MenuItemType),
 			name: "menuItems",
