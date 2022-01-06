@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Route } from "react-router-dom";
-import { AboutUs, AdminAuh, Cafe, MenuType } from "./screens/index";
+import { AboutUs, AdminAuh, Cafe, MenuType, Card } from "./screens/index";
 
 export const appRoutes = [
   // About Our Company page
@@ -22,7 +22,7 @@ export const appRoutes = [
 
   // Cafe Client Page
   {
-    path: "/:cafeName",
+    path: "/:cafeName/:cafeId",
     name: "aboutUs",
     exact: true,
     component: Cafe,
@@ -34,6 +34,12 @@ export const appRoutes = [
     name: "menuType",
     exact: true,
     component: MenuType,
+  },
+
+  {
+    path: "/:cafeName/card/:cafeId",
+    name: "menuType",
+    component: Card,
   },
 
   // {

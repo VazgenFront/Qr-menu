@@ -9,26 +9,65 @@
 }
 
 .cafeInfo__title {
-  font-size: 24px;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 36px;
+  line-height: 60px;
+  text-align: center;
 }
 
 .cafeInfo__recommended {
-  width: 90%;
   margin-top: 20px;
-  display: grid;
-  grid-template-columns: 50% 50%;
 }
 
 .cafeInfo__menuItem {
-  width: 90%;
+  max-width: 280px;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
 }
 
-.cafeInfo__menuItem__img{
-  width: 150px;
-  height: 150px;
+.cafeInfo__menuItem__img {
+  max-width: 235px;
+  width: 100%;
+  height: 132px;
+  margin-bottom: 22px;
+  border-radius: 28px;
+}
+
+.cafeInfo__menuItems__name {
+  font-size: 18px;
+  margin-top: 10px;
+  margin-bottom: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.cafeInfo__menuItem__description {
+  font-size: 14px;
+  max-width: 235px;
+  width: 100%;
+  height: 32px;
+  margin-bottom: 24px;
+}
+
+.buying__info {
+  margin-top: 22px;
+  padding: 0 17px;
+}
+
+.add__card_button {
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid #ec1e1e;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+  font-size: 13px;
+  padding: 8px 24px;
+  margin-left: 16px;
 }
