@@ -1,17 +1,17 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLID } = require("graphql");
+const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = require("graphql");
 const Account = require("../db/models/account");
 const Style = require("../db/models/style");
 const MenuItem = require("../db/models/menuItem");
 const Order = require("../db/models/order");
 const Table = require("../db/models/table");
-const { AccountType, AccountMutations } = require("./accountSchemas");
-const { StyleType, StyleMutations } = require("./styleSchemas");
-const { MenuItemType, MenuItemMutations } = require("./menuItemSchemas");
-const { OrderType, OrderMutations } = require("./orderSchemas");
-const { TableType, TableMutations } = require("./tableSchemas");
+const {AccountType, AccountMutations} = require("./accountSchemas");
+const {StyleType, StyleMutations} = require("./styleSchemas");
+const {MenuItemType, MenuItemMutations} = require("./menuItemSchemas");
+const {OrderType, OrderMutations} = require("./orderSchemas");
+const {TableType, TableMutations} = require("./tableSchemas");
 
 const RootQuery = new GraphQLObjectType({
-  name: "RootQueryType",
+  name: 'RootQueryType',
   fields: {
     account: {
       type: AccountType,
@@ -27,39 +27,57 @@ const RootQuery = new GraphQLObjectType({
       args: { _id: { type: GraphQLID } },
       async resolve(parent, args) {
         const _id = args._id;
-        const style = await Style.findOne({ _id }).lean();
-        return style;
-      },
+        const style = await Style.findOne({_id}).lean();
+        return style
+      }
     },
     menuItem: {
       type: MenuItemType,
       args: { _id: { type: GraphQLID } },
       async resolve(parent, args) {
         const _id = args._id;
-        const menuItem = await MenuItem.findOne({ _id }).lean();
+        const menuItem = await MenuItem.findOne({_id}).lean();
         return menuItem;
-      },
+      }
+    },
+    menuItemsOfType: {
+      type: new GraphQLList(MenuItemType),
+      args: { accountId: { type: GraphQLID }, type: { type: GraphQLString } },
+      async resolve(parent, args) {
+        const { accountId, type } = args;
+        const menuItems = await MenuItem.find({ accountId, type }).lean();
+        return menuItems;
+      }
     },
     order: {
       type: OrderType,
       args: { _id: { type: GraphQLID } },
       async resolve(parent, args) {
         const _id = args._id;
-        const order = await Order.findOne({ _id }).lean();
+        const order = await Order.findOne({_id}).lean();
         return order;
-      },
+      }
     },
     table: {
       type: TableType,
       args: { _id: { type: GraphQLID } },
       async resolve(parent, args) {
         const _id = args._id;
-        const table = await Table.findOne({ _id }).lean();
+        const table = await Table.findOne({_id}).lean();
         return table;
-      },
+      }
     },
-  },
-});
+    accountTable: {
+      type: TableType,
+      args: { accountId: { type: GraphQLID }, tableId: { type: GraphQLID } },
+      async resolve(parent, args) {
+        const { accountId, tableId } = args;
+        const table = await Table.findOne({ accountId, tableId }).lean();
+        return table;
+      }
+    },
+  }
+})
 
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -70,9 +88,9 @@ const Mutation = new GraphQLObjectType({
     ...OrderMutations,
     ...TableMutations,
   }),
-});
+})
 
 module.exports = new GraphQLSchema({
   query: RootQuery,
   mutation: Mutation,
-});
+})

@@ -9,8 +9,14 @@ autoIncrement.initialize(connection);
 const OrderSchema = new Schema({
 	accountId: { type: Number, required: true },
 	tableId: { type: Number, required: true },
-	menuItemId: { type: Number, required: true },
-	itemCount: { type: Number, required: true },
+	cart: [
+		{
+			menuItemId: { type: Number, required: true },
+			itemCount: { type: Number, required: true },
+		}
+	],
+	reserveToken: { type: String, required: true, unique: true },
+	isPaid: { type: Boolean, required: true, default: false },
 	notes: { type: String, required: true },
 }, {versionKey: false});
 

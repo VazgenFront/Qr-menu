@@ -20,7 +20,6 @@ const AccountSchema = new Schema({
     menuTypes: [
         {
             name: {type: String},
-            url: {type: String}
         },
     ],
     styleId: { type: Number },

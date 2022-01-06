@@ -14,7 +14,6 @@ const MenuItemSchema = new Schema({
     img: { type: String, required: true },
     price: { type: Number, required: true },
     currency: { type: String, required: true },
-    isMainDish: { type: Boolean },
 }, {versionKey: false});
 
 MenuItemSchema.plugin(autoIncrement.plugin, { model: 'MenuItem', startAt: 1 });

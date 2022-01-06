@@ -11,8 +11,9 @@ const TableSchema = new Schema({
 	tableId: { type: Number, required: true },
 	seatCount: { type: Number, required: true },
 	reserved: { type: Boolean, required: true },
+	reserveToken: { type: String },
 	notes: { type: String, required: true },
-}, {versionKey: false});
+}, { versionKey: false });
 
 TableSchema.index({ accountId: 1, tableId: 1 }, { unique: true });
 

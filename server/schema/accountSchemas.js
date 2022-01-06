@@ -22,19 +22,10 @@ const AccountType = new GraphQLObjectType({
 				name: 'MenuTypeField',
 				fields: () => ({
 					name: {type: GraphQLString},
-					url: {type: GraphQLString},
 				}),
 			})),
 			resolve(parent, args) {
 				return parent.menuTypes;
-			}
-		},
-		style: {
-			type: StyleType,
-			async resolve(parent, args) {
-				const styleId = parent.styleId;
-				const style = await Style.findOne({_id: styleId}).lean();
-				return style;
 			}
 		},
 		menuItems: {

@@ -1,5 +1,7 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLBoolean, GraphQLInt} = require("graphql");
+const { v4: uuidv4 } = require('uuid');
 const Table = require("../db/models/table");
+const Order = require("../db/models/order");
 
 const TableType = new GraphQLObjectType({
 	name: 'Table',
@@ -36,6 +38,47 @@ const TableMutations = {
 			const updateData = JSON.parse(args.tableJSONString)
 			const table = await Table.findOneAndUpdate({_id: args.id}, updateData, {new: true});
 			return table;
+		}
+	},
+	reserveTable: {
+		type: new GraphQLObjectType({ name: 'reserveTable', fields: ()=>({
+				reserveToken: { type: GraphQLString },
+			})
+		}),
+		args: {
+			accountId: { type: GraphQLID },
+			tableId: { type: GraphQLID },
+		},
+		async resolve(parent, args){
+			const { accountId, tableId } = args;
+			const reserveToken = uuidv4();
+			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: false, reserveToken: null }, { reserved: true, reserveToken }, {new: true});
+			if (table) {
+				return { reserveToken };
+			} else {
+				throw new Error("Table doesn't exist or already reserved!");
+			}
+		}
+	},
+	closeTable: {
+		type: GraphQLString,
+		args: {
+			accountId: { type: GraphQLID },
+			tableId: { type: GraphQLID },
+			reserveToken: { type: GraphQLString },
+		},
+		async resolve(parent, args){
+			const { accountId, tableId, reserveToken } = args;
+			const unpaidOrders = await Order.find({ accountId, tableId, reserveToken, isPaid: false }).lean();
+			if (unpaidOrders.length) {
+				throw new Error(`Orders No: ${unpaidOrders.map(order => order._id).join(", ")} doesn't paid at now!`);
+			}
+			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: true }, { reserved: false, reserveToken: null }, {new: true});
+			if (table) {
+				return `Account ${accountId} table ${tableId} successfully closed.`;
+			} else {
+				throw new Error("Table doesn't exist or don't reserved!");
+			}
 		}
 	}
 }
