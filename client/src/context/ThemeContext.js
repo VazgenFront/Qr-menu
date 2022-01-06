@@ -4,19 +4,28 @@ export const ThemeContext = createContext();
 
 class ThemeContextProvider extends Component {
   state = {
-    cafeName: "",
+    cafeName: localStorage.getItem("cafeName") || "",
     styles: {},
+    cafeId: localStorage.getItem("cafeId") || "0",
     menuItems: [],
+    card: localStorage.getItem("card") || [],
+  };
+
+  getCafeId = (IdFromParams) => {
+    this.setState({ cafeId: IdFromParams });
   };
 
   toggleStyle = (styles) => {
+    localStorage.setItem("styles", styles);
     this.setState({ styles: styles });
   };
 
-  getCafeName = (cafeNameFromParam) =>
-    this.setState({ cafeName: cafeNameFromParam });
+  getCafeName = (cafeNameFromParams) => {
+    this.setState({ cafeName: cafeNameFromParams });
+  };
 
   getMenuItems = (menuItemsFromServer) => {
+    localStorage.setItem("menuItems", menuItemsFromServer);
     this.setState({ menuItems: menuItemsFromServer });
   };
 
@@ -28,6 +37,7 @@ class ThemeContextProvider extends Component {
           toggleStyle: this.toggleStyle,
           getCafeName: this.getCafeName,
           getMenuItems: this.getMenuItems,
+          getCafeId: this.getCafeId,
         }}
       >
         {this.props.children}

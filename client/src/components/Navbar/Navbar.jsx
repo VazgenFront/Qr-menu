@@ -1,5 +1,5 @@
-import { useLazyQuery } from "@apollo/client";
 import React, { useContext, useLayoutEffect, useState } from "react";
+import { useLazyQuery } from "@apollo/client";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_CAFFEE } from "../../queries/queries";
@@ -7,24 +7,22 @@ import "./Navbar.css";
 
 const NavBar = () => {
   const state = useContext(ThemeContext);
-
+  const { cafeId, cafeName } = state;
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
   const [style, setStyle] = useState({});
   const [menuTypes, setMenuTypes] = useState([]);
-  const cafeName = state.cafeName;
   const [getCafe, { loading, error, data }] = useLazyQuery(GET_CAFFEE);
 
   useLayoutEffect(() => {
     setStyle({
       ...data?.account?.style,
     });
-
-    data && !loading && setMenuTypes(() => [...data?.account?.menuTypes]);
+    data && setMenuTypes(() => [...data?.account?.menuTypes]);
   }, [data]);
 
   useLayoutEffect(() => {
-    cafeName && getCafe({ variables: { username: cafeName } });
+    getCafe({ variables: { _id: cafeId } });
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.menuItems);
   }, [style]);
@@ -38,6 +36,7 @@ const NavBar = () => {
   } = style;
 
   error && console.log("erorr");
+  console.log("data", data?.account?.menuTypes);
 
   return (
     <>
@@ -51,7 +50,7 @@ const NavBar = () => {
           }}
         >
           <div className="nav-container">
-            <NavLink exact to={`/${cafeName}`}>
+            <NavLink exact to={`/${cafeName}/${cafeId}`}>
               <img src={logo} alt="logo" className="nav-logo" />
             </NavLink>
 
@@ -66,7 +65,7 @@ const NavBar = () => {
                 <li className="nav-item" key={`nav-${index}`}>
                   <NavLink
                     exact
-                    to={menuItem?.url}
+                    to={`/${cafeName}/menu/${menuItem?.name}`}
                     activeClassName="active"
                     className="nav-links"
                     style={{ color: navbarTitleColor }}
@@ -77,6 +76,18 @@ const NavBar = () => {
                 </li>
               ))}
             </ul>
+
+            <NavLink
+              exact
+              to={`/${cafeName}/card/${cafeId}`}
+              style={{ color: navbarTitleColor }}
+            >
+              <i
+                className="fas fa-shopping-cart"
+                style={{ marginRight: "70px", fontSize: "1.8rem" }}
+              ></i>
+            </NavLink>
+
             <div className="nav-icon" onClick={handleClick}>
               <i
                 className={click ? "fas fa-times" : "fas fa-bars"}

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_CAFFEE = gql`
-  query account($username: String!) {
-    account(username: $username) {
+  query account($_id: ID!) {
+    account(_id: $_id) {
       _id
       username
       password
