@@ -1,26 +1,17 @@
-import React, { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import React from "react";
 import "./index.css";
+import aboutus from "./qrmenu.png";
 
 function AboutUs() {
-  // const history = useHistory();
-
-  // const cleanLocaleStorageIfIsNotClientPage = () => {
-  //   if (history.location.pathname === "/") {
-  //     localStorage.removeItem("cafeName");
-  //     localStorage.removeItem("cafeId");
-  //     JSON.stringify(localStorage.removeItem("styles"));
-  //     JSON.stringify(localStorage.removeItem("menuItems"));
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   cleanLocaleStorageIfIsNotClientPage();
-  // }, [history]);
-
   return (
-    <div style={{ color: "red" }}>
-      <h1>About US</h1>
+    <div className="aboutUs_box">
+      <img src={aboutus} alt="img" className="aboutus_img" />
+      <span className="aboutus_title">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto
+        ratione ducimus molestias laborum, quod voluptas quidem aspernatur quo
+        quisquam inventore exercitationem! Commodi laboriosam, cum sunt velit
+        est alias veniam sint. US
+      </span>
     </div>
   );
 }

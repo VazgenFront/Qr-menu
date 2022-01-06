@@ -4,7 +4,7 @@ import { Form, Field } from "react-final-form";
 
 const AboutUs = () => {
   const login = async (values) => {
-    console.log("values", values);
+    // console.log("values", values);
   };
 
   return (
