@@ -26,57 +26,63 @@ const Cafe = () => {
     history.push(`/${cafeName}/card/${cafeId}`);
   };
 
-  return (
-    <div className="cafeInfo__box" style={{ fontFamily: fontFamily }}>
-      <span className="cafeInfo__title" style={{ color: navbarTitleColor }}>
-        Dishes of the day
-      </span>
+  const isEmpty = Object.keys(state.styles).length === 0;
 
-      <div className="cafeInfo__recommended">
-        {newMockedTypes.map((item, index) => (
-          <div
-            className="cafeInfo__menuItem"
-            key={index}
-            style={{ background: navbarBgColor }}
-          >
-            <img
-              src={item?.img}
-              alt="img"
-              className="cafeInfo__menuItem__img"
-            />
-            <span
-              className="cafeInfo__menuItems__name"
-              style={{ color: navbarTitleColor }}
-            >
-              {item?.name}
-            </span>
-            <span
-              className="cafeInfo__menuItem__description"
-              style={{ color: navbarTitleColor }}
-            >
-              {/* {item?.description} */}
-              Հորթի միս, բրոկկոլի, սպանախ, բուլղարական պղպեղ, քունջութ, բազուկի
-              ճավ
-            </span>
-            <div className="buying__info">
-              <span
-                className="cafeInfo__menuItem__price"
-                style={{ color: navbarTitleColor }}
+  return (
+    <>
+      {isEmpty ? null : (
+        <div className="cafeInfo__box" style={{ fontFamily: fontFamily }}>
+          <span className="cafeInfo__title" style={{ color: navbarTitleColor }}>
+            Dishes of the day
+          </span>
+
+          <div className="cafeInfo__recommended">
+            {newMockedTypes.map((item, index) => (
+              <div
+                className="cafeInfo__menuItem"
+                key={index}
+                style={{ background: navbarBgColor }}
               >
-                {item?.price} AMD
-              </span>
-              <button
-                className="add__card_button"
-                style={{ background: navbarTitleColor }}
-                onClick={() => addToCard(item?._id)}
-              >
-                Buy
-              </button>
-            </div>
+                <img
+                  src={item?.img}
+                  alt="img"
+                  className="cafeInfo__menuItem__img"
+                />
+                <span
+                  className="cafeInfo__menuItems__name"
+                  style={{ color: navbarTitleColor }}
+                >
+                  {item?.name}
+                </span>
+                <span
+                  className="cafeInfo__menuItem__description"
+                  style={{ color: navbarTitleColor }}
+                >
+                  {/* {item?.description} */}
+                  Հորթի միս, բրոկկոլի, սպանախ, բուլղարական պղպեղ, քունջութ,
+                  բազուկի ճավ
+                </span>
+                <div className="buying__info">
+                  <span
+                    className="cafeInfo__menuItem__price"
+                    style={{ color: navbarTitleColor }}
+                  >
+                    {item?.price} AMD
+                  </span>
+                  <button
+                    className="add__card_button"
+                    style={{ background: navbarTitleColor }}
+                    onClick={() => addToCard(item?._id)}
+                  >
+                    Buy
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

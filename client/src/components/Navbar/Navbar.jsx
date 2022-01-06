@@ -18,7 +18,7 @@ const NavBar = () => {
     setStyle({
       ...data?.account?.style,
     });
-    data && setMenuTypes(() => [...data?.account?.menuTypes]);
+    data?.account && setMenuTypes(() => [...data?.account?.menuTypes]);
   }, [data]);
 
   useLayoutEffect(() => {
@@ -36,11 +36,10 @@ const NavBar = () => {
   } = style;
 
   error && console.log("erorr");
-  console.log("data", data?.account?.menuTypes);
 
   return (
     <>
-      {cafeName ? (
+      {data?.account ? (
         <nav
           className="navbar"
           style={{
@@ -51,7 +50,7 @@ const NavBar = () => {
         >
           <div className="nav-container">
             <NavLink exact to={`/${cafeName}/${cafeId}`}>
-              <img src={logo} alt="logo" className="nav-logo" />
+              {cafeId && data && <img src={logo} className="nav-logo" />}
             </NavLink>
 
             <ul
