@@ -1,18 +1,41 @@
 import React, { useContext, useEffect } from "react";
+import { useMutation } from "@apollo/client";
+import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
 import { useParams, useHistory } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import "./Cafe.css";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
-  const { cafeName, cafeId } = useParams();
+  const { cafeName, cafeId, tableId } = useParams();
   const history = useHistory();
+  const [
+    getToken,
+    { loading: loadingToken, error: tokenError, data: tokenData },
+  ] = useMutation(GET_TABBLE_TOKEN);
+
+  const [
+    addOrder,
+    { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
+  ] = useMutation(MAKE_ORDER);
+
+  localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
 
   useEffect(() => {
     localStorage.setItem("cafeId", cafeId);
     localStorage.setItem("cafeName", cafeName);
+    localStorage.setItem("tableId", tableId);
     state.getCafeName(cafeName);
     state.getCafeId(cafeId);
+    state.getTableId(tableId);
+
+    !localStorage.getItem("token") &&
+      getToken({
+        variables: {
+          accountId: cafeId,
+          tableId: tableId,
+        },
+      });
   }, []);
 
   const mockedInfo = [];
@@ -22,10 +45,19 @@ const Cafe = () => {
   const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
 
   const addToCard = (id) => {
-    console.log("id", id);
-    history.push(`/${cafeName}/card/${cafeId}`);
+    addOrder({
+      variables: {
+        accountId: cafeId,
+        tableId: tableId,
+        reserveToken: localStorage.getItem("token"),
+        orderList: [{ menuItemId: 16, itemCount: 1 }],
+      },
+    });
+    history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
   };
 
+  addOrderData?.addOrder?.cart &&
+    localStorage.setItem("items", JSON.stringify(addOrderData?.addOrder?.cart));
   const isEmpty = Object.keys(state.styles).length === 0;
 
   return (

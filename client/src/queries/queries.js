@@ -35,3 +35,52 @@ export const GET_CAFFEE = gql`
     }
   }
 `;
+
+export const GET_TABBLE_TOKEN = gql`
+  mutation reserveTable($accountId: ID!, $tableId: ID!) {
+    reserveTable(accountId: $accountId, tableId: $tableId) {
+      reserveToken
+    }
+  }
+`;
+
+export const MAKE_ORDER = gql`
+  mutation makeorder(
+    $accountId: ID!
+    $tableId: ID!
+    $reserveToken: String!
+    $orderList: [OrderListItemInput]!
+  ) {
+    addOrder(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
+      orderList: $orderList
+    ) {
+      _id
+      accountId
+      tableId
+      reserveToken
+      isPaid
+      notes
+      cart {
+        menuItemId
+        itemCount
+      }
+    }
+  }
+`;
+
+export const GET_ORDER = gql`
+  query order($_id: ID!) {
+    order(_id: $_id) {
+      accountId
+      tableId
+      reserveToken
+      cart {
+        menuItemId
+        itemCount
+      }
+    }
+  }
+`;
