@@ -13,6 +13,10 @@ const OrderSchema = new Schema({
 		{
 			menuItemId: { type: Number, required: true },
 			itemCount: { type: Number, required: true },
+			itemPrice: { type: Number, required: true },
+			itemTotalPrice: { type: Number, required: true },
+			currency: { type: String, required: true },
+			date: { type: Number, default: Date.now() },
 		}
 	],
 	reserveToken: { type: String, required: true, unique: true },
