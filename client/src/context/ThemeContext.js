@@ -9,6 +9,7 @@ class ThemeContextProvider extends Component {
     cafeId: localStorage.getItem("cafeId") || "0",
     menuItems: [],
     card: localStorage.getItem("card") || [],
+    tableId: "0",
   };
 
   getCafeId = (IdFromParams) => {
@@ -29,6 +30,11 @@ class ThemeContextProvider extends Component {
     this.setState({ menuItems: menuItemsFromServer });
   };
 
+  getTableId = (tableIdFromParams) => {
+    localStorage.setItem("tableId", tableIdFromParams);
+    this.setState({ tableId: tableIdFromParams });
+  };
+
   render() {
     return (
       <ThemeContext.Provider
@@ -38,6 +44,7 @@ class ThemeContextProvider extends Component {
           getCafeName: this.getCafeName,
           getMenuItems: this.getMenuItems,
           getCafeId: this.getCafeId,
+          getTableId: this.getTableId,
         }}
       >
         {this.props.children}

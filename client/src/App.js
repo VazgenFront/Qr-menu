@@ -18,7 +18,10 @@ function App() {
     <BrowserRouter>
       <ApolloProvider client={client}>
         <ThemeContextProvider>
-          {history.location.pathname === "/" ? null : <Navbar />}
+          {history.location.pathname.includes("admin-panel") ||
+          history.location.pathname === "/" ? null : (
+            <Navbar />
+          )}
           <Switch>{routes}</Switch>
         </ThemeContextProvider>
       </ApolloProvider>

@@ -22,7 +22,7 @@ export const appRoutes = [
 
   // Cafe Client Page
   {
-    path: "/:cafeName/:cafeId",
+    path: "/:cafeName/:cafeId/:tableId",
     name: "aboutUs",
     exact: true,
     component: Cafe,
@@ -30,14 +30,14 @@ export const appRoutes = [
   // Cafe Client Page
 
   {
-    path: "/:cafeName/menu/:menuType",
+    path: "/:cafeName/:cafeId/:tableId/menuType/:menuType",
     name: "menuType",
     exact: true,
     component: MenuType,
   },
 
   {
-    path: "/:cafeName/card/:cafeId",
+    path: "/:cafeName/:cafeId/:tableId/card",
     name: "menuType",
     component: Card,
   },

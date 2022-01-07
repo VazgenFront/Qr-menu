@@ -4,10 +4,11 @@ import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_CAFFEE } from "../../queries/queries";
 import "./Navbar.css";
+import logos from "./logo.png";
 
 const NavBar = () => {
   const state = useContext(ThemeContext);
-  const { cafeId, cafeName } = state;
+  const { cafeId, cafeName, tableId } = state;
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
   const [style, setStyle] = useState({});
@@ -35,8 +36,6 @@ const NavBar = () => {
     navbarTitleColor,
   } = style;
 
-  error && console.log("erorr");
-
   return (
     <>
       {data?.account ? (
@@ -49,7 +48,7 @@ const NavBar = () => {
           }}
         >
           <div className="nav-container">
-            <NavLink exact to={`/${cafeName}/${cafeId}`}>
+            <NavLink exact to={`/${cafeName}/${cafeId}/${tableId}`}>
               {cafeId && data && <img src={logo} className="nav-logo" />}
             </NavLink>
 
@@ -64,7 +63,7 @@ const NavBar = () => {
                 <li className="nav-item" key={`nav-${index}`}>
                   <NavLink
                     exact
-                    to={`/${cafeName}/menu/${menuItem?.name}`}
+                    to={`/${cafeName}/${cafeId}/${tableId}/menuType/${menuItem?.name}`}
                     activeClassName="active"
                     className="nav-links"
                     style={{ color: navbarTitleColor }}
@@ -78,11 +77,11 @@ const NavBar = () => {
 
             <NavLink
               exact
-              to={`/${cafeName}/card/${cafeId}`}
+              to={`/${cafeName}/${cafeId}/${tableId}/card`}
               style={{ color: navbarTitleColor }}
             >
               <i
-                className="fas fa-shopping-cart"
+                className="fas fa-utensils"
                 style={{ marginRight: "70px", fontSize: "1.8rem" }}
               ></i>
             </NavLink>
