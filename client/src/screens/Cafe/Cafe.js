@@ -43,7 +43,7 @@ const Cafe = () => {
 
   const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
 
-  const addToCard = (id) => {
+  const addToCard = (e, id) => {
     addOrder({
       variables: {
         accountId: cafeId,

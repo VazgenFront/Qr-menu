@@ -13,7 +13,7 @@ const BuyingInfo = ({ navbarTitleColor, item, addToCard }) => {
       <button
         className="add__card_button"
         style={{ background: navbarTitleColor }}
-        onClick={(e) => addToCard(e, item?._id)}
+        onClick={() => addToCard(item?._id)}
       >
         Buy
       </button>
