@@ -20,8 +20,6 @@ const Cafe = () => {
     { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
   ] = useMutation(MAKE_ORDER);
 
-  localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
-
   useEffect(() => {
     localStorage.setItem("cafeId", cafeId);
     localStorage.setItem("cafeName", cafeName);
@@ -51,7 +49,7 @@ const Cafe = () => {
         accountId: cafeId,
         tableId: tableId,
         reserveToken: localStorage.getItem("token"),
-        orderList: [{ menuItemId: 16, itemCount: 1 }],
+        orderList: [{ menuItemId: id, itemCount: 1 }],
       },
     });
     history.push(`/${cafeName}/${cafeId}/${tableId}/card`);

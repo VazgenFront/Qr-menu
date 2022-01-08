@@ -9,7 +9,7 @@ class ThemeContextProvider extends Component {
     cafeId: localStorage.getItem("cafeId") || null,
     menuItems: [],
     card: localStorage.getItem("card") || [],
-    tableId: null,
+    tableId: localStorage.getItem("tableId") || null,
   };
 
   getCafeId = (IdFromParams) => {
