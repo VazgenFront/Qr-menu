@@ -48,8 +48,8 @@ const RootQuery = new GraphQLObjectType({
         reserveToken: { type: GraphQLString },
       },
       async resolve(parent, args) {
-        const _id = args._id;
-        const order = await Order.findOne({_id}).lean();
+        const { accountId, tableId, reserveToken } = args;
+        const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
         return order;
       }
     },
