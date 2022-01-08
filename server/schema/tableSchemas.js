@@ -54,6 +54,8 @@ const TableMutations = {
 			const reserveToken = uuidv4();
 			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: false, reserveToken: null }, { reserved: true, reserveToken }, {new: true});
 			if (table) {
+				const order = new Order({accountId, tableId, reserveToken, notes: "Table reserved", cart: []})
+				await order.save();
 				return { reserveToken };
 			} else {
 				throw new Error("Table doesn't exist or already reserved!");
