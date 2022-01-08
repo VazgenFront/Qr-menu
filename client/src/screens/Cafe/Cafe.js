@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
-import { useParams, useHistory } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { NavLink, useHistory, useParams } from "react-router-dom";
+import BuyingInfo from "../../components/Navbar/BuyingInfo/BuyingInfo";
 import { ThemeContext } from "../../context/ThemeContext";
+import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
 import "./Cafe.css";
 
 const Cafe = () => {
@@ -58,6 +59,7 @@ const Cafe = () => {
 
   addOrderData?.addOrder?.cart &&
     localStorage.setItem("items", JSON.stringify(addOrderData?.addOrder?.cart));
+
   const isEmpty = Object.keys(state.styles).length === 0;
 
   return (
@@ -70,7 +72,8 @@ const Cafe = () => {
 
           <div className="cafeInfo__recommended">
             {newMockedTypes.map((item, index) => (
-              <div
+              <NavLink
+                to={`/${cafeName}/${cafeId}/${tableId}/item/${item?._id}`}
                 className="cafeInfo__menuItem"
                 key={index}
                 style={{ background: navbarBgColor }}
@@ -90,26 +93,14 @@ const Cafe = () => {
                   className="cafeInfo__menuItem__description"
                   style={{ color: navbarTitleColor }}
                 >
-                  {/* {item?.description} */}
-                  Հորթի միս, բրոկկոլի, սպանախ, բուլղարական պղպեղ, քունջութ,
-                  բազուկի ճավ
+                  {item?.description}
                 </span>
-                <div className="buying__info">
-                  <span
-                    className="cafeInfo__menuItem__price"
-                    style={{ color: navbarTitleColor }}
-                  >
-                    {item?.price} AMD
-                  </span>
-                  <button
-                    className="add__card_button"
-                    style={{ background: navbarTitleColor }}
-                    onClick={() => addToCard(item?._id)}
-                  >
-                    Buy
-                  </button>
-                </div>
-              </div>
+                <BuyingInfo
+                  navbarTitleColor={navbarTitleColor}
+                  item={item}
+                  addToCard={addToCard}
+                />
+              </NavLink>
             ))}
           </div>
         </div>

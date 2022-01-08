@@ -1,14 +1,13 @@
-.cafeInfo__box {
-  width: 80%;
-  height: 500px;
+.menuTypes__box {
+  width: 100%;
+  height: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
 }
 
-.cafeInfo__title {
+.menuType__title {
   font-style: normal;
   font-weight: normal;
   font-size: 36px;
@@ -16,11 +15,11 @@
   text-align: center;
 }
 
-.cafeInfo__recommended {
+.menuType__recommended {
   margin-top: 20px;
 }
 
-.cafeInfo__menuItem {
+.menuType__menuItem {
   max-width: 280px;
   width: 100%;
   text-align: center;
@@ -29,9 +28,10 @@
   margin: 10px;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
 }
 
-.cafeInfo__menuItem__img {
+.menuType__menuItem__img {
   max-width: 235px;
   width: 100%;
   height: 132px;
@@ -39,7 +39,7 @@
   border-radius: 8px;
 }
 
-.cafeInfo__menuItems__name {
+.menuType__menuItems__name {
   font-size: 18px;
   margin-top: 10px;
   margin-bottom: 1px;
@@ -47,7 +47,7 @@
   margin-bottom: 14px;
 }
 
-.cafeInfo__menuItem__description {
+.menuType__menuItem__description {
   font-size: 14px;
   max-width: 235px;
   width: 100%;
