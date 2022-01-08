@@ -1,10 +1,9 @@
-import React, { useContext, useLayoutEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_CAFFEE } from "../../queries/queries";
 import "./Navbar.css";
-import logos from "./logo.png";
 
 const NavBar = () => {
   const state = useContext(ThemeContext);
@@ -15,14 +14,14 @@ const NavBar = () => {
   const [menuTypes, setMenuTypes] = useState([]);
   const [getCafe, { loading, error, data }] = useLazyQuery(GET_CAFFEE);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setStyle({
       ...data?.account?.style,
     });
     data?.account && setMenuTypes(() => [...data?.account?.menuTypes]);
   }, [data]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     getCafe({ variables: { _id: cafeId } });
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.menuItems);

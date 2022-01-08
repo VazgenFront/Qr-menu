@@ -45,7 +45,7 @@ export const GET_TABBLE_TOKEN = gql`
 `;
 
 export const MAKE_ORDER = gql`
-  mutation makeorder(
+  mutation addOrder(
     $accountId: ID!
     $tableId: ID!
     $reserveToken: String!
@@ -81,6 +81,36 @@ export const GET_ORDER = gql`
         menuItemId
         itemCount
       }
+    }
+  }
+`;
+
+export const GET_MENU_ITEM = gql`
+  query menuItem($_id: ID!) {
+    menuItem(_id: $_id) {
+      _id
+      type
+      name
+      description
+      img
+      price
+      currency
+      isMainDish
+    }
+  }
+`;
+
+export const GET_MENUTYPE_INFO = gql`
+  query menuItemsOfType($accountId: ID!, $type: String!) {
+    menuItemsOfType(accountId: $accountId, type: $type) {
+      _id
+      type
+      name
+      description
+      img
+      price
+      currency
+      isMainDish
     }
   }
 `;
