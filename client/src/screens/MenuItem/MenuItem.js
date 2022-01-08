@@ -32,7 +32,6 @@ const MenuItem = () => {
   }, [data]);
 
   const addToCard = (id) => {
-    console.log("id", id);
     addOrder({
       variables: {
         accountId: cafeId,
