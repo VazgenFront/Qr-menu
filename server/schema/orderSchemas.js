@@ -5,14 +5,14 @@ const MenuItem = require("../db/models/menuItem");
 const OrderListItemInput = new GraphQLInputObjectType({
 	name: "OrderListItemInput",
 	fields: {
-		menuItemId: { type: GraphQLInt },
+		menuItemId: { type: GraphQLID },
 		itemCount: { type: GraphQLInt },
 	},
 })
 const OrderListItem = new GraphQLObjectType({
 	name: "OrderListItem",
 	fields: {
-		menuItemId: { type: GraphQLInt },
+		menuItemId: { type: GraphQLID },
 		itemCount: { type: GraphQLInt },
 		itemPrice: { type: GraphQLInt },
 		itemTotalPrice: { type: GraphQLInt },
