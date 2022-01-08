@@ -42,7 +42,11 @@ const RootQuery = new GraphQLObjectType({
     },
     order: {
       type: OrderType,
-      args: { _id: { type: GraphQLID } },
+      args: {
+        accountId: { type: GraphQLID },
+        tableId: { type: GraphQLID },
+        reserveToken: { type: GraphQLString },
+      },
       async resolve(parent, args) {
         const _id = args._id;
         const order = await Order.findOne({_id}).lean();
