@@ -6,10 +6,10 @@ class ThemeContextProvider extends Component {
   state = {
     cafeName: localStorage.getItem("cafeName") || "",
     styles: {},
-    cafeId: localStorage.getItem("cafeId") || "0",
+    cafeId: localStorage.getItem("cafeId") || null,
     menuItems: [],
     card: localStorage.getItem("card") || [],
-    tableId: "0",
+    tableId: null,
   };
 
   getCafeId = (IdFromParams) => {
