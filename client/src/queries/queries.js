@@ -72,14 +72,22 @@ export const MAKE_ORDER = gql`
 `;
 
 export const GET_ORDER = gql`
-  query order($_id: ID!) {
-    order(_id: $_id) {
+  query order($accountId: ID!, $tableId: ID!, $reserveToken: String!) {
+    order(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
+    ) {
       accountId
       tableId
       reserveToken
       cart {
         menuItemId
         itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+        date
       }
     }
   }
