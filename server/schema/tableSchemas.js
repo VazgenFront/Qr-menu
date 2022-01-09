@@ -71,10 +71,10 @@ const TableMutations = {
 		},
 		async resolve(parent, args){
 			const { accountId, tableId, reserveToken } = args;
-			const unpaidOrders = await Order.find({ accountId, tableId, reserveToken, isPaid: false }).lean();
-			if (unpaidOrders.length) {
-				throw new Error(`Orders No: ${unpaidOrders.map(order => order._id).join(", ")} doesn't paid at now!`);
-			}
+			const unpaidOrders = await Order.find({ accountId, tableId, reserveToken,	isPaid: false }).lean();
+			// if (unpaidOrders.length) {
+			// 	throw new Error(`Orders No: ${unpaidOrders.map(order => order._id).join(", ")} doesn't paid at now!`);
+			// }
 			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: true }, { reserved: false, reserveToken: null }, {new: true});
 			if (table) {
 				return `Account ${accountId} table ${tableId} successfully closed.`;
