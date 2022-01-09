@@ -9,13 +9,16 @@ const Card = () => {
   const [cart, setCart] = useState([]);
 
   const { loading, data, error } = useQuery(GET_ORDER, {
-    variables: { accountId: cafeId, tableId: tableId, reserveToken: token },
+    variables: {
+      accountId: cafeId,
+      tableId: tableId,
+      reserveToken: token,
+    },
   });
 
-  data && console.log("...data?.order?.cart", data?.order?.cart);
-  // useEffect(() => {
-  //   // data && setCart(() => [...data?.order?.cart]);
-  // }, []);
+  useEffect(() => {
+    data && setCart(() => [data?.order?.cart].flat());
+  }, [data]);
 
   console.log("cart", cart);
   return (
