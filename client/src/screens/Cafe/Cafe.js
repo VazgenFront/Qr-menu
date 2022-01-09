@@ -47,12 +47,13 @@ const Cafe = () => {
   const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
 
   const addToCard = (id) => {
+    const menuItemId = Number(id);
     addOrder({
       variables: {
         accountId: cafeId,
         tableId: tableId,
         reserveToken: localStorage.getItem("token"),
-        orderList: [{ menuItemId: 16, itemCount: 1 }],
+        orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     });
     history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
