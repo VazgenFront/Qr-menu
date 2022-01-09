@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@apollo/client";
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import BuyingInfo from "../../components/Navbar/BuyingInfo/BuyingInfo";
+import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_MENU_ITEM, MAKE_ORDER } from "../../queries/queries";
 import "./MenuItem.css";
@@ -32,12 +32,13 @@ const MenuItem = () => {
   }, [data]);
 
   const addToCard = (id) => {
+    const menuItemId = Number(id);
     addOrder({
       variables: {
         accountId: cafeId,
         tableId: tableId,
         reserveToken: localStorage.getItem("token"),
-        orderList: [{ menuItemId: id, itemCount: 1 }],
+        orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     });
     history.push(`/${cafeName}/${cafeId}/${tableId}/card`);

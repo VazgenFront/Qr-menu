@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React from "react";
 import { Form, Field } from "react-final-form";
+import "./AdminAuth.css";
 
 const AboutUs = () => {
   const login = async (values) => {
@@ -8,31 +9,35 @@ const AboutUs = () => {
   };
 
   return (
-    <div>
+    <div className="auth__box">
       <Form
         onSubmit={login}
         render={({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <div>
-              <label>First Name</label>
+          <form onSubmit={handleSubmit} className="auth__form">
+            <div className="input__box">
+              <label className="input__box__label">Login</label>
               <Field
-                name="firstName"
+                className="textarea"
+                name="login"
                 component="input"
                 type="text"
-                placeholder="First Name"
+                placeholder="Enter your login..."
               />
             </div>
-            <div>
-              <label>Last Name</label>
+            <div className="input__box" style={{ marginTop: "20px" }}>
+              <label className="input__box__label">Password</label>
               <Field
-                name="lastName"
+                className="textarea"
+                name="password"
                 component="input"
                 type="text"
-                placeholder="Last Name"
+                placeholder="Enter your password..."
               />
             </div>
 
-            <button type="submit">Click</button>
+            <button className="auth_button" type="submit">
+              Click
+            </button>
           </form>
         )}
       />

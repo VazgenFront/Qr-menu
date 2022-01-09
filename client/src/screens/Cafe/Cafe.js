@@ -1,10 +1,10 @@
-import { useMutation } from "@apollo/client";
 import React, { useContext, useEffect } from "react";
-import { NavLink, useHistory, useParams } from "react-router-dom";
-import BuyingInfo from "../../components/Navbar/BuyingInfo/BuyingInfo";
-import { ThemeContext } from "../../context/ThemeContext";
+import { useMutation } from "@apollo/client";
 import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
+import { useParams, useHistory } from "react-router-dom";
+import { ThemeContext } from "../../context/ThemeContext";
 import "./Cafe.css";
+import ReadMore from "../../components/ReadMore/Readmore";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
@@ -20,8 +20,9 @@ const Cafe = () => {
     { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
   ] = useMutation(MAKE_ORDER);
 
+  // localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
+
   useEffect(() => {
-    localStorage.setItem("cafeId", cafeId);
     localStorage.setItem("cafeName", cafeName);
     localStorage.setItem("tableId", tableId);
     state.getCafeName(cafeName);
@@ -34,7 +35,9 @@ const Cafe = () => {
           accountId: cafeId,
           tableId: tableId,
         },
-      });
+      }).then((data) =>
+        localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
+      );
   }, []);
 
   const mockedInfo = [];
@@ -43,13 +46,13 @@ const Cafe = () => {
 
   const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
 
-  const addToCard = (e, id) => {
+  const addToCard = (id) => {
     addOrder({
       variables: {
         accountId: cafeId,
         tableId: tableId,
         reserveToken: localStorage.getItem("token"),
-        orderList: [{ menuItemId: id, itemCount: 1 }],
+        orderList: [{ menuItemId: 16, itemCount: 1 }],
       },
     });
     history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
@@ -57,7 +60,6 @@ const Cafe = () => {
 
   addOrderData?.addOrder?.cart &&
     localStorage.setItem("items", JSON.stringify(addOrderData?.addOrder?.cart));
-
   const isEmpty = Object.keys(state.styles).length === 0;
 
   return (
@@ -70,8 +72,7 @@ const Cafe = () => {
 
           <div className="cafeInfo__recommended">
             {newMockedTypes.map((item, index) => (
-              <NavLink
-                to={`/${cafeName}/${cafeId}/${tableId}/item/${item?._id}`}
+              <div
                 className="cafeInfo__menuItem"
                 key={index}
                 style={{ background: navbarBgColor }}
@@ -91,14 +92,24 @@ const Cafe = () => {
                   className="cafeInfo__menuItem__description"
                   style={{ color: navbarTitleColor }}
                 >
-                  {item?.description}
+                  <ReadMore>{item?.description}</ReadMore>
                 </span>
-                <BuyingInfo
-                  navbarTitleColor={navbarTitleColor}
-                  item={item}
-                  addToCard={addToCard}
-                />
-              </NavLink>
+                <div className="buying__info">
+                  <span
+                    className="cafeInfo__menuItem__price"
+                    style={{ color: navbarTitleColor }}
+                  >
+                    {item?.price} AMD
+                  </span>
+                  <button
+                    className="add__card_button"
+                    style={{ background: navbarTitleColor }}
+                    onClick={() => addToCard(item?._id)}
+                  >
+                    Buy
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>

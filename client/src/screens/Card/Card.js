@@ -13,9 +13,9 @@ const Card = () => {
   });
 
   data && console.log("...data?.order?.cart", data?.order?.cart);
-  useEffect(() => {
-    // data && setCart(() => [...data?.order?.cart]);
-  }, []);
+  // useEffect(() => {
+  //   // data && setCart(() => [...data?.order?.cart]);
+  // }, []);
 
   console.log("cart", cart);
   return (
