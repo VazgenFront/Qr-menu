@@ -13,6 +13,8 @@ const OrderListItem = new GraphQLObjectType({
 	name: "OrderListItem",
 	fields: {
 		menuItemId: { type: GraphQLInt },
+		itemName: { type: GraphQLString },
+		img: { type: GraphQLString },
 		itemCount: { type: GraphQLInt },
 		itemPrice: { type: GraphQLInt },
 		itemTotalPrice: { type: GraphQLInt },
@@ -73,6 +75,8 @@ const OrderMutations = {
 						cart[cartSize++] = {
 							menuItemId: itemData.menuItemId,
 							itemCount: itemData.itemCount,
+							itemName: menuItemData.name,
+							img: menuItemData.img,
 							itemPrice: menuItemData.price,
 							itemTotalPrice: itemData.itemCount * menuItemData.price,
 							currency: menuItemData.currency
@@ -86,6 +90,8 @@ const OrderMutations = {
 					const menuItemData = foundMenuItems.find(menuItem => menuItem._id === orderItem.menuItemId);
 					return ({
 						...orderItem,
+						itemName: menuItemData.name,
+						img: menuItemData.img,
 						itemPrice: menuItemData.price,
 						itemTotalPrice: orderItem.itemCount * menuItemData.price,
 						currency: menuItemData.currency,

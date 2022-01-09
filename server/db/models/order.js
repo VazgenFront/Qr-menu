@@ -12,6 +12,8 @@ const OrderSchema = new Schema({
 	cart: [
 		{
 			menuItemId: { type: Number, required: true },
+			itemName: { type: String, required: true },
+			img: { type: String, required: true },
 			itemCount: { type: Number, required: true },
 			itemPrice: { type: Number, required: true },
 			itemTotalPrice: { type: Number, required: true },
