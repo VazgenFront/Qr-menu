@@ -1,11 +1,10 @@
 const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = require("graphql");
 const Account = require("../db/models/account");
-const Style = require("../db/models/style");
 const MenuItem = require("../db/models/menuItem");
 const Order = require("../db/models/order");
 const Table = require("../db/models/table");
 const {AccountType, AccountMutations} = require("./accountSchemas");
-const {StyleType, StyleMutations} = require("./styleSchemas");
+const {StyleMutations} = require("./styleSchemas");
 const {MenuItemType, MenuItemMutations} = require("./menuItemSchemas");
 const {OrderType, OrderMutations} = require("./orderSchemas");
 const {TableType, TableMutations} = require("./tableSchemas");

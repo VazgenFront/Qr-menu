@@ -23,6 +23,8 @@ const OrderSchema = new Schema({
 	],
 	reserveToken: { type: String, required: true, unique: true },
 	isPaid: { type: Boolean, required: true, default: false },
+	totalPrice: { type: Number, default: 0 },
+	totalItems: { type: Number, default: 0 },
 	notes: { type: String, required: true },
 }, {versionKey: false});
 
