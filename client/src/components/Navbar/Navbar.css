@@ -80,7 +80,7 @@
     flex-direction: column;
     width: 100%;
     position: absolute;
-    top: 80px;
+    top: 55px;
     left: -110%;
     opacity: 1;
     transition: all 0.5s ease;
@@ -93,7 +93,6 @@
     transition: all 0.5s ease;
     z-index: 1;
     width: 101%;
-    margin-top: 20px;
   }
   .nav-item .active {
     color: #ffdd40;
@@ -115,4 +114,22 @@
     cursor: pointer;
     color: #ffdd40;
   }
+}
+
+.card__link {
+  position: relative;
+}
+
+.card__qunatity {
+  width: 16px;
+  height: 16px;
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -3px;
+  border-radius: 20px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

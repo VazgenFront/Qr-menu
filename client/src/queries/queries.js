@@ -78,9 +78,6 @@ export const GET_ORDER = gql`
       tableId: $tableId
       reserveToken: $reserveToken
     ) {
-      accountId
-      tableId
-      reserveToken
       cart {
         menuItemId
         itemCount
@@ -88,6 +85,8 @@ export const GET_ORDER = gql`
         itemTotalPrice
         currency
         date
+        itemName
+        img
       }
     }
   }
