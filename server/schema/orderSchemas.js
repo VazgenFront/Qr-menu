@@ -27,12 +27,14 @@ const OrderListItem = new GraphQLObjectType({
 const OrderType = new GraphQLObjectType({
 	name: 'Order',
 	fields: () => ({
-		_id: {type: GraphQLID},
-		accountId: {type: GraphQLID},
-		tableId: {type: GraphQLID},
+		_id: {type: GraphQLInt},
+		accountId: {type: GraphQLInt},
+		tableId: {type: GraphQLInt},
 		cart: {type: new GraphQLList(OrderListItem)},
 		reserveToken: {type: GraphQLString},
 		isPaid: {type: GraphQLBoolean},
+		totalPrice: {type: GraphQLInt},
+		totalItems: {type: GraphQLInt},
 		notes: {type: GraphQLString},
 	}),
 })
@@ -119,34 +121,25 @@ const OrderMutations = {
 		async resolve(parent, args){
 			const { accountId, tableId, reserveToken, menuItemId } = args;
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
-			Order.findOne(
-				{ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId, date: { $gt: allowedDateFrom }, itemCount: { $gt: 0 } } } },
-				(err, order) => {
-				if (err) {
-					throw new Error("Internal server error");
-				} else if (!order) {
-					throw new Error("Not found editable menu item in cart with specified id");
-				} else {
-					order.cart = order.cart.reduce((newCart, cartItem) => {
-						if (cartItem.menuItemId === menuItemId && cartItem.itemCount > 0) {
-							cartItem.itemCount--;
-							cartItem.itemTotalPrice -= cartItem.itemPrice;
-						}
-						return newCart;
-					}, order.cart).filter(cartItem => cartItem.itemCount > 0);
-					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
-					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-					order.save((err, newOrder) => {
-						if (err) {
-							throw new Error("Internal server error");
-						} else if (!newOrder) {
-							throw new Error("Not found menuItem in cart with specified id");
-						} else {
-							return newOrder;
-						}
-					})
-				}
-			})
+			const order = await Order.findOne({ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId } } }).lean();
+			if (order) {
+				order.cart = order.cart.reduce((newCart, cartItem) => {
+					if (cartItem.menuItemId === menuItemId && cartItem.itemCount > 0 && cartItem.date > allowedDateFrom) {
+						cartItem.itemCount--;
+						cartItem.itemTotalPrice -= cartItem.itemPrice;
+					} else if (cartItem.menuItemId === menuItemId && cartItem.itemCount > 0) {
+						throw new Error("Menu item edit time expired.");
+					}
+					return newCart;
+				}, order.cart).filter(cartItem => cartItem.itemCount > 0);
+				order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+				const { _id, ...newOrder } = order;
+				const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+				return updatedOrder;
+			} else {
+				throw new Error("Order doesn't exists for your reservation or not found menu item in cart with specified id.");
+			}
 		}
 	},
 	removeMenuItemFromOrder: {
@@ -160,30 +153,57 @@ const OrderMutations = {
 		async resolve(parent, args){
 			const { accountId, tableId, reserveToken, menuItemId } = args;
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
-			Order.findOne(
-				{ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId, date: { $gt: allowedDateFrom }, itemCount: { $gt: 0 } } } },
-				(err, order) => {
-					if (err) {
-						throw new Error("Internal server error");
-					} else if (!order) {
-						throw new Error("Not found menuItem in cart with specified id");
-					} else {
-						order.cart = order.cart.filter(cartItem => cartItem.menuItemId !== menuItemId && cartItem.itemCount > 0);
-						order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
-						order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-						order.save((err, newOrder) => {
-							if (err) {
-								throw new Error("Internal server error");
-							} else if (!newOrder) {
-								throw new Error("Not found editable menu item in cart with specified id");
-							} else {
-								return newOrder;
-							}
-						})
-					}
-				})
+			const order = await Order.findOne({ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId } } }).lean();
+			if (order) {
+				const menuItemInCart = order.cart.find(cartItem => cartItem.menuItemId === menuItemId);
+				if (menuItemInCart && menuItemInCart.date > allowedDateFrom) {
+					order.cart = order.cart.filter(cartItem => cartItem.menuItemId !== menuItemId && cartItem.itemCount > 0);
+					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice, 0);
+					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
+					const { _id, ...newOrder } = order;
+					const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+					return updatedOrder;
+				} else {
+					throw new Error("Menu item edit time expired.");
+				}
+			} else {
+				throw new Error("Order doesn't exists for your reservation or not found menu item in cart with specified id.");
+			}
 		}
-	}
+	},
+	removeCartItemsFromOrder: {
+		type: OrderType,
+		args: {
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
+			reserveToken: { type: GraphQLString },
+		},
+		async resolve(parent, args){
+			const { accountId, tableId, reserveToken, menuItemId } = args;
+			const allowedDateFrom = Date.now() - configs.orderEditDuration;
+			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			if (order && order.cart && order.cart.length > 0) {
+				const cartLength = order.cart.length;
+				order.cart = order.cart.reduce((newCart, cartItem) => {
+					if (cartItem.date < allowedDateFrom) {
+						newCart.push(cartItem)
+					}
+					return newCart;
+				}, []);
+				if (order.cart.length !== cartLength) {
+					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice, 0);
+					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
+					const { _id, ...newOrder } = order;
+					const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+					return updatedOrder;
+				} else {
+					throw new Error("Order cart is empty or all menu items edit time expired..");
+				}
+			} else {
+				throw new Error("Order doesn't exists for your reservation or cart is empty.");
+			}
+		}
+	},
 }
 
 module.exports = {
