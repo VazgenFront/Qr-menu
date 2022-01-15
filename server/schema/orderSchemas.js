@@ -71,7 +71,6 @@ const OrderMutations = {
 					});
 					if (itemIndex >= 0) {
 						cart[itemIndex].itemCount += itemData.itemCount;
-						cart[itemIndex].date = Date.now();
 						cart[itemIndex].itemTotalPrice = cart[itemIndex].itemCount * cart[itemIndex].itemPrice;
 					} else {
 						const menuItemData = foundMenuItems.find(item => item._id === itemData.menuItemId);
@@ -82,7 +81,8 @@ const OrderMutations = {
 							img: menuItemData.img,
 							itemPrice: menuItemData.price,
 							itemTotalPrice: itemData.itemCount * menuItemData.price,
-							currency: menuItemData.currency
+							currency: menuItemData.currency,
+							date: Date.now()
 						};
 					}
 				});
@@ -93,14 +93,15 @@ const OrderMutations = {
 			} else {
 				const cart = orderList.map(orderItem => {
 					const menuItemData = foundMenuItems.find(menuItem => menuItem._id === orderItem.menuItemId);
-					return ({
+					return {
 						...orderItem,
 						itemName: menuItemData.name,
 						img: menuItemData.img,
 						itemPrice: menuItemData.price,
 						itemTotalPrice: orderItem.itemCount * menuItemData.price,
 						currency: menuItemData.currency,
-					})
+						date: Date.now(),
+					}
 				})
 				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);

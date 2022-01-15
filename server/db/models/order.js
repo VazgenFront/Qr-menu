@@ -18,7 +18,7 @@ const OrderSchema = new Schema({
 			itemPrice: { type: Number, required: true },
 			itemTotalPrice: { type: Number, required: true },
 			currency: { type: String, required: true },
-			date: { type: Number, default: Date.now() },
+			date: { type: Number, required: true },
 		}
 	],
 	reserveToken: { type: String, required: true, unique: true },
