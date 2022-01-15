@@ -6,6 +6,8 @@ import "./AdminAuth.css";
 const AboutUs = () => {
   const login = async (values) => {
     console.log("values", values);
+    values.login = "";
+    values.password = "";
   };
 
   return (
@@ -30,7 +32,7 @@ const AboutUs = () => {
                 className="textarea"
                 name="password"
                 component="input"
-                type="text"
+                type="password"
                 placeholder="Enter your password..."
               />
             </div>

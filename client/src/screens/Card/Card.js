@@ -1,29 +1,59 @@
-import { useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import CardItem from "../../components/CardItem/CardItem";
+import { ThemeContext } from "../../context/ThemeContext";
 import { GET_ORDER } from "../../queries/queries";
 import "./Card.css";
+
 const Card = () => {
   const { tableId, cafeId } = useParams();
-  const token = localStorage.getItem("token");
   const [cart, setCart] = useState([]);
+  const token = localStorage.getItem("token");
+  const state = useContext(ThemeContext);
 
-  const { loading, data, error } = useQuery(GET_ORDER, {
-    variables: {
-      accountId: cafeId,
-      tableId: tableId,
-      reserveToken: token,
-    },
-  });
+  const [getOrder, { loading, data, error }] = useLazyQuery(GET_ORDER);
 
   useEffect(() => {
-    data && setCart(() => [data?.order?.cart].flat());
+    getOrder({
+      variables: {
+        accountId: cafeId,
+        tableId: tableId,
+        reserveToken: token,
+      },
+    }).then((data) => setCart(() => [...data?.data?.order?.cart]));
   }, [data]);
 
-  console.log("cart", cart);
+  const { navbarTitleColor, navbarBgColor, mostBookedBorder } = state.styles;
+
+  loading && <p>Loading...</p>;
   return (
-    <div className="card_box">
-      <span className="card__title">MY CART</span>
+    <div
+      className="card_box"
+      style={{
+        background: navbarBgColor,
+      }}
+    >
+      <span className="card__title" style={{ color: navbarTitleColor }}>
+        MY CART
+      </span>
+      {cart.map((item, index) => (
+        <CardItem
+          key={index}
+          item={item}
+          index={index}
+          navbarTitleColor={navbarTitleColor}
+        />
+      ))}
+
+      <div className="cart__btns">
+        <button className="order__btn" style={{ background: navbarTitleColor }}>
+          Cancel
+        </button>
+        <button className="order__btn" style={{ background: navbarTitleColor }}>
+          Order
+        </button>
+      </div>
     </div>
   );
 };

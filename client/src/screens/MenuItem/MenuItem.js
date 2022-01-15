@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from "@apollo/client";
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useMutation, useQuery } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_MENU_ITEM, MAKE_ORDER } from "../../queries/queries";
@@ -25,8 +25,7 @@ const MenuItem = () => {
   });
 
   useEffect(() => {
-    setItem((prevItem) => ({
-      ...prevItem,
+    setItem(() => ({
       ...data?.menuItem,
     }));
   }, [data]);
@@ -41,7 +40,6 @@ const MenuItem = () => {
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     });
-    history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
   };
 
   return (
