@@ -25,6 +25,7 @@ const Cafe = () => {
   useEffect(() => {
     localStorage.setItem("cafeName", cafeName);
     localStorage.setItem("tableId", tableId);
+    localStorage.setItem("cafeId", cafeId);
     state.getCafeName(cafeName);
     state.getCafeId(cafeId);
     state.getTableId(tableId);
@@ -38,7 +39,7 @@ const Cafe = () => {
       }).then((data) =>
         localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
       );
-  }, []);
+  }, [window.location.pathname]);
 
   const mockedInfo = [];
   mockedInfo.push(state.menuItems);
@@ -56,7 +57,6 @@ const Cafe = () => {
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     });
-    history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
   };
 
   addOrderData?.addOrder?.cart &&
@@ -66,17 +66,19 @@ const Cafe = () => {
   return (
     <>
       {isEmpty ? null : (
-        <div className="cafeInfo__box" style={{ fontFamily: fontFamily }}>
+        <div
+          className="cafeInfo__box"
+          style={{ fontFamily: fontFamily, background: navbarBgColor }}
+        >
           <span className="cafeInfo__title" style={{ color: navbarTitleColor }}>
             Dishes of the day
           </span>
-
           <div className="cafeInfo__recommended">
             {newMockedTypes.map((item, index) => (
               <div
                 className="cafeInfo__menuItem"
                 key={index}
-                style={{ background: navbarBgColor }}
+                style={{ border: `4px solid ${navbarTitleColor}` }}
               >
                 <img
                   src={item?.img}

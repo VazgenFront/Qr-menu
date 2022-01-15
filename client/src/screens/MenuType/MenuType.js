@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, NavLink, useHistory } from "react-router-dom";
-import { GET_MENUTYPE_INFO, MAKE_ORDER } from "../../queries/queries";
-import { useQuery, useMutation } from "@apollo/client";
-import "./menuTypes.css";
-import { ThemeContext } from "../../context/ThemeContext";
+import { useMutation, useQuery } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
+import { ThemeContext } from "../../context/ThemeContext";
+import { GET_MENUTYPE_INFO, MAKE_ORDER } from "../../queries/queries";
+import "./menuTypes.css";
 
 const MenuType = () => {
   const { cafeId, menuType, cafeName, tableId } = useParams();
@@ -43,15 +43,13 @@ const MenuType = () => {
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     });
-    history.push(`/${cafeName}/${cafeId}/${tableId}/card`);
   };
 
   return (
     <div className="menuTypes__box" style={{ background: navbarBgColor }}>
       <div className="cafeInfo__recommended">
         {menuTypes.map((item, index) => (
-          <NavLink
-            to={`/${cafeName}/${cafeId}/${tableId}/item/${item?._id}`}
+          <div
             className="menuType__menuItem"
             key={index}
             style={{
@@ -81,7 +79,7 @@ const MenuType = () => {
               item={item}
               addToCard={addToCard}
             />
-          </NavLink>
+          </div>
         ))}
       </div>
     </div>

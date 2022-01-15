@@ -7,10 +7,10 @@ function AboutUs() {
     <div className="aboutUs_box">
       <img src={aboutus} alt="img" className="aboutus_img" />
       <span className="aboutus_title">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto
-        ratione ducimus molestias laborum, quod voluptas quidem aspernatur quo
-        quisquam inventore exercitationem! Commodi laboriosam, cum sunt velit
-        est alias veniam sint. US
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Modi
+        temporibus dicta quisquam quas vero dignissimos, sunt et. Animi, dolor
+        natus numquam doloremque labore alias. Necessitatibus quidem iure
+        tenetur aliquid porro.
       </span>
     </div>
   );

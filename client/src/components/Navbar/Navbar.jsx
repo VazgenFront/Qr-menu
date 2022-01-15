@@ -1,4 +1,4 @@
-import { useLazyQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -12,7 +12,12 @@ const NavBar = () => {
   const handleClick = () => setClick(!click);
   const [style, setStyle] = useState({});
   const [menuTypes, setMenuTypes] = useState([]);
-  const [getCafe, { loading, error, data }] = useLazyQuery(GET_CAFFEE);
+
+  const { loading, error, data } = useQuery(GET_CAFFEE, {
+    variables: {
+      _id: cafeId,
+    },
+  });
 
   useEffect(() => {
     setStyle({
@@ -22,7 +27,6 @@ const NavBar = () => {
   }, [data]);
 
   useEffect(() => {
-    getCafe({ variables: { _id: cafeId } });
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.menuItems);
   }, [style]);
@@ -55,7 +59,8 @@ const NavBar = () => {
               className={click ? "nav-menu active" : "nav-menu"}
               style={{
                 backgroundColor: click ? navbarBgColor : null,
-                border: mostBookedBorder,
+                borderBottom: `4px solid ${navbarTitleColor}`,
+                borderTop: `4px solid ${navbarTitleColor}`,
               }}
             >
               {menuTypes.map((menuItem, index) => (
@@ -78,17 +83,22 @@ const NavBar = () => {
               exact
               to={`/${cafeName}/${cafeId}/${tableId}/card`}
               style={{ color: navbarTitleColor }}
+              className="card__link"
             >
               <i
                 className="fas fa-utensils"
-                style={{ marginRight: "70px", fontSize: "1.8rem" }}
+                style={{ marginRight: "76px", fontSize: "2rem" }}
               ></i>
+
+              <span className="card__qunatity" style={{ color: navbarBgColor }}>
+                1
+              </span>
             </NavLink>
 
             <div className="nav-icon" onClick={handleClick}>
               <i
                 className={click ? "fas fa-times" : "fas fa-bars"}
-                style={{ color: navbarTitleColor }}
+                style={{ color: navbarTitleColor, fontSize: "2rem" }}
               ></i>
             </div>
           </div>
