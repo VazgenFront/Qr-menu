@@ -1,6 +1,7 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLList, GraphQLInputObjectType, GraphQLBoolean } = require("graphql");
 const Order = require("../db/models/order");
 const MenuItem = require("../db/models/menuItem");
+const configs = require("../config/configs");
 
 const OrderListItemInput = new GraphQLInputObjectType({
 	name: "OrderListItemInput",
@@ -40,8 +41,8 @@ const OrderMutations = {
 	addOrder: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLID },
-			tableId: { type: GraphQLID },
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
 			reserveToken: { type: GraphQLString },
 			orderList: { type: new GraphQLList(OrderListItemInput)},
 		},
@@ -83,7 +84,9 @@ const OrderMutations = {
 						};
 					}
 				});
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { cart }, { new: true, upsert: true }).lean();
+				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { cart, totalPrice, totalItems }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				const cart = orderList.map(orderItem => {
@@ -97,22 +100,88 @@ const OrderMutations = {
 						currency: menuItemData.currency,
 					})
 				})
-				const orderEntity = new Order({ accountId, tableId, reserveToken, cart, notes: "Created by user after adding order." });
+				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+				const orderEntity = new Order({ accountId, tableId, reserveToken, cart, totalPrice, totalItems, notes: "Created by user after adding order." });
 				newOrder = await orderEntity.save();
 				return newOrder
 			}
 		}
 	},
-	editOrder: {
+	reduceOneMenuItemCount: {
 		type: OrderType,
 		args: {
-			id: { type: GraphQLID },
-			orderJSONString: { type: GraphQLString },
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
+			reserveToken: { type: GraphQLString },
+			menuItemId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
-			const updateData = JSON.parse(args.orderJSONString)
-			const order = await Order.findOneAndUpdate({_id: args.id}, updateData, {new: true});
-			return order;
+			const { accountId, tableId, reserveToken, menuItemId } = args;
+			const allowedDateFrom = Date.now() - configs.orderEditDuration;
+			Order.findOne(
+				{ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId, date: { $gt: allowedDateFrom }, itemCount: { $gt: 0 } } } },
+				(err, order) => {
+				if (err) {
+					throw new Error("Internal server error");
+				} else if (!order) {
+					throw new Error("Not found editable menu item in cart with specified id");
+				} else {
+					order.cart = order.cart.reduce((newCart, cartItem) => {
+						if (cartItem.menuItemId === menuItemId && cartItem.itemCount > 0) {
+							cartItem.itemCount--;
+							cartItem.itemTotalPrice -= cartItem.itemPrice;
+						}
+						return newCart;
+					}, order.cart).filter(cartItem => cartItem.itemCount > 0);
+					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+					order.save((err, newOrder) => {
+						if (err) {
+							throw new Error("Internal server error");
+						} else if (!newOrder) {
+							throw new Error("Not found menuItem in cart with specified id");
+						} else {
+							return newOrder;
+						}
+					})
+				}
+			})
+		}
+	},
+	removeMenuItemFromOrder: {
+		type: OrderType,
+		args: {
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
+			reserveToken: { type: GraphQLString },
+			menuItemId: { type: GraphQLInt },
+		},
+		async resolve(parent, args){
+			const { accountId, tableId, reserveToken, menuItemId } = args;
+			const allowedDateFrom = Date.now() - configs.orderEditDuration;
+			Order.findOne(
+				{ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId, date: { $gt: allowedDateFrom }, itemCount: { $gt: 0 } } } },
+				(err, order) => {
+					if (err) {
+						throw new Error("Internal server error");
+					} else if (!order) {
+						throw new Error("Not found menuItem in cart with specified id");
+					} else {
+						order.cart = order.cart.filter(cartItem => cartItem.menuItemId !== menuItemId && cartItem.itemCount > 0);
+						order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+						order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+						order.save((err, newOrder) => {
+							if (err) {
+								throw new Error("Internal server error");
+							} else if (!newOrder) {
+								throw new Error("Not found editable menu item in cart with specified id");
+							} else {
+								return newOrder;
+							}
+						})
+					}
+				})
 		}
 	}
 }
