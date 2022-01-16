@@ -1,10 +1,10 @@
-const {GraphQLObjectType, GraphQLID, GraphQLString} = require("graphql");
+const {GraphQLObjectType, GraphQLInt, GraphQLString} = require("graphql");
 const Style = require("../db/models/style");
 
 const StyleType = new GraphQLObjectType({
 	name: 'Style',
 	fields: () => ({
-		_id: {type: GraphQLID},
+		_id: {type: GraphQLInt},
 		navbarBgColor: {type: GraphQLString},
 		navbarTitleColor: {type: GraphQLString},
 		logo: {type: GraphQLString},
@@ -29,7 +29,7 @@ const StyleMutations = {
 	editStyle: {
 		type: StyleType,
 		args: {
-			id: { type: GraphQLID },
+			id: { type: GraphQLInt },
 			styleJSONString: { type: GraphQLString },
 		},
 		async resolve(parent, args){

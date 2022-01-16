@@ -1,10 +1,10 @@
-const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLFloat, GraphQLBoolean} = require("graphql");
+const {GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFloat, GraphQLBoolean } = require("graphql");
 const MenuItem = require("../db/models/menuItem");
 
 const MenuItemType = new GraphQLObjectType({
 	name: 'MenuItem',
 	fields: () => ({
-		_id: {type: GraphQLID},
+		_id: {type: GraphQLInt},
 		type: {type: GraphQLString},
 		name: {type: GraphQLString},
 		description: {type: GraphQLString},
@@ -31,7 +31,7 @@ const MenuItemMutations = {
 	editMenuItem: {
 		type: MenuItemType,
 		args: {
-			id: { type: GraphQLID },
+			id: { type: GraphQLInt },
 			menuItemJSONString: { type: GraphQLString },
 		},
 		async resolve(parent, args){

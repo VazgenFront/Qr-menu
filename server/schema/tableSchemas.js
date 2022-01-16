@@ -1,4 +1,4 @@
-const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLBoolean, GraphQLInt} = require("graphql");
+const { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLBoolean } = require("graphql");
 const { v4: uuidv4 } = require('uuid');
 const Table = require("../db/models/table");
 const Order = require("../db/models/order");
@@ -6,9 +6,9 @@ const Order = require("../db/models/order");
 const TableType = new GraphQLObjectType({
 	name: 'Table',
 	fields: () => ({
-		_id: {type: GraphQLID},
-		accountId: {type: GraphQLID},
-		tableId: {type: GraphQLID},
+		_id: {type: GraphQLInt},
+		accountId: {type: GraphQLInt},
+		tableId: {type: GraphQLInt},
 		seatCount: {type: GraphQLInt},
 		reserved: {type: GraphQLBoolean},
 		notes: {type: GraphQLString},
@@ -31,7 +31,7 @@ const TableMutations = {
 	editTable: {
 		type: TableType,
 		args: {
-			id: { type: GraphQLID },
+			id: { type: GraphQLInt },
 			tableJSONString: { type: GraphQLString },
 		},
 		async resolve(parent, args){
@@ -46,8 +46,8 @@ const TableMutations = {
 			})
 		}),
 		args: {
-			accountId: { type: GraphQLID },
-			tableId: { type: GraphQLID },
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
 			const { accountId, tableId } = args;
@@ -65,8 +65,8 @@ const TableMutations = {
 	closeTable: {
 		type: GraphQLString,
 		args: {
-			accountId: { type: GraphQLID },
-			tableId: { type: GraphQLID },
+			accountId: { type: GraphQLInt },
+			tableId: { type: GraphQLInt },
 			reserveToken: { type: GraphQLString },
 		},
 		async resolve(parent, args){

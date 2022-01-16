@@ -1,4 +1,4 @@
-const {GraphQLString, GraphQLID, GraphQLObjectType, GraphQLList} = require("graphql");
+const {GraphQLString, GraphQLInt, GraphQLObjectType, GraphQLList } = require("graphql");
 const Account = require("../db/models/account");
 const Style = require("../db/models/style");
 const MenuItem = require("../db/models/menuItem");
@@ -8,7 +8,7 @@ const {MenuItemType} = require("./menuItemSchemas");
 const AccountType = new GraphQLObjectType({
 	name: 'Account',
 	fields: () => ({
-		_id: {type: GraphQLID},
+		_id: {type: GraphQLInt},
 		username: {type: GraphQLString},
 		password: {type: GraphQLString},
 		name: {type: GraphQLString},
@@ -64,7 +64,7 @@ const AccountMutations = {
 	editAccount: {
 		type: AccountType,
 		args: {
-			id: { type: GraphQLID },
+			id: { type: GraphQLInt },
 			accountJSONString: { type: GraphQLString },
 		},
 		async resolve(parent, args){

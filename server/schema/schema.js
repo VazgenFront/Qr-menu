@@ -1,4 +1,4 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = require("graphql");
+const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } = require("graphql");
 const Account = require("../db/models/account");
 const MenuItem = require("../db/models/menuItem");
 const Order = require("../db/models/order");
@@ -14,7 +14,7 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     account: {
       type: AccountType,
-      args: { _id: { type: GraphQLID } },
+      args: { _id: { type: GraphQLInt } },
       resolve(parent, args) {
         const _id = args._id;
         const account = Account.findOne({ _id }, { stylesId: 0 }).lean();
@@ -23,7 +23,7 @@ const RootQuery = new GraphQLObjectType({
     },
     menuItem: {
       type: MenuItemType,
-      args: { _id: { type: GraphQLID } },
+      args: { _id: { type: GraphQLInt } },
       async resolve(parent, args) {
         const _id = args._id;
         const menuItem = await MenuItem.findOne({_id}).lean();
@@ -32,7 +32,7 @@ const RootQuery = new GraphQLObjectType({
     },
     menuItemsOfType: {
       type: new GraphQLList(MenuItemType),
-      args: { accountId: { type: GraphQLID }, type: { type: GraphQLString } },
+      args: { accountId: { type: GraphQLInt }, type: { type: GraphQLString } },
       async resolve(parent, args) {
         const { accountId, type } = args;
         const menuItems = await MenuItem.find({ accountId, type }).lean();
@@ -42,8 +42,8 @@ const RootQuery = new GraphQLObjectType({
     order: {
       type: OrderType,
       args: {
-        accountId: { type: GraphQLID },
-        tableId: { type: GraphQLID },
+        accountId: { type: GraphQLInt },
+        tableId: { type: GraphQLInt },
         reserveToken: { type: GraphQLString },
       },
       async resolve(parent, args) {
@@ -54,7 +54,7 @@ const RootQuery = new GraphQLObjectType({
     },
     table: {
       type: TableType,
-      args: { _id: { type: GraphQLID } },
+      args: { _id: { type: GraphQLInt } },
       async resolve(parent, args) {
         const _id = args._id;
         const table = await Table.findOne({_id}).lean();
@@ -63,7 +63,7 @@ const RootQuery = new GraphQLObjectType({
     },
     accountTable: {
       type: TableType,
-      args: { accountId: { type: GraphQLID }, tableId: { type: GraphQLID } },
+      args: { accountId: { type: GraphQLInt }, tableId: { type: GraphQLInt } },
       async resolve(parent, args) {
         const { accountId, tableId } = args;
         const table = await Table.findOne({ accountId, tableId }).lean();
