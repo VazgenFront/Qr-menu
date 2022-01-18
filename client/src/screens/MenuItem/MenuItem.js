@@ -32,10 +32,13 @@ const MenuItem = () => {
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
+    const serverCafeId = Number(cafeId);
+    const serverTableId = Number(tableId);
+
     addOrder({
       variables: {
-        accountId: cafeId,
-        tableId: tableId,
+        accountId: serverCafeId,
+        tableId: serverTableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },

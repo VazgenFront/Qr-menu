@@ -7,10 +7,10 @@ function AboutUs() {
     <div className="aboutUs_box">
       <img src={aboutus} alt="img" className="aboutus_img" />
       <span className="aboutus_title">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Modi
-        temporibus dicta quisquam quas vero dignissimos, sunt et. Animi, dolor
-        natus numquam doloremque labore alias. Necessitatibus quidem iure
-        tenetur aliquid porro.
+        Welcome to QR-menu company! We are glad to have you with us! The QR-menu
+        was created for your safety and convenience. It will give you new
+        opportunities: take a closer look at the dishes, allow you to make an
+        online order and much more. Enjoy!
       </span>
     </div>
   );

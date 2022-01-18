@@ -12,10 +12,9 @@ const NavBar = () => {
   const handleClick = () => setClick(!click);
   const [style, setStyle] = useState({});
   const [menuTypes, setMenuTypes] = useState([]);
-
   const { loading, error, data } = useQuery(GET_CAFFEE, {
     variables: {
-      _id: cafeId,
+      _id: Number(cafeId),
     },
   });
 

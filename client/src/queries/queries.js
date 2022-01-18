@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_CAFFEE = gql`
-  query account($_id: ID!) {
+  query account($_id: Int!) {
     account(_id: $_id) {
       _id
       username
@@ -37,7 +37,7 @@ export const GET_CAFFEE = gql`
 `;
 
 export const GET_TABBLE_TOKEN = gql`
-  mutation reserveTable($accountId: ID!, $tableId: ID!) {
+  mutation reserveTable($accountId: Int!, $tableId: Int!) {
     reserveTable(accountId: $accountId, tableId: $tableId) {
       reserveToken
     }
@@ -46,8 +46,8 @@ export const GET_TABBLE_TOKEN = gql`
 
 export const MAKE_ORDER = gql`
   mutation addOrder(
-    $accountId: ID!
-    $tableId: ID!
+    $accountId: Int!
+    $tableId: Int!
     $reserveToken: String!
     $orderList: [OrderListItemInput]!
   ) {
@@ -88,6 +88,8 @@ export const GET_ORDER = gql`
         itemName
         img
       }
+      totalItems
+      totalPrice
     }
   }
 `;
@@ -118,6 +120,49 @@ export const GET_MENUTYPE_INFO = gql`
       price
       currency
       isMainDish
+    }
+  }
+`;
+
+export const REDUCE_MENU_ITEM_COUNT = gql`
+  mutation reduceOneMenuItemCount(
+    $accountId: Int!
+    $tableId: Int!
+    $reserveToken: String!
+    $menuItemId: Int!
+  ) {
+    reduceOneMenuItemCount(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
+      menuItemId: $menuItemId
+    ) {
+      _id
+      accountId
+      tableId
+      reserveToken
+      isPaid
+      totalPrice
+      totalItems
+      notes
+    }
+  }
+`;
+
+export const REMOVE_CART_ITEM = gql`
+  mutation removeMenuItemFromOrder(
+    $accountId: Int!
+    $tableId: Int!
+    $reserveToken: String!
+    $menuItemId: Int!
+  ) {
+    removeMenuItemFromOrder(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
+      menuItemId: $menuItemId
+    ) {
+      __typename
     }
   }
 `;
