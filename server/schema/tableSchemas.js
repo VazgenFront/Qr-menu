@@ -52,7 +52,7 @@ const TableMutations = {
 		async resolve(parent, args){
 			const { accountId, tableId } = args;
 			const reserveToken = uuidv4();
-			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: false, reserveToken: null }, { reserved: true, reserveToken }, {new: true});
+			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: false }, { reserved: true, reserveToken });
 			if (table) {
 				const order = new Order({accountId, tableId, reserveToken, notes: "Table reserved", cart: []})
 				await order.save();

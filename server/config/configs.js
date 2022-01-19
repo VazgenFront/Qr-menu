@@ -1,6 +1,6 @@
 module.exports = {
 	port: process.env.PORT || 4000,
-	dbUri: 'mongodb+srv://qruser:qrAdmin987@cluster0.32wrh.mongodb.net/qrmenu?retryWrites=true&w=majority',
+	dbUri: 'mongodb+srv://secondAdmin:2ndAdmin@cluster0.32wrh.mongodb.net/qrmenu?retryWrites=true&w=majority',
 	// dbUri: 'mongodb://localhost:27017/qrmenu',
 	dbOptions: {
 		useNewUrlParser: true,
