@@ -17,8 +17,8 @@ const Card = () => {
   useEffect(() => {
     getOrder({
       variables: {
-        accountId: cafeId,
-        tableId: tableId,
+        accountId: Number(cafeId),
+        tableId: Number(tableId),
         reserveToken: token,
       },
     }).then((data) => setCart(() => [...data?.data?.order?.cart]));

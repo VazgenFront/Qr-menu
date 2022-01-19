@@ -15,7 +15,7 @@ const MenuType = () => {
 
   const { data, error, loading } = useQuery(GET_MENUTYPE_INFO, {
     variables: {
-      accountId: cafeId,
+      accountId: Number(cafeId),
       type: menuType,
     },
   });
@@ -35,10 +35,13 @@ const MenuType = () => {
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
+    const serverCafeId = Number(cafeId);
+    const serverTableId = Number(tableId);
+
     addOrder({
       variables: {
-        accountId: cafeId,
-        tableId: tableId,
+        accountId: serverCafeId,
+        tableId: serverTableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },

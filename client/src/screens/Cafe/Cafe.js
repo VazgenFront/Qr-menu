@@ -33,8 +33,8 @@ const Cafe = () => {
     !localStorage.getItem("token") &&
       getToken({
         variables: {
-          accountId: cafeId,
-          tableId: tableId,
+          accountId: Number(cafeId),
+          tableId: Number(tableId),
         },
       }).then((data) =>
         localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
@@ -49,10 +49,13 @@ const Cafe = () => {
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
+    const serverCafeId = Number(cafeId);
+    const serverTableId = Number(tableId);
+    console.log('serverCafeId',serverCafeId);
     addOrder({
       variables: {
-        accountId: cafeId,
-        tableId: tableId,
+        accountId: serverCafeId,
+        tableId: serverTableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
