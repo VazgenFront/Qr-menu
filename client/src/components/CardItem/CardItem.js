@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   MAKE_ORDER,
@@ -37,6 +37,10 @@ const CardItem = ({ item, index, navbarTitleColor }) => {
   const [count, setCount] = useState(item.itemCount);
   const [price, setPrice] = useState(item.itemTotalPrice);
   const [deleted, setDeleted] = useState(false);
+
+  useEffect(() => {
+    console.log("hello");
+  }, [price, count, deleted]);
 
   const addToCard = (id, type) => {
     const menuItemId = Number(id);

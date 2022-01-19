@@ -72,7 +72,7 @@ export const MAKE_ORDER = gql`
 `;
 
 export const GET_ORDER = gql`
-  query order($accountId: ID!, $tableId: ID!, $reserveToken: String!) {
+  query order($accountId: Int!, $tableId: Int!, $reserveToken: String!) {
     order(
       accountId: $accountId
       tableId: $tableId
@@ -110,7 +110,7 @@ export const GET_MENU_ITEM = gql`
 `;
 
 export const GET_MENUTYPE_INFO = gql`
-  query menuItemsOfType($accountId: ID!, $type: String!) {
+  query menuItemsOfType($accountId: Int!, $type: String!) {
     menuItemsOfType(accountId: $accountId, type: $type) {
       _id
       type

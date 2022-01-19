@@ -2,10 +2,20 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
 import "./AdminAuth.css";
+import axios from "axios";
 
 const AboutUs = () => {
   const login = async (values) => {
     console.log("values", values);
+
+    const username = values.login;
+    const password = values.password;
+
+    await axios.post("http://localhost:4000/api/account/authenticate", {
+      username,
+      password,
+    });
+
     values.login = "";
     values.password = "";
   };

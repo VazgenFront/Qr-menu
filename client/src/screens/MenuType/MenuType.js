@@ -15,7 +15,7 @@ const MenuType = () => {
 
   const { data, error, loading } = useQuery(GET_MENUTYPE_INFO, {
     variables: {
-      accountId: cafeId,
+      accountId: Number(cafeId),
       type: menuType,
     },
   });
