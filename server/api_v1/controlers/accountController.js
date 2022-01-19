@@ -9,8 +9,8 @@ const log = getLogger("default");
 const AccountController = {
 	authenticate: async (req, res) => {
 		try {
-			const { username, email, password } = req.body;
-			const account = await Account.findOne({username, email}).lean();
+			const { username, password } = req.body;
+			const account = await Account.findOne({ username }).lean();
 			if (password != account.password) {
 				throw new Error("Invalid password!");
 			}
