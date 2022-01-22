@@ -7,11 +7,11 @@ const { Schema } = mongoose;
 autoIncrement.initialize(connection);
 
 const AccountSchema = new Schema({
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
-    img: { type: String, required: false },
     email: { type: String, required: true },
+    img: { type: String, required: false },
     typeId: { type: String, required: false, index: true },
     subTypeId: { type: String, required: false },
     status: {
@@ -22,9 +22,8 @@ const AccountSchema = new Schema({
             name: {type: String},
         },
     ],
+    defaultMenuType: { type: String, required: true, default: "other" },
     styleId: { type: Number },
-    menuItems: { type: Array },
-    mainDishes: { type: Array },
 }, {versionKey: false});
 
 AccountSchema.index({ email: 1, username: 1 }, { unique: true });

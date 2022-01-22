@@ -16,30 +16,6 @@ const TableType = new GraphQLObjectType({
 })
 
 const TableMutations = {
-	addTable: {
-		type: TableType,
-		args: {
-			tableJSONString: { type: GraphQLString },
-		},
-		async resolve(parent, args){
-			const data = JSON.parse(args.tableJSONString)
-			const table = new Table(data);
-			await table.save();
-			return table;
-		}
-	},
-	editTable: {
-		type: TableType,
-		args: {
-			id: { type: GraphQLInt },
-			tableJSONString: { type: GraphQLString },
-		},
-		async resolve(parent, args){
-			const updateData = JSON.parse(args.tableJSONString)
-			const table = await Table.findOneAndUpdate({_id: args.id}, updateData, {new: true});
-			return table;
-		}
-	},
 	reserveTable: {
 		type: new GraphQLObjectType({ name: 'reserveTable', fields: ()=>({
 				reserveToken: { type: GraphQLString },
@@ -54,8 +30,6 @@ const TableMutations = {
 			const reserveToken = uuidv4();
 			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: false }, { reserved: true, reserveToken });
 			if (table) {
-				const order = new Order({accountId, tableId, reserveToken, notes: "Table reserved", cart: []})
-				await order.save();
 				return { reserveToken };
 			} else {
 				throw new Error("Table doesn't exist or already reserved!");
@@ -71,11 +45,11 @@ const TableMutations = {
 		},
 		async resolve(parent, args){
 			const { accountId, tableId, reserveToken } = args;
-			const unpaidOrders = await Order.find({ accountId, tableId, reserveToken,	isPaid: false }).lean();
-			// if (unpaidOrders.length) {
-			// 	throw new Error(`Orders No: ${unpaidOrders.map(order => order._id).join(", ")} doesn't paid at now!`);
-			// }
-			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: true }, { reserved: false, reserveToken: null }, {new: true});
+			const unpaidOrders = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false }).lean();
+			if (unpaidOrders) {
+				throw new Error(`Orders No: ${unpaidOrders.map(order => order._id).join(", ")} doesn't paid at now!`);
+			}
+			const table = await Table.findOneAndUpdate({ accountId, tableId, reserved: true }, { reserved: false, reserveToken: null }, { new: true });
 			if (table) {
 				return `Account ${accountId} table ${tableId} successfully closed.`;
 			} else {

@@ -12,7 +12,7 @@ const StyleSchema = new Schema({
     logo: { type: String, required: true },
     mostBookedBorder: { type: String, required: true },
     fontFamily: { type: String, required: true },
-}, {versionKey: false});
+}, { versionKey: false });
 
 StyleSchema.plugin(autoIncrement.plugin, { model: 'Style', startAt: 1 });
 
