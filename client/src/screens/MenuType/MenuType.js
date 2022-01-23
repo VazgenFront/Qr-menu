@@ -1,13 +1,16 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import ReadMore from "../../components/ReadMore/Readmore";
+import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_MENUTYPE_INFO, MAKE_ORDER } from "../../queries/queries";
 import "./menuTypes.css";
 
 const MenuType = () => {
-  const { cafeId, menuType, cafeName, tableId } = useParams();
+  const { cafeId, menuType, tableId } = useParams();
 
   const [menuTypes, setMenuTypes] = useState([]);
 
@@ -20,18 +23,14 @@ const MenuType = () => {
     },
   });
 
-  const history = useHistory();
-
-  const [
-    addOrder,
-    { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
-  ] = useMutation(MAKE_ORDER);
+  const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
+    useMutation(MAKE_ORDER);
 
   useEffect(() => {
     data?.menuItemsOfType && setMenuTypes(() => [...data?.menuItemsOfType]);
   }, [data]);
 
-  const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
+  const { navbarTitleColor, navbarBgColor } = state.styles;
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
@@ -47,6 +46,19 @@ const MenuType = () => {
       },
     });
   };
+
+  if (loading) {
+    return <Spinner color={navbarTitleColor} />;
+  }
+
+  if (error || addOrderDataError) {
+    return (
+      <ErrorMessage
+        error={error || addOrderDataError}
+        color={navbarTitleColor}
+      />
+    );
+  }
 
   return (
     <div className="menuTypes__box" style={{ background: navbarBgColor }}>
@@ -75,7 +87,7 @@ const MenuType = () => {
               className="menuType__menuItem__description"
               style={{ color: navbarTitleColor }}
             >
-              {item?.description}
+              <ReadMore>{item?.description}</ReadMore>
             </span>
             <BuyingInfo
               navbarTitleColor={navbarTitleColor}

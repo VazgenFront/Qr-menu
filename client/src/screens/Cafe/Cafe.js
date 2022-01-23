@@ -1,24 +1,20 @@
 import React, { useContext, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import "./Cafe.css";
 import ReadMore from "../../components/ReadMore/Readmore";
+import Spinner from "../../components/Spinner/Spinner";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
   const { cafeName, cafeId, tableId } = useParams();
-  const history = useHistory();
-  const [
-    getToken,
-    { loading: loadingToken, error: tokenError, data: tokenData },
-  ] = useMutation(GET_TABBLE_TOKEN);
+  const [getToken, { loading: loadingToken, error: tokenError }] =
+    useMutation(GET_TABBLE_TOKEN);
 
-  const [
-    addOrder,
-    { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
-  ] = useMutation(MAKE_ORDER);
+  const [addOrder, { data: addOrderData }] = useMutation(MAKE_ORDER);
 
   // localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
 
@@ -39,6 +35,7 @@ const Cafe = () => {
       }).then((data) =>
         localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
       );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.pathname]);
 
   const mockedInfo = [];
@@ -51,7 +48,7 @@ const Cafe = () => {
     const menuItemId = Number(id);
     const serverCafeId = Number(cafeId);
     const serverTableId = Number(tableId);
-    console.log('serverCafeId',serverCafeId);
+    console.log("serverCafeId", serverCafeId);
     addOrder({
       variables: {
         accountId: serverCafeId,
@@ -59,12 +56,22 @@ const Cafe = () => {
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
-    });
+    }).then((data) => console.log(data.data.addOrder.totalItems));
   };
 
   addOrderData?.addOrder?.cart &&
     localStorage.setItem("items", JSON.stringify(addOrderData?.addOrder?.cart));
   const isEmpty = Object.keys(state.styles).length === 0;
+
+  if (loadingToken) {
+    return <Spinner color={navbarTitleColor} />;
+  }
+
+  if (tokenError) {
+    return (
+      <ErrorMessage error={tokenError?.message} color={navbarTitleColor} />
+    );
+  }
 
   return (
     <>

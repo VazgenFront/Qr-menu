@@ -6,32 +6,22 @@ import {
   REDUCE_MENU_ITEM_COUNT,
   REMOVE_CART_ITEM,
 } from "../../queries/queries";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import Spinner from "../Spinner/Spinner";
 import "./CardItem.css";
 
 const CardItem = ({ item, index, navbarTitleColor }) => {
-  const { cafeName, cafeId, tableId } = useParams();
+  const { cafeId, tableId } = useParams();
 
-  const [
-    addOrder,
-    { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
-  ] = useMutation(MAKE_ORDER);
+  const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
+    useMutation(MAKE_ORDER);
 
-  const [
-    reduceItem,
-    {
-      loading: loadingReduceItem,
-      data: reduceItemData,
-      error: reduceItemError,
-    },
-  ] = useMutation(REDUCE_MENU_ITEM_COUNT);
+  const [reduceItem, { loading: loadingReduceItem, error: reduceItemError }] =
+    useMutation(REDUCE_MENU_ITEM_COUNT);
 
   const [
     removeCartItem,
-    {
-      loading: loadingRemovueCartItem,
-      data: removueCartItemData,
-      error: removueCartItemError,
-    },
+    { loading: loadingRemovueCartItem, error: removueCartItemError },
   ] = useMutation(REMOVE_CART_ITEM);
 
   const [count, setCount] = useState(item.itemCount);
@@ -105,13 +95,32 @@ const CardItem = ({ item, index, navbarTitleColor }) => {
 
   const onRemoveItem = (itm) => {
     removeCartItemFromCart(itm.menuItemId);
-  };
-
-  const onDelete = (item) => {
-    setDeleted(!deleted);
+    setCount(0);
+    setPrice(0);
   };
 
   if (deleted) {
+    return null;
+  }
+
+  if (loadingRemovueCartItem) {
+    return <Spinner color={navbarTitleColor} />;
+  }
+
+  if (reduceItemError || removueCartItemError || addOrderDataError) {
+    return (
+      <ErrorMessage
+        color={navbarTitleColor}
+        error={
+          reduceItemError?.message ||
+          removueCartItemError?.message ||
+          addOrderDataError?.message
+        }
+      />
+    );
+  }
+
+  if (!count || !price) {
     return null;
   }
 

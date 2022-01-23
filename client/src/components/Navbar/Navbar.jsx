@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_CAFFEE } from "../../queries/queries";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import Spinner from "../Spinner/Spinner";
 import "./Navbar.css";
 
 const NavBar = () => {
@@ -28,15 +30,18 @@ const NavBar = () => {
   useEffect(() => {
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.menuItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style]);
 
-  const {
-    fontFamily,
-    logo,
-    mostBookedBorder,
-    navbarBgColor,
-    navbarTitleColor,
-  } = style;
+  const { fontFamily, logo, navbarBgColor, navbarTitleColor } = style;
+
+  if (error) {
+    return <ErrorMessage error={error?.message} color={navbarTitleColor} />;
+  }
+
+  if (loading) {
+    return <Spinner color={navbarTitleColor} />;
+  }
 
   return (
     <>
@@ -51,7 +56,9 @@ const NavBar = () => {
         >
           <div className="nav-container">
             <NavLink exact to={`/${cafeName}/${cafeId}/${tableId}`}>
-              {cafeId && data && <img src={logo} className="nav-logo" />}
+              {cafeId && data && (
+                <img src={logo} alt="logo" className="nav-logo" />
+              )}
             </NavLink>
 
             <ul

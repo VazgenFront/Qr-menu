@@ -1,9 +1,11 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardItem from "../../components/CardItem/CardItem";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_ORDER } from "../../queries/queries";
+import { GET_ORDER, REMOVE_ALL_CART_ITEMS } from "../../queries/queries";
 import "./Card.css";
 
 const Card = () => {
@@ -14,6 +16,20 @@ const Card = () => {
 
   const [getOrder, { loading, data, error }] = useLazyQuery(GET_ORDER);
 
+  const [removeAllItems, { data: dt }] = useMutation(REMOVE_ALL_CART_ITEMS);
+
+  const { navbarTitleColor, navbarBgColor } = state.styles;
+
+  const onDeleteAllItems = () => {
+    removeAllItems({
+      variables: {
+        accountId: Number(cafeId),
+        tableId: Number(tableId),
+        reserveToken: token,
+      },
+    }).then(() => setCart([]));
+  };
+
   useEffect(() => {
     getOrder({
       variables: {
@@ -22,11 +38,15 @@ const Card = () => {
         reserveToken: token,
       },
     }).then((data) => setCart(() => [...data?.data?.order?.cart]));
-  }, [data]);
+  }, [cafeId, data, getOrder, tableId, token]);
 
-  const { navbarTitleColor, navbarBgColor, mostBookedBorder } = state.styles;
+  if (loading) {
+    return <Spinner color={navbarTitleColor} />;
+  }
 
-  loading && <p>Loading...</p>;
+  if (error) {
+    return <ErrorMessage error={error?.message} color={navbarTitleColor} />;
+  }
   return (
     <div
       className="card_box"
@@ -37,25 +57,41 @@ const Card = () => {
       <span className="card__title" style={{ color: navbarTitleColor }}>
         MY CART
       </span>
-      {cart.map((item, index) => (
-        <CardItem
-          key={index}
-          item={item}
-          index={index}
-          navbarTitleColor={navbarTitleColor}
-        />
-      ))}
+      {cart.length > 0 ? (
+        cart.map((item, index) => (
+          <CardItem
+            key={index}
+            item={item}
+            index={index}
+            navbarTitleColor={navbarTitleColor}
+          />
+        ))
+      ) : (
+        <span className="emptyCart__title" style={{ color: navbarTitleColor }}>
+          Yout Cart is Empty
+        </span>
+      )}
 
+      {cart.length > 0 && Buttons()}
+    </div>
+  );
+
+  function Buttons() {
+    return (
       <div className="cart__btns">
-        <button className="order__btn" style={{ background: navbarTitleColor }}>
+        <button
+          className="order__btn"
+          style={{ background: navbarTitleColor }}
+          onClick={onDeleteAllItems}
+        >
           Cancel
         </button>
         <button className="order__btn" style={{ background: navbarTitleColor }}>
           Order
         </button>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default Card;

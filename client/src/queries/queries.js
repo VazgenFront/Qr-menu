@@ -67,6 +67,8 @@ export const MAKE_ORDER = gql`
         menuItemId
         itemCount
       }
+      totalItems
+      totalPrice
     }
   }
 `;
@@ -161,6 +163,22 @@ export const REMOVE_CART_ITEM = gql`
       tableId: $tableId
       reserveToken: $reserveToken
       menuItemId: $menuItemId
+    ) {
+      __typename
+    }
+  }
+`;
+
+export const REMOVE_ALL_CART_ITEMS = gql`
+  mutation removeCartItemsFromOrder(
+    $accountId: Int!
+    $tableId: Int!
+    $reserveToken: String!
+  ) {
+    removeCartItemsFromOrder(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
     ) {
       __typename
     }

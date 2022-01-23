@@ -1,22 +1,21 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_MENU_ITEM, MAKE_ORDER } from "../../queries/queries";
 import "./MenuItem.css";
 
 const MenuItem = () => {
   const [item, setItem] = useState({});
-  const history = useHistory();
-  const { itemId, cafeName, cafeId, tableId } = useParams();
+  const { itemId, cafeId, tableId } = useParams();
   const state = useContext(ThemeContext);
   const { navbarBgColor, navbarTitleColor } = state.styles;
 
-  const [
-    addOrder,
-    { loading: loadingAddOrder, data: addOrderData, error: addOrderDataError },
-  ] = useMutation(MAKE_ORDER);
+  const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
+    useMutation(MAKE_ORDER);
 
   const { data, loading, error } = useQuery(GET_MENU_ITEM, {
     variables: {
@@ -44,6 +43,19 @@ const MenuItem = () => {
       },
     });
   };
+
+  if (loadingAddOrder || loading) {
+    return <Spinner color={navbarTitleColor} />;
+  }
+
+  if (addOrderDataError || error) {
+    return (
+      <ErrorMessage
+        error={addOrderDataError?.message || error?.message}
+        color={navbarTitleColor}
+      />
+    );
+  }
 
   return (
     <div className="menuItem__box" style={{ background: navbarBgColor }}>

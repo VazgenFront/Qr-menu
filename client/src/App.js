@@ -14,8 +14,6 @@ function App() {
 
   const history = useHistory();
 
-  
-
   return (
     <BrowserRouter>
       <ApolloProvider client={client}>
