@@ -5,7 +5,7 @@ module.exports = (express) => {
 	const apiRouter = express.Router();
 
 	apiRouter.post("/authenticate", AccountController.authenticate);
-	apiRouter.post("/register", AccountController.register);
+	// apiRouter.post("/register", AccountController.register);
 
 	apiRouter.use(verifyToken);
 

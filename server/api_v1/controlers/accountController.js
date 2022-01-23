@@ -536,6 +536,10 @@ const generateToken = (account) => {
 	return {
 		exp: tokenExpirationTimeInMinutes * 60,
 		token,
+		account: {
+			...account,
+			password: undefined,
+		}
 	}
 };
 
