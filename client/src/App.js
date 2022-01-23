@@ -22,7 +22,8 @@ function App() {
           history.location.pathname === "/" ? null : (
             <Navbar />
           )}
-          <Switch>{routes}</Switch>
+          <Switch>{routes}
+          </Switch>
         </ThemeContextProvider>
       </ApolloProvider>
     </BrowserRouter>

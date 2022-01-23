@@ -10,31 +10,25 @@ import {
 } from "./screens/index";
 
 export const appRoutes = [
-  // About Our Company page
   {
     path: "/",
     name: "aboutUs",
     exact: true,
     component: AboutUs,
   },
-  // About Our Company page
 
-  // Cafe Admin Page
   {
     path: "/:id/:cafeName/admin-panel",
     name: "AdminAuh",
     component: AdminAuh,
   },
-  // Cafe Admin Page
 
-  // Cafe Client Page
   {
     path: "/:cafeName/:cafeId/:tableId",
     name: "aboutUs",
     exact: true,
     component: Cafe,
   },
-  // Cafe Client Page
 
   {
     path: "/:cafeName/:cafeId/:tableId/menuType/:menuType",
@@ -54,21 +48,6 @@ export const appRoutes = [
     name: "menuType",
     component: MenuItem,
   },
-
-  // {
-  //   path: "/:id/:cafeName/menu/:menuType/:id",
-  //   name: "menu_item",
-  //   exact: true,
-  //   page: MenuItem,
-  // },
-
-  // {
-  //   path: "/:id/:cafeName/:tableId/card",
-  //   name: "main_page",
-  //   exact: true,
-  //   page: Card,
-  // },
-  // Client Side
 ];
 
 export const renderRoutes = (routeProps = {}) => {

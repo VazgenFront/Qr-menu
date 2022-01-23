@@ -1,15 +1,15 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_CAFFEE } from "../../queries/queries";
+import { GET_CAFFEE, GET_ORDER } from "../../queries/queries";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import Spinner from "../Spinner/Spinner";
 import "./Navbar.css";
 
 const NavBar = () => {
   const state = useContext(ThemeContext);
-  const { cafeId, cafeName, tableId } = state;
+  const { cafeId, cafeName, tableId, totalItemsCount } = state;
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
   const [style, setStyle] = useState({});
@@ -20,12 +20,26 @@ const NavBar = () => {
     },
   });
 
+  const [getOrder, { loading: ld, data: dt, error: err }] =
+    useLazyQuery(GET_ORDER);
+
   useEffect(() => {
     setStyle({
       ...data?.account?.style,
     });
     data?.account && setMenuTypes(() => [...data?.account?.menuTypes]);
-  }, [data]);
+
+    localStorage.getItem("token") &&
+      getOrder({
+        variables: {
+          accountId: Number(cafeId),
+          tableId: Number(tableId),
+          reserveToken: localStorage.getItem("token"),
+        },
+      }).then((data) =>
+        state.getTotalItemsCount(data?.data?.order?.totalItems)
+      );
+  }, [data, totalItemsCount, dt]);
 
   useEffect(() => {
     state.toggleStyle(style);
@@ -96,9 +110,14 @@ const NavBar = () => {
                 style={{ marginRight: "76px", fontSize: "2rem" }}
               ></i>
 
-              <span className="card__qunatity" style={{ color: navbarBgColor }}>
-                1
-              </span>
+              {totalItemsCount ? (
+                <span
+                  className="card__qunatity"
+                  style={{ color: navbarBgColor }}
+                >
+                  {totalItemsCount}
+                </span>
+              ) : null}
             </NavLink>
 
             <div className="nav-icon" onClick={handleClick}>
