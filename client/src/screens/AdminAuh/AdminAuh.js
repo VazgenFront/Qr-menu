@@ -2,9 +2,12 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Field, Form } from "react-final-form";
+import { useHistory, useParams } from "react-router-dom";
 import "./AdminAuth.css";
 
 const AboutUs = () => {
+  const history = useHistory();
+
   // eslint-disable-next-line no-unused-vars
   const [token, setToken] = useState("");
   const login = async (values) => {
@@ -17,12 +20,15 @@ const AboutUs = () => {
         password,
       })
       .then(async (res) => {
+        console.log("res", res);
         await setToken(res.data.body.token);
         localStorage.setItem("adminToken", res.data.body.token);
       });
 
-    values.login = "";
-    values.password = "";
+    // values.login = "";
+    // values.password = "";
+
+    // history.push(`/${id}/${cafeName}/admin-panel/dashboard`);
   };
 
   return (
