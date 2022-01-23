@@ -17,7 +17,7 @@ const Card = () => {
   const [getOrder, { loading, data, error }] = useLazyQuery(GET_ORDER);
 
   const [removeAllItems, { data: dt }] = useMutation(REMOVE_ALL_CART_ITEMS);
-
+  const { getTotalItemsCount } = state;
   const { navbarTitleColor, navbarBgColor } = state.styles;
 
   const onDeleteAllItems = () => {
@@ -27,7 +27,9 @@ const Card = () => {
         tableId: Number(tableId),
         reserveToken: token,
       },
-    }).then(() => setCart([]));
+    })
+      .then(() => setCart([]))
+      .then(() => getTotalItemsCount(0));
   };
 
   useEffect(() => {
@@ -37,7 +39,9 @@ const Card = () => {
         tableId: Number(tableId),
         reserveToken: token,
       },
-    }).then((data) => setCart(() => [...data?.data?.order?.cart]));
+    }).then(
+      (data) => data?.data?.order && setCart(() => [...data?.data?.order?.cart])
+    );
   }, [cafeId, data, getOrder, tableId, token]);
 
   if (loading) {

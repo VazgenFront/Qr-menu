@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
-import { useMutation } from "@apollo/client";
-import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { GET_ORDER, GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
 import { useParams } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import "./Cafe.css";
@@ -48,7 +48,6 @@ const Cafe = () => {
     const menuItemId = Number(id);
     const serverCafeId = Number(cafeId);
     const serverTableId = Number(tableId);
-    console.log("serverCafeId", serverCafeId);
     addOrder({
       variables: {
         accountId: serverCafeId,
@@ -56,7 +55,7 @@ const Cafe = () => {
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
-    }).then((data) => console.log(data.data.addOrder.totalItems));
+    });
   };
 
   addOrderData?.addOrder?.cart &&
