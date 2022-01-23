@@ -32,7 +32,7 @@ const AccountController = {
 			console.log("authenticate error", e);
 			log.error("authenticate error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -49,6 +49,7 @@ const AccountController = {
 			});
 			const account = await accountEntity.save();
 			return res.status(200).send({
+				success: true,
 				_id: account._id,
 				username,
 				name,
@@ -58,9 +59,10 @@ const AccountController = {
 			console.log("register error", e);
 			log.error("register error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
 	},
 
 	getAccountData: async (req, res) => {
@@ -68,6 +70,7 @@ const AccountController = {
 			const { _id } = req.decoded;
 			const account = await Account.findOne({ _id }).lean();
 			res.status(200).send({
+				success: true,
 				...account,
 				password: undefined,
 			});
@@ -75,7 +78,7 @@ const AccountController = {
 			console.log("getAccountData error", e);
 			log.error("getAccountData error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -92,6 +95,7 @@ const AccountController = {
 			if (typeof subTypeId === "string") updateQuery.subTypeId = subTypeId;
 			const account = await Account.findOneAndUpdate({ _id }, { $set: updateQuery }, { new: true }).lean();
 			res.status(200).send({
+				success: true,
 				...account,
 				password: undefined,
 			});
@@ -99,7 +103,7 @@ const AccountController = {
 			console.log("editAccount error", e);
 			log.error("editAccount error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -117,6 +121,7 @@ const AccountController = {
 				const style = await styleEntity.save();
 				await Account.findOneAndUpdate({ _id }, { $set: { styleId: style._id } });
 				res.status(200).send({
+					success: true,
 					style,
 				});
 			} else {
@@ -126,6 +131,7 @@ const AccountController = {
 					{ new: true },
 				).lean();
 				res.status(200).send({
+					success: true,
 					style,
 				});
 			}
@@ -133,9 +139,10 @@ const AccountController = {
 			console.log("editStyle error", e);
 			log.error("editStyle error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
 	},
 
 	addMenuItem: async (req, res) => {
@@ -147,15 +154,17 @@ const AccountController = {
 			})
 			const menuItem = await menuItemEntity.save();
 			res.status(200).send({
-				menuItem
+				success: true,
+				menuItem,
 			});
 		} catch (e) {
 			console.log("addMenuItem error", e);
 			log.error("addMenuItem error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
 	},
 
 	editMenuItem: async (req, res) => {
@@ -168,15 +177,82 @@ const AccountController = {
 				{ new: true },
 			).lean();
 			res.status(200).send({
-				menuItem
+				success: true,
+				menuItem,
 			});
 		} catch (e) {
 			console.log("editMenuItem error", e);
 			log.error("editMenuItem error", e);
 			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	deleteMenuItem: async (req, res) => {
+		try {
+			const { menuItemId } = req.body;
+			const { _id } = req.decoded;
+			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, "cart.menuItemId": menuItemId }).lean();
+			if (unpaidOrders.length) {
+				throw new Error("Please close all unpaid orders with specified menu item before delete.");
+			}
+			await MenuItem.deleteOne({ _id: menuItemId, accountId: _id });
+			res.status(200).send({
+				success: true,
+			});
+		} catch (e) {
+			console.log("deleteMenuItem error", e);
+			log.error("deleteMenuItem error", e);
+			res.status(500).send({
 				success: true,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
+	},
+
+	addMainDish: async (req, res) => {
+		try {
+			const { menuItemId } = req.body;
+			const { _id } = req.decoded;
+			const menuItem = await MenuItem.findOneAndUpdate(
+				{ _id: menuItemId, accountId: _id },
+				{ $set: { isMainDish: true } },
+				{ new: true }
+			);
+			if (!menuItem) {
+				throw new Error("Menu item not found.");
+			}
+			res.status(200).send({
+				success: true,
+			});
+		} catch (e) {
+			console.log("addMainDish error", e);
+			log.error("addMainDish error", e);
+			res.status(500).send({
+				success: true,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	removeMainDish: async (req, res) => {
+		try {
+			const { menuItemId } = req.body;
+			const { _id } = req.decoded;
+			await MenuItem.updateOne({ _id: menuItemId, accountId: _id }, { $set: { isMainDish: false } });
+			res.status(200).send({
+				success: true,
+			});
+		} catch (e) {
+			console.log("removeMainDish error", e);
+			log.error("removeMainDish error", e);
+			res.status(500).send({
+				success: true,
+				body: e.message ? e.message : e,
+			});
+		}
 	},
 
 	addMenuType: async (req, res) => {
@@ -185,19 +261,21 @@ const AccountController = {
 			const { _id } = req.decoded;
 			const account = await Account.findOneAndUpdate(
 				{ _id },
-				{ $addToSet: { menuTypes: typeName } },
+				{ $addToSet: { menuTypes: { name: typeName } } },
 				{ new: true },
 			).lean();
 			res.status(200).send({
-				account
+				success: true,
+				account,
 			});
 		} catch (e) {
 			console.log("addMenuType error", e);
 			log.error("addMenuType error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
 	},
 
 	editMenuType: async (req, res) => {
@@ -211,15 +289,64 @@ const AccountController = {
 			).lean();
 			await MenuItem.updateMany({ accountId: _id, type: oldName }, { $set: { type: newName } });
 			res.status(200).send({
-				account
+				success: true,
+				account,
 			});
 		} catch (e) {
-			console.log("addMenuType error", e);
-			log.error("addMenuType error", e);
+			console.log("editMenuType error", e);
+			log.error("editMenuType error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
-			});		}
+			});
+		}
+	},
+
+	editDefaultMenuType: async (req, res) => {
+		try {
+			const { newName } = req.body;
+			const { _id } = req.decoded;
+			const account = await Account.findOneAndUpdate(
+				{ _id },
+				{ $set: { defaultMenuType: newName } },
+				{ new: true },
+			).lean();
+			res.status(200).send({
+				success: true,
+				account,
+			});
+		} catch (e) {
+			console.log("editDefaultMenuType error", e);
+			log.error("editDefaultMenuType error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	deleteMenuType: async (req, res) => {
+		try {
+			const { typeName } = req.body;
+			const { _id } = req.decoded;
+			const account = await Account.findOneAndUpdate(
+				{ _id },
+				{ $pull: { menuTypes: { name: typeName } } },
+				{ new: true },
+			).lean();
+			// await MenuItem.updateMany({ accountId: _id, type: typeName }, { $set: { type: account.defaultMenuType } });
+			res.status(200).send({
+				success: true,
+				account,
+			});
+		} catch (e) {
+			console.log("deleteMenuType error", e);
+			log.error("deleteMenuType error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
 	},
 
 	addTable: async (req, res) => {
@@ -236,13 +363,14 @@ const AccountController = {
 			})
 			const table = await tableEntity.save();
 			res.status(200).send({
-				table
+				success: true,
+				table,
 			});
 		} catch (e) {
 			console.log("addTable error", e);
 			log.error("addTable error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -253,17 +381,40 @@ const AccountController = {
 			const { tableId, seatCount, notes } = req.body;
 			const { _id } = req.decoded;
 			const table = await Table.findOneAndUpdate(
-				{ accountId: _id, tableId },
+				{ accountId: _id, _id: tableId },
 				{ $set: { seatCount, notes } },
 				{ new: true }).lean();
 			res.status(200).send({
-				table
+				success: true,
+				table,
 			});
 		} catch (e) {
 			console.log("editTable error", e);
 			log.error("editTable error", e);
 			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	deleteTable: async (req, res) => {
+		try {
+			const { tableId } = req.body;
+			const { _id } = req.decoded;
+			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, tableId }).lean();
+			if (unpaidOrders.length) {
+				throw new Error("Please close all unpaid orders with specified tableId before delete.");
+			}
+			await Table.deleteOne({ accountId: _id, _id: tableId });
+			res.status(200).send({
 				success: true,
+			});
+		} catch (e) {
+			console.log("deleteTable error", e);
+			log.error("deleteTable error", e);
+			res.status(500).send({
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -273,18 +424,23 @@ const AccountController = {
 		try {
 			const { dateFrom, dateTo } = req.query;
 			const { _id } = req.decoded;
+			const dateRange = {
+				$gte: new Date(dateFrom),
+				$lte: new Date(dateTo),
+			};
 			const orders = await Order.find({
 				accountId: _id,
-				dateCreated: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
+				dateCreated: dateRange,
 			}).lean();
 			res.status(200).send({
-				orders
+				success: true,
+				orders,
 			});
 		} catch (e) {
 			console.log("getOrders error", e);
 			log.error("getOrders error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -300,13 +456,14 @@ const AccountController = {
 				dateCreated: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
 			}).lean();
 			res.status(200).send({
-				orders
+				success: true,
+				orders,
 			});
 		} catch (e) {
 			console.log("getPaidOrders error", e);
 			log.error("getPaidOrders error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -320,13 +477,14 @@ const AccountController = {
 				isPaid: false,
 			}).lean();
 			res.status(200).send({
-				orders
+				success: true,
+				orders,
 			});
 		} catch (e) {
 			console.log("getUnpaidOrders error", e);
 			log.error("getUnpaidOrders error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}
@@ -345,13 +503,14 @@ const AccountController = {
 				{ new: true },
 			).lean();
 			res.status(200).send({
+				success: true,
 				order
 			});
 		} catch (e) {
 			console.log("closeOrder error", e);
 			log.error("closeOrder error", e);
 			res.status(500).send({
-				success: true,
+				success: false,
 				body: e.message ? e.message : e,
 			});
 		}

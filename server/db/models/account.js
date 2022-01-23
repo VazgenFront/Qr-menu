@@ -19,6 +19,7 @@ const AccountSchema = new Schema({
     },
     menuTypes: [
         {
+            _id: false,
             name: {type: String},
         },
     ],
