@@ -18,7 +18,7 @@ export const appRoutes = [
   },
 
   {
-    path: "/:id/:cafeName/admin-panel",
+    path: "/admin-panel/login",
     name: "AdminAuh",
     component: AdminAuh,
   },
