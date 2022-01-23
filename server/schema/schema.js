@@ -3,11 +3,10 @@ const Account = require("../db/models/account");
 const MenuItem = require("../db/models/menuItem");
 const Order = require("../db/models/order");
 const Table = require("../db/models/table");
-const {AccountType, AccountMutations} = require("./accountSchemas");
-const {StyleMutations} = require("./styleSchemas");
-const {MenuItemType, MenuItemMutations} = require("./menuItemSchemas");
-const {OrderType, OrderMutations} = require("./orderSchemas");
-const {TableType, TableMutations} = require("./tableSchemas");
+const { AccountType } = require("./accountSchemas");
+const { MenuItemType } = require("./menuItemSchemas");
+const { OrderType, OrderMutations } = require("./orderSchemas");
+const { TableType, TableMutations } = require("./tableSchemas");
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -15,9 +14,9 @@ const RootQuery = new GraphQLObjectType({
     account: {
       type: AccountType,
       args: { _id: { type: GraphQLInt } },
-      resolve(parent, args) {
+      async resolve(parent, args) {
         const _id = args._id;
-        const account = Account.findOne({ _id }, { stylesId: 0 }).lean();
+        const account = await Account.findOne({ _id }, { password: 0 }).lean();
         return account;
       },
     },
@@ -76,9 +75,6 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: () => ({
-    ...AccountMutations,
-    ...StyleMutations,
-    ...MenuItemMutations,
     ...OrderMutations,
     ...TableMutations,
   }),

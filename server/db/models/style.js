@@ -9,10 +9,10 @@ autoIncrement.initialize(connection);
 const StyleSchema = new Schema({
     navbarBgColor: { type: String, required: true },
     navbarTitleColor: { type: String, required: true },
-    logo: { type: String, required: true },
+    logo: { type: String, required: true, unique: true },
     mostBookedBorder: { type: String, required: true },
     fontFamily: { type: String, required: true },
-}, {versionKey: false});
+}, { versionKey: false });
 
 StyleSchema.plugin(autoIncrement.plugin, { model: 'Style', startAt: 1 });
 

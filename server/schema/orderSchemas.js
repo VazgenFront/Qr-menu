@@ -1,5 +1,6 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLList, GraphQLInputObjectType, GraphQLBoolean } = require("graphql");
 const Order = require("../db/models/order");
+const Account = require("../db/models/account");
 const MenuItem = require("../db/models/menuItem");
 const configs = require("../config/configs");
 
@@ -50,6 +51,10 @@ const OrderMutations = {
 		},
 		async resolve(parent, args){
 			const { accountId, tableId, reserveToken, orderList } = args;
+			const account = await Account.findOne({ _id: accountId }).lean();
+			if (!account || account.status !== "enabled") {
+				throw new Error("Account not active now.");
+			}
 			const invalidItemsCount = orderList.filter(item => item.itemCount <= 0).length;
 			if (invalidItemsCount > 0) {
 				throw new Error("Invalid item count provided in order list.")
@@ -105,7 +110,7 @@ const OrderMutations = {
 				})
 				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				const orderEntity = new Order({ accountId, tableId, reserveToken, cart, totalPrice, totalItems, notes: "Created by user after adding order." });
+				const orderEntity = new Order({ accountId, tableId, reserveToken, cart, totalPrice, totalItems, notes: "Created by user after adding order.", dateCreated: new Date() });
 				newOrder = await orderEntity.save();
 				return newOrder
 			}
@@ -133,10 +138,10 @@ const OrderMutations = {
 					}
 					return newCart;
 				}, order.cart).filter(cartItem => cartItem.itemCount > 0);
-				order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
-				order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+				order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice, 0);
+				order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 				const { _id, ...newOrder } = order;
-				const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+				const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
 				return updatedOrder;
 			} else {
 				throw new Error("Order doesn't exists for your reservation or not found menu item in cart with specified id.");
@@ -162,7 +167,7 @@ const OrderMutations = {
 					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice, 0);
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
-					const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
 					return updatedOrder;
 				} else {
 					throw new Error("Menu item edit time expired.");
@@ -180,7 +185,7 @@ const OrderMutations = {
 			reserveToken: { type: GraphQLString },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, menuItemId } = args;
+			const { accountId, tableId, reserveToken } = args;
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 			if (order && order.cart && order.cart.length > 0) {
@@ -195,7 +200,7 @@ const OrderMutations = {
 					order.totalPrice = order.cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice, 0);
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
-					const updatedOrder = await Order.findOneAndUpdate({_id}, newOrder, { new: true }).lean();
+					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
 					return updatedOrder;
 				} else {
 					throw new Error("Order cart is empty or all menu items edit time expired..");

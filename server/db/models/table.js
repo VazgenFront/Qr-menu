@@ -10,7 +10,7 @@ const TableSchema = new Schema({
 	accountId: { type: Number, required: true },
 	tableId: { type: Number, required: true },
 	seatCount: { type: Number, required: true },
-	reserved: { type: Boolean, required: true },
+	reserved: { type: Boolean, required: true, default: false },
 	reserveToken: { type: String },
 	notes: { type: String, required: true },
 }, { versionKey: false });

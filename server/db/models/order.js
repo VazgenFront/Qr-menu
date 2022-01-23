@@ -26,7 +26,8 @@ const OrderSchema = new Schema({
 	totalPrice: { type: Number, default: 0 },
 	totalItems: { type: Number, default: 0 },
 	notes: { type: String, required: true },
-}, {versionKey: false});
+	dateCreated: { type: Date, required: true },
+}, { versionKey: false });
 
 OrderSchema.plugin(autoIncrement.plugin, { model: 'Order', startAt: 1 });
 
