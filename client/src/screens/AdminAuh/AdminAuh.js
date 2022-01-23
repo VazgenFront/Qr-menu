@@ -1,20 +1,25 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from "react";
-import { Form, Field } from "react-final-form";
-import "./AdminAuth.css";
 import axios from "axios";
+import React, { useState } from "react";
+import { Field, Form } from "react-final-form";
+import "./AdminAuth.css";
 
 const AboutUs = () => {
+  // eslint-disable-next-line no-unused-vars
+  const [token, setToken] = useState("");
   const login = async (values) => {
-    console.log("values", values);
-
     const username = values.login;
     const password = values.password;
 
-    await axios.post("http://localhost:4000/api/account/authenticate", {
-      username,
-      password,
-    });
+    await axios
+      .post("http://localhost:4000/api/account/authenticate", {
+        username,
+        password,
+      })
+      .then(async (res) => {
+        await setToken(res.data.body.token);
+        localStorage.setItem("adminToken", res.data.body.token);
+      });
 
     values.login = "";
     values.password = "";
