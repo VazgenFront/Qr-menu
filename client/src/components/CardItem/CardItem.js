@@ -13,11 +13,11 @@ import "./CardItem.css";
 const CardItem = ({ item, index, navbarTitleColor }) => {
   const { cafeId, tableId } = useParams();
 
-  const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
-    useMutation(MAKE_ORDER);
+  const [addOrder, { error: addOrderDataError }] = useMutation(MAKE_ORDER);
 
-  const [reduceItem, { loading: loadingReduceItem, error: reduceItemError }] =
-    useMutation(REDUCE_MENU_ITEM_COUNT);
+  const [reduceItem, { error: reduceItemError }] = useMutation(
+    REDUCE_MENU_ITEM_COUNT
+  );
 
   const [
     removeCartItem,

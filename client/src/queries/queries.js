@@ -5,7 +5,6 @@ export const GET_CAFFEE = gql`
     account(_id: $_id) {
       _id
       username
-      password
       name
       img
       email

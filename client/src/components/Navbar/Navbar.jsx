@@ -39,7 +39,7 @@ const NavBar = () => {
       }).then((data) =>
         state.getTotalItemsCount(data?.data?.order?.totalItems)
       );
-  }, [data, totalItemsCount, dt]);
+  }, [data, totalItemsCount, dt, state.totalItemsCount]);
 
   useEffect(() => {
     state.toggleStyle(style);
@@ -115,7 +115,8 @@ const NavBar = () => {
                   className="card__qunatity"
                   style={{ color: navbarBgColor }}
                 >
-                  {totalItemsCount}
+                  {/* {totalItemsCount} */}
+                  {state.totalItemsCount}
                 </span>
               ) : null}
             </NavLink>
