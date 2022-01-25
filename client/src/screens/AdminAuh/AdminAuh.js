@@ -2,11 +2,15 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Field, Form } from "react-final-form";
+import { useHistory } from "react-router-dom";
 import "./AdminAuth.css";
 
 const AboutUs = () => {
+  const history = useHistory();
+
   // eslint-disable-next-line no-unused-vars
   const [token, setToken] = useState("");
+
   const login = async (values) => {
     const username = values.login;
     const password = values.password;
@@ -17,8 +21,11 @@ const AboutUs = () => {
         password,
       })
       .then(async (res) => {
+        const { styleId, username } = res.data.body.account;
         await setToken(res.data.body.token);
-        localStorage.setItem("adminToken", res.data.body.token);
+        localStorage.setItem("adminTkn", res.data.body.token);
+        history.push(`/admin-panel/dashboard/${styleId}/${username}`);
+        console.log('push');
       });
 
     values.login = "";

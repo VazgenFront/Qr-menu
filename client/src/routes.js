@@ -7,6 +7,9 @@ import {
   MenuType,
   Card,
   MenuItem,
+  ErrorPage,
+  AdminPage,
+  Blank,
 } from "./screens/index";
 
 export const appRoutes = [
@@ -15,12 +18,6 @@ export const appRoutes = [
     name: "aboutUs",
     exact: true,
     component: AboutUs,
-  },
-
-  {
-    path: "/:id/:cafeName/admin-panel",
-    name: "AdminAuh",
-    component: AdminAuh,
   },
 
   {
@@ -47,6 +44,26 @@ export const appRoutes = [
     path: "/:cafeName/:cafeId/:tableId/item/:itemId",
     name: "menuType",
     component: MenuItem,
+  },
+
+  {
+    path: "/admin-panel",
+    name: "AdminAuh",
+    exact: true,
+    component: AdminAuh,
+  },
+
+  {
+    path: "/admin-panel/dashboard/:cafeId/:cafeName",
+    name: "menuType",
+    exact: true,
+    component: AdminPage,
+  },
+
+  {
+    path: "*",
+    name: "ErrorPage",
+    component: ErrorPage,
   },
 ];
 

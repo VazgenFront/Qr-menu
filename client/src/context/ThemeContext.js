@@ -38,7 +38,6 @@ class ThemeContextProvider extends Component {
 
   getTotalItemsCount = (totalItemsCountParams) => {
     this.setState({ totalItemsCount: totalItemsCountParams });
-    console.log("this.state.totalItemsCount", this.state.totalItemsCount);
   };
 
   render() {
