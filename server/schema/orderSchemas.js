@@ -69,15 +69,25 @@ const OrderMutations = {
 			let newOrder;
 			if (order) {
 				let cart = order.cart;
+				let tempCart = order.tempCart;
 				let cartSize = order.cart.length;
 				orderList.forEach(itemData => {
-					const itemIndex = cart.findIndex((cartItem) => {
-						return cartItem.menuItemId === itemData.menuItemId
+					const cartItemIndex = cart.findIndex((cartItem) => {
+						return cartItem.menuItemId === itemData.menuItemId;
 					});
-					if (itemIndex >= 0) {
-						cart[itemIndex].itemCount += itemData.itemCount;
-						cart[itemIndex].itemTotalPrice = cart[itemIndex].itemCount * cart[itemIndex].itemPrice;
+					const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
+						return tempCartItem.menuItemId === itemData.menuItemId;
+					})
+					if (tempCartItemIndex < 0 || tempCart[tempCartItemIndex].itemCount < itemData.itemCount) {
+						throw new Error("You haven't added some items to cart yet. Add it to cart to order.")
+					}
+					if (cartItemIndex >= 0) {
+						cart[cartItemIndex].itemCount += itemData.itemCount;
+						cart[cartItemIndex].itemTotalPrice = cart[cartItemIndex].itemCount * cart[cartItemIndex].itemPrice;
 					} else {
+						const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
+							return tempCartItem.menuItemId === itemData.menuItemId;
+						})
 						const menuItemData = foundMenuItems.find(item => item._id === itemData.menuItemId);
 						cart[cartSize++] = {
 							menuItemId: itemData.menuItemId,
@@ -89,11 +99,19 @@ const OrderMutations = {
 							currency: menuItemData.currency,
 							date: Date.now()
 						};
+
 					}
+					tempCart[tempCartItemIndex].movements.push({
+						type: 'addToOrder',
+						count: itemData.itemCount,
+						date: Date.now(),
+					})
+					tempCart[tempCartItemIndex].itemCount -= itemData.itemCount;
+					tempCart[tempCartItemIndex].itemTotalPrice = tempCart[tempCartItemIndex].itemCount * tempCart[tempCartItemIndex].itemPrice;
 				});
 				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { cart, totalPrice, totalItems }, { new: true, upsert: true }).lean();
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { tempCart, cart, totalPrice, totalItems }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				const cart = orderList.map(orderItem => {
