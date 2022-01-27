@@ -109,6 +109,29 @@ const AccountController = {
 		}
 	},
 
+	getStyle: async (req, res) => {
+		try {
+			const { _id } = req.decoded;
+			const account = await Account.findOne({ _id }).lean();
+			if (!account.styleId) {
+				throw new Error("Account don't have style configured. Use default style indeed.")
+			} else {
+				const style = await Style.findOne({ _id: account.styleId }).lean();
+				res.status(200).send({
+					success: true,
+					style,
+				});
+			}
+		} catch (e) {
+			console.log("getStyle error", e);
+			log.error("getStyle error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
 	editStyle: async (req, res) => {
 		try {
 			const { navbarBgColor, navbarTitleColor, logo, mostBookedBorder, fontFamily } = req.body;
@@ -160,6 +183,43 @@ const AccountController = {
 		} catch (e) {
 			console.log("addMenuItem error", e);
 			log.error("addMenuItem error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	getMenuItems: async (req, res) => {
+		try {
+			const { _id } = req.decoded;
+			const menuItems = await MenuItem.find({ accountId: _id });
+			res.status(200).send({
+				success: true,
+				menuItems,
+			});
+		} catch (e) {
+			console.log("getMenuItems error", e);
+			log.error("getMenuItems error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	getMenuItemsOfType: async (req, res) => {
+		try {
+			const { type } = req.query;
+			const { _id } = req.decoded;
+			const menuItems = await MenuItem.find({ accountId: _id, type });
+			res.status(200).send({
+				success: true,
+				menuItems,
+			});
+		} catch (e) {
+			console.log("getMenuItemsOfType error", e);
+			log.error("getMenuItemsOfType error", e);
 			res.status(500).send({
 				success: false,
 				body: e.message ? e.message : e,
@@ -257,11 +317,11 @@ const AccountController = {
 
 	addMenuType: async (req, res) => {
 		try {
-			const { typeName } = req.body;
+			const { typeName, img } = req.body;
 			const { _id } = req.decoded;
 			const account = await Account.findOneAndUpdate(
 				{ _id },
-				{ $addToSet: { menuTypes: { name: typeName } } },
+				{ $addToSet: { menuTypes: { name: typeName, img } } },
 				{ new: true },
 			).lean();
 			res.status(200).send({
@@ -280,11 +340,11 @@ const AccountController = {
 
 	editMenuType: async (req, res) => {
 		try {
-			const { oldName, newName } = req.body;
+			const { oldName, newName, img } = req.body;
 			const { _id } = req.decoded;
 			const account = await Account.findOneAndUpdate(
 				{ _id, menuTypes: { $elemMatch: { name: oldName } } },
-				{ $set: { "menuTypes.$.name": newName } },
+				{ $set: { "menuTypes.$.name": newName, "menuTypes.$.img": img } },
 				{ new: true },
 			).lean();
 			await MenuItem.updateMany({ accountId: _id, type: oldName }, { $set: { type: newName } });
