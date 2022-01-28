@@ -11,8 +11,12 @@ module.exports = (express) => {
 
 	apiRouter.get("/getAccountData", AccountController.getAccountData);
 	apiRouter.put("/account", AccountController.editAccount);
+
+	apiRouter.get("/style", AccountController.getStyle);
 	apiRouter.put("/style", AccountController.editStyle);
 
+	apiRouter.get("/menuItems", AccountController.getMenuItems);
+	apiRouter.get("/menuItemsOfType", AccountController.getMenuItemsOfType);
 	apiRouter.post("/menuItem", AccountController.addMenuItem);
 	apiRouter.put("/menuItem", AccountController.editMenuItem);
 	apiRouter.delete("/menuItem", AccountController.deleteMenuItem);

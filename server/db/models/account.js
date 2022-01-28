@@ -20,7 +20,8 @@ const AccountSchema = new Schema({
     menuTypes: [
         {
             _id: false,
-            name: {type: String},
+            name: { type: String, unique: true },
+            img: { type: String },
         },
     ],
     defaultMenuType: { type: String, required: true, default: "other" },

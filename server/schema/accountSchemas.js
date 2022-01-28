@@ -20,6 +20,7 @@ const AccountType = new GraphQLObjectType({
 				name: 'MenuTypeField',
 				fields: () => ({
 					name: {type: GraphQLString},
+					img: {type: GraphQLString},
 				}),
 			})),
 			resolve(parent) {
