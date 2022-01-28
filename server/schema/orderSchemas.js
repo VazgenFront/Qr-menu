@@ -10,7 +10,17 @@ const OrderListItemInput = new GraphQLInputObjectType({
 		menuItemId: { type: GraphQLInt },
 		itemCount: { type: GraphQLInt },
 	},
-})
+});
+
+const TempCartMovement = new GraphQLObjectType({
+	name: "TempCartMovement",
+	fields: {
+		type: { type: GraphQLString },
+		count: { type: GraphQLInt },
+		date: { type: GraphQLID },
+	},
+});
+
 const OrderListItem = new GraphQLObjectType({
 	name: "OrderListItem",
 	fields: {
@@ -23,20 +33,36 @@ const OrderListItem = new GraphQLObjectType({
 		currency: { type: GraphQLString },
 		date: { type: GraphQLID },
 	},
-})
+});
+const TempCartItem = new GraphQLObjectType({
+	name: "TempCartItem",
+	fields: {
+		menuItemId: { type: GraphQLInt },
+		itemName: { type: GraphQLString },
+		img: { type: GraphQLString },
+		itemCount: { type: GraphQLInt },
+		itemPrice: { type: GraphQLInt },
+		itemTotalPrice: { type: GraphQLInt },
+		currency: { type: GraphQLString },
+		movements: { type: new GraphQLList(TempCartMovement) },
+	},
+});
 
 const OrderType = new GraphQLObjectType({
 	name: 'Order',
 	fields: () => ({
-		_id: {type: GraphQLInt},
-		accountId: {type: GraphQLInt},
-		tableId: {type: GraphQLInt},
-		cart: {type: new GraphQLList(OrderListItem)},
-		reserveToken: {type: GraphQLString},
-		isPaid: {type: GraphQLBoolean},
-		totalPrice: {type: GraphQLInt},
-		totalItems: {type: GraphQLInt},
-		notes: {type: GraphQLString},
+		_id: { type: GraphQLInt },
+		accountId: { type: GraphQLInt },
+		tableId: { type: GraphQLInt },
+		tempCart: { type: new GraphQLList(TempCartItem) },
+		cart: { type: new GraphQLList(OrderListItem) },
+		reserveToken: { type: GraphQLString },
+		isPaid: { type: GraphQLBoolean },
+		totalPrice: { type: GraphQLInt },
+		totalItems: { type: GraphQLInt },
+		tempTotalPrice: { type: GraphQLInt },
+		tempTotalItems: { type: GraphQLInt },
+		notes: { type: GraphQLString },
 	}),
 })
 
@@ -85,9 +111,6 @@ const OrderMutations = {
 						cart[cartItemIndex].itemCount += itemData.itemCount;
 						cart[cartItemIndex].itemTotalPrice = cart[cartItemIndex].itemCount * cart[cartItemIndex].itemPrice;
 					} else {
-						const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
-							return tempCartItem.menuItemId === itemData.menuItemId;
-						})
 						const menuItemData = foundMenuItems.find(item => item._id === itemData.menuItemId);
 						cart[cartSize++] = {
 							menuItemId: itemData.menuItemId,
@@ -111,7 +134,9 @@ const OrderMutations = {
 				});
 				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems } }, { new: true, upsert: true }).lean();
+				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				const cart = orderList.map(orderItem => {
@@ -176,7 +201,7 @@ const OrderMutations = {
 							img: menuItemData.img,
 							itemCount: itemData.itemCount,
 							itemPrice: menuItemData.price,
-							itemTotalPrice: orderItem.itemCount * menuItemData.price,
+							itemTotalPrice: itemData.itemCount * menuItemData.price,
 							currency: menuItemData.currency,
 							movements: [
 								{
@@ -188,22 +213,26 @@ const OrderMutations = {
 						});
 					} else {
 						const oldData = tempCart[tempCartItemIndex];
+						oldData.movements.push({
+							type: "addToTempCart",
+							count: itemData.itemCount,
+							date: Date.now(),
+						})
 						tempCart[tempCartItemIndex] = {
 							...oldData,
 							itemCount: oldData.itemCount + itemData.itemCount,
 							itemTotalPrice: oldData.itemTotalPrice + (itemData.itemCount * menuItemData.price),
-							movements: oldData.movements.push({
-								type: "addToTempCart",
-								count: itemData.itemCount,
-								date: Date.now(),
-							}),
+							movements: oldData.movements,
 						};
 					}
 				})
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart } }, { new: true, upsert: true }).lean();
+				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
-				const cart = orderList.map(orderItem => {
+				const tempCart = orderList.map(orderItem => {
 					const menuItemData = foundMenuItems.find(menuItem => menuItem._id === orderItem.menuItemId);
 					return {
 						...orderItem,
@@ -212,15 +241,21 @@ const OrderMutations = {
 						itemPrice: menuItemData.price,
 						itemTotalPrice: orderItem.itemCount * menuItemData.price,
 						currency: menuItemData.currency,
-						date: Date.now(),
+						movements: [
+							{
+								type: "addToTempCart",
+								count: orderItem.itemCount,
+								date: Date.now(),
+							}
+						],
 					}
 				})
-				const totalPrice = cart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
-				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				const orderEntity = new Order({ accountId, tableId, reserveToken, cart, totalPrice, totalItems, notes: "Created by user after adding order.", dateCreated: new Date() });
+				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+
+				const orderEntity = new Order({ accountId, tableId, reserveToken, cart: [], tempCart, totalPrice: 0, totalItems: 0, tempTotalPrice, tempTotalItems, notes: "Created by user after adding order.", dateCreated: new Date() });
 				newOrder = await orderEntity.save();
-				return newOrder
-				throw new Error("Order not found.")
+				return newOrder;
 			}
 		}
 	},
@@ -253,18 +288,22 @@ const OrderMutations = {
 					if (oldData.itemCount < 1) {
 						throw new Error("Item not found in your cart.");
 					}
+					oldData.movements.push({
+						type: "removeFromTempCart",
+						count: -1,
+						date: Date.now(),
+					})
 					tempCart[tempCartItemIndex] = {
 						...oldData,
 						itemCount: oldData.itemCount - 1,
 						itemTotalPrice: oldData.itemTotalPrice - oldData.itemPrice,
-						movements: oldData.movements.push({
-							type: "removeFromTempCart",
-							count: -1,
-							date: Date.now(),
-						}),
+						movements: oldData.movements,
 					};
 				}
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart } }, { new: true, upsert: true }).lean();
+				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				throw new Error("Order not found.")
@@ -300,18 +339,22 @@ const OrderMutations = {
 					if (oldData.itemCount < 1) {
 						throw new Error("Item not found in your cart.");
 					}
+					oldData.movements.push({
+						type: "removeFromTempCart",
+						count: -oldData.itemCount,
+						date: Date.now(),
+					});
 					tempCart[tempCartItemIndex] = {
 						...oldData,
 						itemCount: 0,
 						itemTotalPrice: 0,
-						movements: oldData.movements.push({
-							type: "removeFromTempCart",
-							count: -oldData.itemCount,
-							date: Date.now(),
-						}),
+						movements: oldData.movements,
 					};
 				}
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart } }, { new: true, upsert: true }).lean();
+				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
+				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
+
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				throw new Error("Order not found.")
@@ -338,19 +381,21 @@ const OrderMutations = {
 				const tempCart = order.tempCart;
 				tempCart.forEach((menuItemData, index) => {
 					if (menuItemData.itemCount > 0) {
+						menuItemData.movements.push({
+							type: "removeFromTempCart",
+							count: -(menuItemData.itemCount),
+							date: Date.now(),
+						})
 						tempCart[index] = {
 							...menuItemData,
 							itemCount: 0,
 							itemTotalPrice: 0,
-							movements: menuItemData.movements.push({
-								type: "removeFromTempCart",
-								count: menuItemData.itemCount,
-								date: Date.now(),
-							}),
+							movements: menuItemData.movements,
 						};
 					}
 				});
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart } }, { new: true, upsert: true }).lean();
+
+				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice: 0, tempTotalItems: 0 } }, { new: true, upsert: true }).lean();
 				return newOrder;
 			} else {
 				throw new Error("Order not found.")
@@ -432,8 +477,14 @@ const OrderMutations = {
 			if (order && order.cart && order.cart.length > 0) {
 				const cartLength = order.cart.length;
 				order.cart = order.cart.reduce((newCart, cartItem) => {
+					const tempCartItemIndex = order.tempCart.findIndex(tempCartItem => tempCartItem.menuItemId === cartItem.menuItemId);
 					if (cartItem.date < allowedDateFrom) {
 						newCart.push(cartItem)
+						order.tempCart[tempCartItemIndex].movements.push({
+							type: "removeMenuItem",
+							count: cartItem.itemCount,
+							date: Date.now(),
+						})
 					}
 					return newCart;
 				}, []);
