@@ -345,7 +345,7 @@ const AccountController = {
 			const account = await Account.findOneAndUpdate(
 				{ _id, menuTypes: { $elemMatch: { name: oldName } } },
 				{ $set: { "menuTypes.$.name": newName, "menuTypes.$.img": img } },
-				{ new: true },
+				{ upsert: false, new: true },
 			).lean();
 			await MenuItem.updateMany({ accountId: _id, type: oldName }, { $set: { type: newName } });
 			res.status(200).send({
@@ -369,7 +369,7 @@ const AccountController = {
 			const account = await Account.findOneAndUpdate(
 				{ _id },
 				{ $set: { defaultMenuType: newName } },
-				{ new: true },
+				{ upsert: false, new: true },
 			).lean();
 			res.status(200).send({
 				success: true,
@@ -389,10 +389,11 @@ const AccountController = {
 		try {
 			const { typeName } = req.body;
 			const { _id } = req.decoded;
+			console.log({_id, typeName})
 			const account = await Account.findOneAndUpdate(
 				{ _id },
 				{ $pull: { menuTypes: { name: typeName } } },
-				{ new: true },
+				{ upsert: false, new: true },
 			).lean();
 			// await MenuItem.updateMany({ accountId: _id, type: typeName }, { $set: { type: account.defaultMenuType } });
 			res.status(200).send({
