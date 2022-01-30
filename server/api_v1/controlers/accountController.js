@@ -297,6 +297,24 @@ const AccountController = {
 		}
 	},
 
+	getMainDishes: async (req, res) => {
+		try {
+			const { _id } = req.decoded;
+			const mainDishes = await MenuItem.find({ accountId: _id, isMainDish: true }).lean();
+			res.status(200).send({
+				success: true,
+				mainDishes,
+			});
+		} catch (e) {
+			console.log("getMainDishes error", e);
+			log.error("getMainDishes error", e);
+			res.status(500).send({
+				success: true,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
 	removeMainDish: async (req, res) => {
 		try {
 			const { menuItemId } = req.body;

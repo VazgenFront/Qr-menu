@@ -21,6 +21,7 @@ module.exports = (express) => {
 	apiRouter.put("/menuItem", AccountController.editMenuItem);
 	apiRouter.delete("/menuItem", AccountController.deleteMenuItem);
 
+	apiRouter.get("/mainDishes", AccountController.getMainDishes);
 	apiRouter.post("/addMainDish", AccountController.addMainDish);
 	apiRouter.post("/removeMainDish", AccountController.removeMainDish);
 
