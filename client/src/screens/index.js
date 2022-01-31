@@ -6,7 +6,11 @@ import Card from "./Card/Card.js";
 import MenuItem from "./MenuItem/MenuItem.js";
 import ErrorPage from "./ErrorPage/ErrorPage.js";
 import AdminPage from "./AdminPage/AdminPage.js";
-import Blank from "./Blank/Blank.js";
+import AdminPanelHome from "./AdminPanelHome/AdminPanelHome.js";
+import AdminPanelMenuTypes from "./AdminPanelMenuTypes/AdminPanelMenuTypes.js";
+import AdminPanelMenuItems from "./AdminPanelMenuItems/AdminPanelMenuItems.js";
+import AdminPanelMenuTypesItem from "./AdminPanelMenuTypesItem/AdminPanelMenuTypesItem.js";
+import AdminPanelMainDishes from "./AdminPanelMainDishes/AdminPanelMainDishes.js";
 
 export {
   AboutUs,
@@ -17,5 +21,9 @@ export {
   MenuItem,
   ErrorPage,
   AdminPage,
-  Blank,
+  AdminPanelHome,
+  AdminPanelMenuTypes,
+  AdminPanelMenuItems,
+  AdminPanelMenuTypesItem,
+  AdminPanelMainDishes,
 };

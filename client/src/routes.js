@@ -9,7 +9,11 @@ import {
   MenuItem,
   ErrorPage,
   AdminPage,
-  Blank,
+  AdminPanelHome,
+  AdminPanelMenuTypes,
+  AdminPanelMenuItems,
+  AdminPanelMenuTypesItem,
+  AdminPanelMainDishes,
 } from "./screens/index";
 
 export const appRoutes = [
@@ -47,7 +51,7 @@ export const appRoutes = [
   },
 
   {
-    path: "/admin-panel",
+    path: "/admin-panel/auth",
     name: "AdminAuh",
     exact: true,
     component: AdminAuh,
@@ -58,6 +62,41 @@ export const appRoutes = [
     name: "menuType",
     exact: true,
     component: AdminPage,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/home",
+    name: "adminPanelHome",
+    exact: true,
+    component: AdminPanelHome,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/menuTypes",
+    name: "adminPanelMenuTypes",
+    exact: true,
+    component: AdminPanelMenuTypes,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/menuTypes/:menuType",
+    name: "adminPanelMenuTypes",
+    exact: true,
+    component: AdminPanelMenuTypesItem,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/menuItem",
+    name: "adminPanelMenuTypes",
+    exact: true,
+    component: AdminPanelMenuItems,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/mainDishes",
+    name: "adminPanelMenuTypes",
+    exact: true,
+    component: AdminPanelMainDishes,
   },
 
   {

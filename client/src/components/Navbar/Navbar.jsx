@@ -20,37 +20,42 @@ const NavBar = () => {
     },
   });
 
-  const [getOrder, { loading: ld, data: dt, error: err }] =
-    useLazyQuery(GET_ORDER);
+  const [getOrder, { data: dt }] = useLazyQuery(GET_ORDER);
 
-  useEffect(() => {
+  const getTotalItemsCountFnc = async () => {
+    await getOrder({
+      variables: {
+        accountId: Number(cafeId),
+        tableId: Number(tableId),
+        reserveToken: localStorage.getItem("token"),
+      },
+    }).then((data) => state.getTotalItemsCount(data?.data?.order?.totalItems));
+  };
+
+  useEffect(async () => {
     setStyle({
       ...data?.account?.style,
     });
     data?.account && setMenuTypes(() => [...data?.account?.menuTypes]);
 
-    localStorage.getItem("token") &&
-      getOrder({
-        variables: {
-          accountId: Number(cafeId),
-          tableId: Number(tableId),
-          reserveToken: localStorage.getItem("token"),
-        },
-      }).then((data) =>
-        state.getTotalItemsCount(data?.data?.order?.totalItems)
-      );
+    localStorage.getItem("token") && (await getTotalItemsCountFnc());
   }, [data, totalItemsCount, dt, state.totalItemsCount]);
 
   useEffect(() => {
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.menuItems);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style]);
 
   const { fontFamily, logo, navbarBgColor, navbarTitleColor } = style;
 
   if (error) {
-    return <ErrorMessage error={error?.message} color={navbarTitleColor} />;
+    return (
+      <ErrorMessage
+        error={"Something gone wrong, please reload the page"}
+        color={navbarTitleColor}
+        background={navbarBgColor}
+      />
+    );
   }
 
   if (loading) {
@@ -113,9 +118,11 @@ const NavBar = () => {
               {totalItemsCount ? (
                 <span
                   className="card__qunatity"
-                  style={{ color: navbarBgColor }}
+                  style={{
+                    color: navbarBgColor,
+                    backgroundColor: navbarTitleColor,
+                  }}
                 >
-                  {/* {totalItemsCount} */}
                   {state.totalItemsCount}
                 </span>
               ) : null}

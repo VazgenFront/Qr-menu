@@ -41,3 +41,9 @@
   margin-top: 32px;
   font-weight: bold;
 }
+
+.totalItems__price {
+  margin-top: 48px;
+  font-size: 22px;
+  color: gold;
+}

@@ -32,19 +32,21 @@ const MenuType = () => {
 
   const { navbarTitleColor, navbarBgColor } = state.styles;
 
-  const addToCard = (id) => {
+  const addToCard = async (id) => {
     const menuItemId = Number(id);
     const serverCafeId = Number(cafeId);
     const serverTableId = Number(tableId);
 
-    addOrder({
+    const totalItemsCount = await addOrder({
       variables: {
         accountId: serverCafeId,
         tableId: serverTableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
-    });
+    }).then((data) => data.data?.addOrder?.totalItems);
+
+    state.getTotalItemsCount(totalItemsCount);
   };
 
   if (loading) {

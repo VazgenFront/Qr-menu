@@ -13,10 +13,12 @@ const Card = () => {
   const [cart, setCart] = useState([]);
   const token = localStorage.getItem("token");
   const state = useContext(ThemeContext);
+  const [totalPrice, setToTalItemsPrice] = useState(0);
+  const [error, setError] = useState({ hasError: false, errorMessage: "" });
 
-  const [getOrder, { loading, data, error }] = useLazyQuery(GET_ORDER);
+  const [getOrder, { loading, data }] = useLazyQuery(GET_ORDER);
 
-  const [removeAllItems, { data: dt }] = useMutation(REMOVE_ALL_CART_ITEMS);
+  const [removeAllItems] = useMutation(REMOVE_ALL_CART_ITEMS);
   const { getTotalItemsCount } = state;
   const { navbarTitleColor, navbarBgColor } = state.styles;
 
@@ -29,7 +31,14 @@ const Card = () => {
       },
     })
       .then(() => setCart([]))
-      .then(() => getTotalItemsCount(0));
+      .then(() => getTotalItemsCount())
+      .catch((e) => {
+        setError((prevState) => ({
+          ...prevState,
+          hasError: true,
+          errorMessage: e.message,
+        }));
+      });
   };
 
   useEffect(() => {
@@ -39,18 +48,34 @@ const Card = () => {
         tableId: Number(tableId),
         reserveToken: token,
       },
-    }).then(
-      (data) => data?.data?.order && setCart(() => [...data?.data?.order?.cart])
-    );
+    })
+      .then((data) => {
+        setToTalItemsPrice(data?.data?.order?.totalPrice);
+        return data?.data?.order && setCart(() => [...data?.data?.order?.cart]);
+      })
+      .catch((e) => {
+        setError((prevState) => ({
+          ...prevState,
+          hasError: true,
+          errorMessage: e.message,
+        }));
+      });
   }, [cafeId, data, getOrder, tableId, token]);
 
   if (loading) {
     return <Spinner color={navbarTitleColor} />;
   }
-
-  if (error) {
-    return <ErrorMessage error={error?.message} color={navbarTitleColor} />;
+  
+  if (error.errorMessage) {
+    return (
+      <ErrorMessage
+        color={navbarTitleColor}
+        background={navbarBgColor}
+        error={"Something Went Wrong"}
+      />
+    );
   }
+
   return (
     <div
       className="card_box"
@@ -68,6 +93,7 @@ const Card = () => {
             item={item}
             index={index}
             navbarTitleColor={navbarTitleColor}
+            navbarBgColor={navbarBgColor}
           />
         ))
       ) : (
@@ -76,6 +102,9 @@ const Card = () => {
         </span>
       )}
 
+      {totalPrice ? (
+        <span className="totalItems__price">Total Price: {totalPrice} AMD</span>
+      ) : null}
       {cart.length > 0 && Buttons()}
     </div>
   );
