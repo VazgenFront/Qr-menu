@@ -108,7 +108,7 @@
     display: block;
     position: absolute;
     top: 4px;
-    right: 0;
+    right: -10px;
     transform: translate(-100%, 60%);
     font-size: 1.8rem;
     cursor: pointer;
@@ -121,14 +121,12 @@
 }
 
 .card__qunatity {
-  width: 16px;
-  height: 16px;
+  padding: 1px 5px 0px 5px;
   content: "";
   position: absolute;
   left: 22px;
   bottom: -3px;
   border-radius: 20px;
-  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;

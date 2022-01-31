@@ -164,6 +164,8 @@ export const REMOVE_CART_ITEM = gql`
       menuItemId: $menuItemId
     ) {
       __typename
+      totalPrice
+      totalItems
     }
   }
 `;

@@ -16,9 +16,12 @@ const ReadMore = ({ children }) => {
       <span
         onClick={toggleReadMore}
         className="read-or-hide"
-        style={{ color: navbarTitleColor }}
+        style={{
+          color: navbarTitleColor,
+          borderBottom: `1px solid ${navbarTitleColor}`,
+        }}
       >
-        {isReadMore ? "...read more" : " show less"}
+        {isReadMore ? "read more" : " show less"}
       </span>
     </p>
   );

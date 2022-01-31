@@ -2,12 +2,9 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Field, Form } from "react-final-form";
-import { useHistory } from "react-router-dom";
 import "./AdminAuth.css";
 
-const AboutUs = () => {
-  const history = useHistory();
-
+const AdminAuth = () => {
   // eslint-disable-next-line no-unused-vars
   const [token, setToken] = useState("");
 
@@ -22,10 +19,11 @@ const AboutUs = () => {
       })
       .then(async (res) => {
         const { styleId, username } = res.data.body.account;
+        localStorage.setItem("cafeId", styleId);
+        localStorage.setItem("cafeName", username);
         await setToken(res.data.body.token);
         localStorage.setItem("adminTkn", res.data.body.token);
-        history.push(`/admin-panel/dashboard/${styleId}/${username}`);
-        console.log('push');
+        window.location.href = `/admin-panel/${styleId}/${username}/dashboard/home`;
       });
 
     values.login = "";
@@ -69,4 +67,4 @@ const AboutUs = () => {
   );
 };
 
-export default AboutUs;
+export default AdminAuth;

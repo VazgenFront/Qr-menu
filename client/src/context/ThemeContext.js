@@ -3,15 +3,18 @@ import React, { Component, createContext } from "react";
 export const ThemeContext = createContext();
 
 class ThemeContextProvider extends Component {
-  state = {
-    cafeName: localStorage.getItem("cafeName") || "",
-    styles: {},
-    cafeId: localStorage.getItem("cafeId") || null,
-    menuItems: [],
-    card: localStorage.getItem("card") || [],
-    tableId: localStorage.getItem("tableId") || null,
-    totalItemsCount: 0,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      cafeName: localStorage.getItem("cafeName") || "",
+      styles: {},
+      cafeId: localStorage.getItem("cafeId") || null,
+      menuItems: [],
+      card: localStorage.getItem("card") || [],
+      tableId: localStorage.getItem("tableId") || null,
+      totalItemsCount: 0,
+    };
+  }
 
   getCafeId = (IdFromParams) => {
     this.setState({ cafeId: IdFromParams });

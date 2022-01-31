@@ -8,6 +8,9 @@
 .text {
   display: inline;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .read-or-hide {
@@ -15,4 +18,6 @@
   display: block;
   font-weight: bold;
   margin-left: 1px;
+  width: fit-content;
+  margin-top: 10px;
 }

@@ -1,20 +1,20 @@
-import React, { useContext, useEffect } from "react";
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_ORDER, GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
+import { useMutation } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ThemeContext } from "../../context/ThemeContext";
-import "./Cafe.css";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import ReadMore from "../../components/ReadMore/Readmore";
 import Spinner from "../../components/Spinner/Spinner";
-import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import { ThemeContext } from "../../context/ThemeContext";
+import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
+import "./Cafe.css";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
   const { cafeName, cafeId, tableId } = useParams();
-  const [getToken, { loading: loadingToken, error: tokenError }] =
-    useMutation(GET_TABBLE_TOKEN);
+  const [getToken, { loading: loadingToken }] = useMutation(GET_TABBLE_TOKEN);
 
   const [addOrder, { data: addOrderData }] = useMutation(MAKE_ORDER);
+  const [error, setError] = useState({ hasError: false, errorMessage: "" });
 
   // localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
 
@@ -55,7 +55,15 @@ const Cafe = () => {
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
-    });
+    })
+      .then((data) => state.getTotalItemsCount(data.data.addOrder.ItemsCount))
+      .catch((e) => {
+        setError((prevState) => ({
+          ...prevState,
+          hasError: true,
+          errorMessage: e.message,
+        }));
+      });
   };
 
   addOrderData?.addOrder?.cart &&
@@ -66,9 +74,13 @@ const Cafe = () => {
     return <Spinner color={navbarTitleColor} />;
   }
 
-  if (tokenError) {
+  if (error.errorMessage) {
     return (
-      <ErrorMessage error={tokenError?.message} color={navbarTitleColor} />
+      <ErrorMessage
+        error={"Table is reserved"}
+        color={navbarTitleColor}
+        background={navbarBgColor}
+      />
     );
   }
 
@@ -104,7 +116,11 @@ const Cafe = () => {
                   className="cafeInfo__menuItem__description"
                   style={{ color: navbarTitleColor }}
                 >
-                  <ReadMore>{item?.description}</ReadMore>
+                  {item?.description.length < 100 ? (
+                    <p>{item?.description}</p>
+                  ) : (
+                    <ReadMore>{item?.description}</ReadMore>
+                  )}
                 </span>
                 <div className="buying__info">
                   <span

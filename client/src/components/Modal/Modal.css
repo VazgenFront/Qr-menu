@@ -1,0 +1,51 @@
+.EditModal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.AddModal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.EditModal__img {
+  height: 240px;
+  width: 100%;
+}
+
+.item__img {
+  width: 100%;
+  height: 100%;
+}
+
+.editModal__input {
+  min-width: 80%;
+  padding: 3px 5px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding-left: 12px;
+  margin-top: 20px;
+}
+
+.edit__btn__box {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.isMainDish {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  font-size: 21px;
+}
