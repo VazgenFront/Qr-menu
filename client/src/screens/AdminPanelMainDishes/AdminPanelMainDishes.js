@@ -22,14 +22,6 @@ const AdminPanelMainDishes = () => {
       });
   }, [needRefresh]);
 
-  // for Adding
-  const openAddModal = () => {
-    setAddModalOpen(true);
-  };
-  const closeAddModal = () => {
-    setAddModalOpen(false);
-  };
-
   // for Editing
   const openEditModal = () => {
     setEditModalOpen(true);
@@ -42,23 +34,8 @@ const AdminPanelMainDishes = () => {
     });
   };
 
-  const onAdd = () => {
-    openAddModal();
-  };
-
   const closeEditModal = () => {
     setEditModalOpen(false);
-  };
-
-  const onDelete = async (itm) => {
-    const data = { menuItemId: itm._id };
-
-    await axios.delete("http://localhost:4000/api/account/menuItem", {
-      data,
-      headers: { "x-access-token": token },
-    });
-
-    setNeedRefresh(!needRefresh);
   };
 
   return (
@@ -76,13 +53,6 @@ const AdminPanelMainDishes = () => {
             <div className="btn__box" style={{ justifyContent: "center" }}>
               <button className="btn edit" onClick={(e) => onEdit(e, item)}>
                 Edit
-              </button>
-              <button
-                className="btn delete"
-                style={{ marginLeft: "20px" }}
-                onClick={() => onDelete(item)}
-              >
-                Delete
               </button>
             </div>
           </div>

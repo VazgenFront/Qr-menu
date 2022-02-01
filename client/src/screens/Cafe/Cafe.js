@@ -32,9 +32,17 @@ const Cafe = () => {
           accountId: Number(cafeId),
           tableId: Number(tableId),
         },
-      }).then((data) =>
-        localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
-      );
+      })
+        .then((data) =>
+          localStorage.setItem("token", data?.data?.reserveTable?.reserveToken)
+        )
+        .catch((e) => {
+          setError((prevState) => ({
+            ...prevState,
+            hasError: true,
+            errorMessage: e.message,
+          }));
+        });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.pathname]);
 

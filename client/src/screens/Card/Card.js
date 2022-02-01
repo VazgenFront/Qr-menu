@@ -65,7 +65,9 @@ const Card = () => {
   if (loading) {
     return <Spinner color={navbarTitleColor} />;
   }
-  
+
+  console.log("error.errorMessage", error.errorMessage);
+
   if (error.errorMessage) {
     return (
       <ErrorMessage
