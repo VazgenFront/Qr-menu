@@ -1,4 +1,5 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { useEffect } from "react";
 import { BrowserRouter, Switch, useHistory } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./components/Dashboard/Dashboard";
@@ -21,8 +22,7 @@ function App() {
 
   const isAuthAdmin =
     history.location.pathname.includes("admin-panel") &&
-    !history.location.pathname.includes("auth") &&
-    localStorage.getItem("adminTkn");
+    !history.location.pathname.includes("auth");
 
   if (isAuthAdmin) {
     document.getElementById("root").style.display = "flex";
@@ -39,11 +39,27 @@ function App() {
         <ThemeContextProvider>
           {isClient ? <Navbar /> : null}
           {isAuthAdmin ? <Dashboard /> : null}
-          <Switch>{routes}</Switch>
+          <Wrapper history={history}>
+            <Switch>{routes}</Switch>
+          </Wrapper>
         </ThemeContextProvider>
       </ApolloProvider>
     </BrowserRouter>
   );
+}
+
+function Wrapper(props) {
+  const token = localStorage.getItem("adminTkn");
+
+  if (
+    !token &&
+    window.location.pathname.includes("admin-panel") &&
+    !window.location.pathname.includes("auth")
+  ) {
+    window.location.pathname = "/admin-panel/auth";
+  }
+
+  return <div className="wrapper">{props.children}</div>;
 }
 
 export default App;

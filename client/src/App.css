@@ -13,3 +13,7 @@ body {
   min-height: 100vh;
   min-height: 100%;
 }
+
+.wrapper {
+  width: 100%;
+}

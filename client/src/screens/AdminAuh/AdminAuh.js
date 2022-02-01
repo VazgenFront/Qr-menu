@@ -7,6 +7,7 @@ import "./AdminAuth.css";
 const AdminAuth = () => {
   // eslint-disable-next-line no-unused-vars
   const [token, setToken] = useState("");
+  const [authError, setError] = useState(false);
 
   const login = async (values) => {
     const username = values.login;
@@ -24,7 +25,8 @@ const AdminAuth = () => {
         await setToken(res.data.body.token);
         localStorage.setItem("adminTkn", res.data.body.token);
         window.location.href = `/admin-panel/${styleId}/${username}/dashboard/home`;
-      });
+      })
+      .catch(() => setError(true));
 
     values.login = "";
     values.password = "";
@@ -34,7 +36,7 @@ const AdminAuth = () => {
     <div className="auth__box">
       <Form
         onSubmit={login}
-        render={({ handleSubmit }) => (
+        render={({ handleSubmit, values }) => (
           <form onSubmit={handleSubmit} className="auth__form">
             <div className="input__box">
               <label className="input__box__label">Login</label>
@@ -57,9 +59,16 @@ const AdminAuth = () => {
               />
             </div>
 
-            <button className="auth_button" type="submit">
+            <button
+              className="auth_button"
+              disabled={!values.login || !values.password}
+              type="submit"
+            >
               Click
             </button>
+            {authError && (!values.login || !values.password) ? (
+              <p className="error_text">Login or Password is incorrect</p>
+            ) : null}
           </form>
         )}
       />
