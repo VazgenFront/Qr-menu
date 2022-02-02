@@ -9,6 +9,28 @@ autoIncrement.initialize(connection);
 const OrderSchema = new Schema({
 	accountId: { type: Number, required: true },
 	tableId: { type: Number, required: true },
+	tempCart: [
+		{
+			_id: false,
+			menuItemId: { type: Number, required: true },
+			itemName: { type: String, required: true },
+			img: { type: String, required: true },
+			movements: [
+				{
+					_id: false,
+					type: { type: String, required: true,
+						enum: ['addToOrder', 'cancelOrder', 'reduceMenuItem', 'removeMenuItem', 'addToTempCart', 'removeFromTempCart']
+					},
+					count: { type: Number, required: true },
+					date: { type: Number, required: true },
+				}
+			],
+			itemCount: { type: Number, required: true },
+			itemPrice: { type: Number, required: true },
+			itemTotalPrice: { type: Number, required: true },
+			currency: { type: String, required: true },
+		}
+	],
 	cart: [
 		{
 			menuItemId: { type: Number, required: true },
@@ -25,6 +47,8 @@ const OrderSchema = new Schema({
 	isPaid: { type: Boolean, required: true, default: false },
 	totalPrice: { type: Number, default: 0 },
 	totalItems: { type: Number, default: 0 },
+	tempTotalPrice: { type: Number, default: 0 },
+	tempTotalItems: { type: Number, default: 0 },
 	notes: { type: String, required: true },
 	dateCreated: { type: Date, required: true },
 }, { versionKey: false });
