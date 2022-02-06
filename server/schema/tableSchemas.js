@@ -31,7 +31,6 @@ const TableMutations = {
 			accountId = toObjectId(accountId);
 			tableId = toObjectId(tableId);
 			const reserveToken = uuidv4();
-			console.log(findQuery)
 			const table = await Table.findOneAndUpdate(
 				{ accountId, tableId, reserved: false },
 				{ reserved: true, reserveToken },
