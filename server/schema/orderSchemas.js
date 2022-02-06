@@ -13,6 +13,8 @@ const OrderListItemInput = new GraphQLInputObjectType({
 	},
 });
 
+// Temp cart movements must not be visible for clients
+/*
 const TempCartMovement = new GraphQLObjectType({
 	name: "TempCartMovement",
 	fields: {
@@ -21,6 +23,7 @@ const TempCartMovement = new GraphQLObjectType({
 		date: { type: GraphQLID },
 	},
 });
+*/
 
 const OrderListItem = new GraphQLObjectType({
 	name: "OrderListItem",
@@ -45,7 +48,7 @@ const TempCartItem = new GraphQLObjectType({
 		itemPrice: { type: GraphQLInt },
 		itemTotalPrice: { type: GraphQLInt },
 		currency: { type: GraphQLString },
-		movements: { type: new GraphQLList(TempCartMovement) },
+		// movements: { type: new GraphQLList(TempCartMovement) },
 	},
 });
 
@@ -141,6 +144,7 @@ const OrderMutations = {
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
 				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				newOrder.tempCart = newOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return newOrder;
 			} else {
 				const tempCart = orderList.map(orderItem => {
@@ -166,6 +170,7 @@ const OrderMutations = {
 
 				const orderEntity = new Order({ accountId, tableId, reserveToken, cart: [], tempCart, totalPrice: 0, totalItems: 0, tempTotalPrice, tempTotalItems, notes: "Created by user after adding order.", dateCreated: new Date() });
 				newOrder = await orderEntity.save();
+				newOrder.tempCart = newOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return newOrder;
 			}
 		}
@@ -188,7 +193,6 @@ const OrderMutations = {
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
@@ -216,8 +220,9 @@ const OrderMutations = {
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -241,7 +246,6 @@ const OrderMutations = {
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
@@ -269,8 +273,9 @@ const OrderMutations = {
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -293,7 +298,6 @@ const OrderMutations = {
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				tempCart.forEach((menuItemData, index) => {
@@ -312,8 +316,9 @@ const OrderMutations = {
 					}
 				});
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice: 0, tempTotalItems: 0 } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice: 0, tempTotalItems: 0 } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -336,7 +341,6 @@ const OrderMutations = {
 			}
 
 			const order = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false }).lean();
-			let newOrder;
 			if (order) {
 				let cart = order.cart;
 				let tempCart = order.tempCart;
@@ -392,8 +396,9 @@ const OrderMutations = {
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("You must add some items to cart before order.");
 			}
@@ -433,6 +438,7 @@ const OrderMutations = {
 				order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 				const { _id, ...newOrder } = order;
 				const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return updatedOrder;
 			} else {
 				throw new Error("Order doesn't exists for your reservation or not found menu item in cart with specified id.");
@@ -467,6 +473,7 @@ const OrderMutations = {
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
 					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+					updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 					return updatedOrder;
 				} else {
 					throw new Error("Menu item edit time expired.");
@@ -508,6 +515,7 @@ const OrderMutations = {
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
 					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+					updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 					return updatedOrder;
 				} else {
 					throw new Error("Order cart is empty or all menu items edit time expired..");
