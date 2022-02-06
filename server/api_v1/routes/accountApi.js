@@ -30,6 +30,7 @@ module.exports = (express) => {
 	apiRouter.put("/defaultMenuType", AccountController.editDefaultMenuType);
 	apiRouter.delete("/menuType", AccountController.deleteMenuType);
 
+	apiRouter.get("/tables", AccountController.getTables);
 	apiRouter.post("/table", AccountController.addTable);
 	apiRouter.put("/table", AccountController.editTable);
 	apiRouter.delete("/table", AccountController.deleteTable);

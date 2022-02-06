@@ -429,6 +429,25 @@ const AccountController = {
 		}
 	},
 
+	getTables: async (req, res) => {
+		try {
+			const _id = toObjectId(req.decoded._id);
+			const accountTables = await Table.find({ accountId: _id }).lean();
+
+			res.status(200).send({
+				success: true,
+				accountTables,
+			});
+		} catch (e) {
+			console.log("addTable error", e);
+			log.error("addTable error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
 	addTable: async (req, res) => {
 		try {
 			const { seatCount, notes } = req.body;
