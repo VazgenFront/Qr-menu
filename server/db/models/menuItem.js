@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 autoIncrement.initialize(connection);
 
 const MenuItemSchema = new Schema({
-    accountId: { type: Number, required: true },
+    accountId: { type: mongoose.Types.ObjectId, required: true },
     type: { type: String, required: true },
     name: { type: String, required: true },
     description: { type: String, required: true },

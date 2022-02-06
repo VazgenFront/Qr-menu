@@ -7,7 +7,7 @@ const { MenuItemType } = require("./menuItemSchemas");
 const AccountType = new GraphQLObjectType({
 	name: 'Account',
 	fields: () => ({
-		_id: {type: GraphQLInt},
+		_id: {type: GraphQLString},
 		username: {type: GraphQLString},
 		name: {type: GraphQLString},
 		img: {type: GraphQLString},
