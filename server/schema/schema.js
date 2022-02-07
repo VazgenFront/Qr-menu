@@ -7,6 +7,7 @@ const { AccountType } = require("./accountSchemas");
 const { MenuItemType } = require("./menuItemSchemas");
 const { OrderType, OrderMutations } = require("./orderSchemas");
 const { TableType, TableMutations } = require("./tableSchemas");
+const { toObjectId } = require("../helpers/conversions");
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -46,8 +47,11 @@ const RootQuery = new GraphQLObjectType({
         reserveToken: { type: GraphQLString },
       },
       async resolve(parent, args) {
-        const { accountId, tableId, reserveToken } = args;
+        let { accountId, tableId, reserveToken } = args;
+        accountId = toObjectId(accountId);
+        tableId = toObjectId(tableId);
         const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+        order.tempCart = order.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0);
         return order;
       }
     },
