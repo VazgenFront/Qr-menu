@@ -57,10 +57,13 @@ const RootQuery = new GraphQLObjectType({
     },
     accountTable: {
       type: TableType,
-      args: { accountId: { type: GraphQLString }, tableId: { type: GraphQLString } },
+      args: {
+        accountId: { type: GraphQLString },
+        tableId: { type: GraphQLString },
+      },
       async resolve(parent, args) {
         const { accountId, tableId } = args;
-        const table = await Table.findOne({ accountId, tableId }).lean();
+        const table = await Table.findOne({ accountId, tableId }, { reserveToken: 0 }).lean();
         return table;
       }
     },
