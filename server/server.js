@@ -13,6 +13,8 @@ app.use(bodyParser.json());
 
 app.use(corsHandler);
 
+app.use('/up-images', express.static('up-images'));
+
 app.use('/graphql', graphqlHTTP({
     schema,
     graphiql: true

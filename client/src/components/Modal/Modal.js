@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import { addFieldHandler, changeFieldHandler } from "../../utils";
 import UploadImage from "../UploadImage/UploadImage";
 import "./Modal.css";
+import axios from "axios";
 
 const renderMenuTypes = ({
   closeModal,
@@ -201,14 +202,25 @@ const EditModal = ({
         img: image || selectedType.img,
       };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      let reader = new FileReader();
-
-      reader.onload = function (e) {
-        setImage(e.target.result);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      // let reader = new FileReader();
+      //
+      // reader.onload = function (e) {
+      //   setImage(e.target.result);
+      // };
+      // reader.readAsDataURL(e.target.files[0]);
+      const formData = new FormData();
+      formData.append('up-img', e.target.files[0], e.target.files[0].name);
+      const result = await axios.post('http://localhost:4000/api/account/image-upload', formData, {
+        headers: {
+          "x-access-token": token,
+        },
+      });
+      if (result && result.data && result.data.url) {
+        console.log(result.data.url);
+        setImage(result.data.url);
+      }
     }
   };
 
@@ -280,9 +292,10 @@ const EditModal = ({
       <div className="edit__btn__box">
         <input
           type="file"
+          name="up-img"
           style={{ width: "100%", height: "100%", marginTop: "10px" }}
           accept=".jpg,.jpeg,.gif,.png"
-          onClick={handleImageChange}
+          onChange={handleImageChange}
         />
 
         <button className="btn edit" onClick={onSave}>

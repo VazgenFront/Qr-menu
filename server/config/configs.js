@@ -10,4 +10,5 @@ module.exports = {
 	secret: 'v3yi39ng7aR6vb11ib9ga7',
 	tokenExpirationTimeInMinutes: 480,
 	orderEditDuration: 5 * 60 * 1000,
+	imageUploadPath: `up-images/`
 };
