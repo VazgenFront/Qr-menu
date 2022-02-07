@@ -1,10 +1,7 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 
 const connection = require('../dbConnection');
 const { Schema } = mongoose;
-
-autoIncrement.initialize(connection);
 
 const AccountSchema = new Schema({
     username: { type: String, required: true, unique: true },
@@ -29,7 +26,5 @@ const AccountSchema = new Schema({
 }, {versionKey: false});
 
 AccountSchema.index({ email: 1, username: 1 }, { unique: true });
-
-AccountSchema.plugin(autoIncrement.plugin, { model: 'Account', startAt: 1 });
 
 module.exports = connection.model('Account', AccountSchema);

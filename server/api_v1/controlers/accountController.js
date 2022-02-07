@@ -8,6 +8,7 @@ const Style = require("../../db/models/style");
 const Table = require("../../db/models/table");
 
 const { getLogger } = require("../../helpers/logger")
+const { toObjectId } = require("../../helpers/conversions");
 
 const log = getLogger("default");
 
@@ -16,8 +17,8 @@ const AccountController = {
 		try {
 			const { username, password } = req.body;
 			const account = await Account.findOne({ username }).lean();
-			if (password !== account.password) {
-				throw new Error("Invalid password!");
+			if (!account || password !== account.password) {
+				throw new Error("Username or password is incorrect.")
 			}
 			if (["deactivated", "disabled"].includes(account.status)) {
 				throw new Error("Account is now inactive. Please contact to administrator to get more information.")
@@ -67,7 +68,7 @@ const AccountController = {
 
 	getAccountData: async (req, res) => {
 		try {
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOne({ _id }).lean();
 			res.status(200).send({
 				success: true,
@@ -87,7 +88,7 @@ const AccountController = {
 	editAccount: async (req, res) => {
 		try {
 			const { name, img, typeId, subTypeId } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const updateQuery = {};
 			if (typeof name === "string") updateQuery.name = name;
 			if (typeof img === "string") updateQuery.img = img;
@@ -111,7 +112,7 @@ const AccountController = {
 
 	getStyle: async (req, res) => {
 		try {
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOne({ _id }).lean();
 			if (!account.styleId) {
 				throw new Error("Account don't have style configured. Use default style indeed.")
@@ -135,7 +136,7 @@ const AccountController = {
 	editStyle: async (req, res) => {
 		try {
 			const { navbarBgColor, navbarTitleColor, logo, mostBookedBorder, fontFamily } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOne({ _id }).lean();
 			if (!account.styleId) {
 				const styleEntity = new Style({
@@ -171,7 +172,7 @@ const AccountController = {
 	addMenuItem: async (req, res) => {
 		try {
 			const { type, name, description, img, price, currency, isMainDish } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const menuItemEntity = new MenuItem({
 				accountId: _id, type, name, description, img, price, currency, isMainDish,
 			})
@@ -192,7 +193,7 @@ const AccountController = {
 
 	getMenuItems: async (req, res) => {
 		try {
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const menuItems = await MenuItem.find({ accountId: _id });
 			res.status(200).send({
 				success: true,
@@ -211,7 +212,7 @@ const AccountController = {
 	getMenuItemsOfType: async (req, res) => {
 		try {
 			const { type } = req.query;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const menuItems = await MenuItem.find({ accountId: _id, type });
 			res.status(200).send({
 				success: true,
@@ -230,7 +231,7 @@ const AccountController = {
 	editMenuItem: async (req, res) => {
 		try {
 			const { id, type, name, description, img, price, currency, isMainDish } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const menuItem =  await MenuItem.findOneAndUpdate(
 				{_id: id, accountId: _id},
 				{ $set: { type, name, description, img, price, currency, isMainDish } },
@@ -253,7 +254,7 @@ const AccountController = {
 	deleteMenuItem: async (req, res) => {
 		try {
 			const { menuItemId } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, "cart.menuItemId": menuItemId }).lean();
 			if (unpaidOrders.length) {
 				throw new Error("Please close all unpaid orders with specified menu item before delete.");
@@ -275,7 +276,7 @@ const AccountController = {
 	addMainDish: async (req, res) => {
 		try {
 			const { menuItemId } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const menuItem = await MenuItem.findOneAndUpdate(
 				{ _id: menuItemId, accountId: _id },
 				{ $set: { isMainDish: true } },
@@ -299,7 +300,7 @@ const AccountController = {
 
 	getMainDishes: async (req, res) => {
 		try {
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const mainDishes = await MenuItem.find({ accountId: _id, isMainDish: true }).lean();
 			res.status(200).send({
 				success: true,
@@ -318,7 +319,7 @@ const AccountController = {
 	removeMainDish: async (req, res) => {
 		try {
 			const { menuItemId } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			await MenuItem.updateOne({ _id: menuItemId, accountId: _id }, { $set: { isMainDish: false } });
 			res.status(200).send({
 				success: true,
@@ -336,7 +337,7 @@ const AccountController = {
 	addMenuType: async (req, res) => {
 		try {
 			const { typeName, img } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOneAndUpdate(
 				{ _id },
 				{ $addToSet: { menuTypes: { name: typeName, img } } },
@@ -359,7 +360,7 @@ const AccountController = {
 	editMenuType: async (req, res) => {
 		try {
 			const { oldName, newName, img } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOneAndUpdate(
 				{ _id, menuTypes: { $elemMatch: { name: oldName } } },
 				{ $set: { "menuTypes.$.name": newName, "menuTypes.$.img": img } },
@@ -383,7 +384,7 @@ const AccountController = {
 	editDefaultMenuType: async (req, res) => {
 		try {
 			const { newName } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const account = await Account.findOneAndUpdate(
 				{ _id },
 				{ $set: { defaultMenuType: newName } },
@@ -406,7 +407,7 @@ const AccountController = {
 	deleteMenuType: async (req, res) => {
 		try {
 			const { typeName } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			console.log({_id, typeName})
 			const account = await Account.findOneAndUpdate(
 				{ _id },
@@ -428,10 +429,29 @@ const AccountController = {
 		}
 	},
 
+	getTables: async (req, res) => {
+		try {
+			const _id = toObjectId(req.decoded._id);
+			const accountTables = await Table.find({ accountId: _id }).lean();
+
+			res.status(200).send({
+				success: true,
+				accountTables,
+			});
+		} catch (e) {
+			console.log("addTable error", e);
+			log.error("addTable error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
 	addTable: async (req, res) => {
 		try {
 			const { seatCount, notes } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const accountTables = await Table.find({ accountId: _id }).lean();
 			const newTableId = accountTables.reduce((maxId, table) => Math.max(maxId, table.tableId), 0) + 1;
 			const tableEntity = new Table({
@@ -458,7 +478,7 @@ const AccountController = {
 	editTable: async (req, res) => {
 		try {
 			const { tableId, seatCount, notes } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const table = await Table.findOneAndUpdate(
 				{ accountId: _id, _id: tableId },
 				{ $set: { seatCount, notes } },
@@ -480,7 +500,7 @@ const AccountController = {
 	deleteTable: async (req, res) => {
 		try {
 			const { tableId } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, tableId }).lean();
 			if (unpaidOrders.length) {
 				throw new Error("Please close all unpaid orders with specified tableId before delete.");
@@ -502,7 +522,7 @@ const AccountController = {
 	getOrders: async (req, res) => {
 		try {
 			const { dateFrom, dateTo } = req.query;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const dateRange = {
 				$gte: new Date(dateFrom),
 				$lte: new Date(dateTo),
@@ -528,7 +548,7 @@ const AccountController = {
 	getPaidOrders: async (req, res) => {
 		try {
 			const { dateFrom, dateTo } = req.query;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const orders = await Order.find({
 				accountId: _id,
 				isPaid: true,
@@ -550,7 +570,7 @@ const AccountController = {
 
 	getUnpaidOrders: async (req, res) => {
 		try {
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const orders = await Order.find({
 				accountId: _id,
 				isPaid: false,
@@ -572,7 +592,7 @@ const AccountController = {
 	closeOrder: async (req, res) => {
 		try {
 			const { orderId, notes } = req.body;
-			const { _id } = req.decoded;
+			const _id = toObjectId(req.decoded._id);
 			const order = await Order.findOneAndUpdate(
 				{
 					_id: orderId,

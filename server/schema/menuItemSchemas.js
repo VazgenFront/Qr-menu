@@ -4,6 +4,7 @@ const MenuItemType = new GraphQLObjectType({
 	name: 'MenuItem',
 	fields: () => ({
 		_id: {type: GraphQLInt},
+		accountId: {type: GraphQLString},
 		type: {type: GraphQLString},
 		name: {type: GraphQLString},
 		description: {type: GraphQLString},

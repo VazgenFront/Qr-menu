@@ -13,7 +13,7 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     account: {
       type: AccountType,
-      args: { _id: { type: GraphQLInt } },
+      args: { _id: { type: GraphQLString } },
       async resolve(parent, args) {
         const _id = args._id;
         const account = await Account.findOne({ _id }, { password: 0 }).lean();
@@ -31,7 +31,7 @@ const RootQuery = new GraphQLObjectType({
     },
     menuItemsOfType: {
       type: new GraphQLList(MenuItemType),
-      args: { accountId: { type: GraphQLInt }, type: { type: GraphQLString } },
+      args: { accountId: { type: GraphQLString }, type: { type: GraphQLString } },
       async resolve(parent, args) {
         const { accountId, type } = args;
         const menuItems = await MenuItem.find({ accountId, type }).lean();
@@ -41,8 +41,8 @@ const RootQuery = new GraphQLObjectType({
     order: {
       type: OrderType,
       args: {
-        accountId: { type: GraphQLInt },
-        tableId: { type: GraphQLInt },
+        accountId: { type: GraphQLString },
+        tableId: { type: GraphQLString },
         reserveToken: { type: GraphQLString },
       },
       async resolve(parent, args) {
@@ -51,18 +51,9 @@ const RootQuery = new GraphQLObjectType({
         return order;
       }
     },
-    table: {
-      type: TableType,
-      args: { _id: { type: GraphQLInt } },
-      async resolve(parent, args) {
-        const _id = args._id;
-        const table = await Table.findOne({_id}).lean();
-        return table;
-      }
-    },
     accountTable: {
       type: TableType,
-      args: { accountId: { type: GraphQLInt }, tableId: { type: GraphQLInt } },
+      args: { accountId: { type: GraphQLString }, tableId: { type: GraphQLString } },
       async resolve(parent, args) {
         const { accountId, tableId } = args;
         const table = await Table.findOne({ accountId, tableId }).lean();

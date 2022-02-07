@@ -7,8 +7,8 @@ const { Schema } = mongoose;
 autoIncrement.initialize(connection);
 
 const OrderSchema = new Schema({
-	accountId: { type: Number, required: true },
-	tableId: { type: Number, required: true },
+	accountId: { type: mongoose.Types.ObjectId, required: true },
+	tableId: { type: mongoose.Types.ObjectId, required: true },
 	tempCart: [
 		{
 			_id: false,

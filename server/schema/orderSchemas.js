@@ -3,6 +3,7 @@ const Order = require("../db/models/order");
 const Account = require("../db/models/account");
 const MenuItem = require("../db/models/menuItem");
 const configs = require("../config/configs");
+const { toObjectId } = require("../helpers/conversions");
 
 const OrderListItemInput = new GraphQLInputObjectType({
 	name: "OrderListItemInput",
@@ -12,6 +13,8 @@ const OrderListItemInput = new GraphQLInputObjectType({
 	},
 });
 
+// Temp cart movements must not be visible for clients
+/*
 const TempCartMovement = new GraphQLObjectType({
 	name: "TempCartMovement",
 	fields: {
@@ -20,6 +23,7 @@ const TempCartMovement = new GraphQLObjectType({
 		date: { type: GraphQLID },
 	},
 });
+*/
 
 const OrderListItem = new GraphQLObjectType({
 	name: "OrderListItem",
@@ -44,7 +48,7 @@ const TempCartItem = new GraphQLObjectType({
 		itemPrice: { type: GraphQLInt },
 		itemTotalPrice: { type: GraphQLInt },
 		currency: { type: GraphQLString },
-		movements: { type: new GraphQLList(TempCartMovement) },
+		// movements: { type: new GraphQLList(TempCartMovement) },
 	},
 });
 
@@ -52,8 +56,8 @@ const OrderType = new GraphQLObjectType({
 	name: 'Order',
 	fields: () => ({
 		_id: { type: GraphQLInt },
-		accountId: { type: GraphQLInt },
-		tableId: { type: GraphQLInt },
+		accountId: { type: GraphQLString },
+		tableId: { type: GraphQLString },
 		tempCart: { type: new GraphQLList(TempCartItem) },
 		cart: { type: new GraphQLList(OrderListItem) },
 		reserveToken: { type: GraphQLString },
@@ -70,13 +74,15 @@ const OrderMutations = {
 	addToTempCart: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 			orderList: { type: new GraphQLList(OrderListItemInput)},
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, orderList } = args;
+			let { accountId, tableId, reserveToken, orderList } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const account = await Account.findOne({ _id: accountId }).lean();
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
@@ -138,6 +144,7 @@ const OrderMutations = {
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
 				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				newOrder.tempCart = newOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return newOrder;
 			} else {
 				const tempCart = orderList.map(orderItem => {
@@ -163,6 +170,7 @@ const OrderMutations = {
 
 				const orderEntity = new Order({ accountId, tableId, reserveToken, cart: [], tempCart, totalPrice: 0, totalItems: 0, tempTotalPrice, tempTotalItems, notes: "Created by user after adding order.", dateCreated: new Date() });
 				newOrder = await orderEntity.save();
+				newOrder.tempCart = newOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return newOrder;
 			}
 		}
@@ -170,20 +178,21 @@ const OrderMutations = {
 	reduceFromTempCartOneMenuItem: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 			menuItemId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, menuItemId } = args;
+			let { accountId, tableId, reserveToken, menuItemId } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const account = await Account.findOne({ _id: accountId }).lean();
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
@@ -211,8 +220,9 @@ const OrderMutations = {
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -221,20 +231,21 @@ const OrderMutations = {
 	removeFromTempCartMenuItem: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 			menuItemId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, menuItemId } = args;
+			let { accountId, tableId, reserveToken, menuItemId } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const account = await Account.findOne({ _id: accountId }).lean();
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
@@ -262,8 +273,9 @@ const OrderMutations = {
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -272,19 +284,20 @@ const OrderMutations = {
 	removeTempCartMenuItems: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken } = args;
+			let { accountId, tableId, reserveToken } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const account = await Account.findOne({ _id: accountId }).lean();
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 
-			let newOrder;
 			if (order) {
 				const tempCart = order.tempCart;
 				tempCart.forEach((menuItemData, index) => {
@@ -303,8 +316,9 @@ const OrderMutations = {
 					}
 				});
 
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice: 0, tempTotalItems: 0 } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, tempTotalPrice: 0, tempTotalItems: 0 } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
 				throw new Error("Order not found.")
 			}
@@ -313,32 +327,38 @@ const OrderMutations = {
 	addOrder: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
-			orderList: { type: new GraphQLList(OrderListItemInput)},
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, orderList } = args;
+			let { accountId, tableId, reserveToken } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const account = await Account.findOne({ _id: accountId }).lean();
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
-			const invalidItemsCount = orderList.filter(item => item.itemCount <= 0).length;
-			if (invalidItemsCount > 0) {
-				throw new Error("Invalid item count provided in order list.")
-			}
-			const menuItemIds = orderList.map(item => item.menuItemId);
 
-			const foundMenuItems = await MenuItem.find({ accountId, _id: {"$in": menuItemIds }}).lean();
-			if (foundMenuItems.length !== menuItemIds.length) {
-				throw new Error("Not all menuItems exists.")
-			}
 			const order = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false }).lean();
-			let newOrder;
 			if (order) {
 				let cart = order.cart;
 				let tempCart = order.tempCart;
+				const orderList = tempCart.reduce((tempCartItemList, tempItemData) => {
+					if (tempItemData.itemCount > 0) {
+						tempCartItemList.push({ menuItemId: tempItemData.menuItemId, itemCount: tempItemData.itemCount })
+					}
+					return tempCartItemList;
+				}, []);
+				if (!(orderList.length > 0)) {
+					throw new Error("Your cart is empty. Please add some items before order.")
+				}
+				const menuItemIds = orderList.map(item => item.menuItemId);
+
+				const foundMenuItems = await MenuItem.find({ accountId, _id: {"$in": menuItemIds }}).lean();
+				if (foundMenuItems.length !== menuItemIds.length) {
+					throw new Error("Not all menuItems exists.")
+				}
 				let cartSize = order.cart.length;
 				orderList.forEach(itemData => {
 					const cartItemIndex = cart.findIndex((cartItem) => {
@@ -347,9 +367,6 @@ const OrderMutations = {
 					const tempCartItemIndex = tempCart.findIndex((tempCartItem) => {
 						return tempCartItem.menuItemId === itemData.menuItemId;
 					})
-					if (tempCartItemIndex < 0 || tempCart[tempCartItemIndex].itemCount < itemData.itemCount) {
-						throw new Error("You haven't added some items to cart yet. Add it to cart to order.")
-					}
 					if (cartItemIndex >= 0) {
 						cart[cartItemIndex].itemCount += itemData.itemCount;
 						cart[cartItemIndex].itemTotalPrice = cart[cartItemIndex].itemCount * cart[cartItemIndex].itemPrice;
@@ -379,23 +396,26 @@ const OrderMutations = {
 				const totalItems = cart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
 				const tempTotalPrice = tempCart.reduce((total, cartItem) => total + cartItem.itemTotalPrice , 0);
 				const tempTotalItems = tempCart.reduce((total, cartItem) => total + cartItem.itemCount , 0);
-				newOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
-				return newOrder;
+				const updatedOrder = await Order.findOneAndUpdate({ accountId, tableId, reserveToken }, { $set: { tempCart, cart, totalPrice, totalItems, tempTotalPrice, tempTotalItems } }, { new: true, upsert: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
+				return updatedOrder;
 			} else {
-				throw new Error("You must add some items to cart before order.")
+				throw new Error("You must add some items to cart before order.");
 			}
 		}
 	},
 	reduceOneMenuItemCount: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 			menuItemId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, menuItemId } = args;
+			let { accountId, tableId, reserveToken, menuItemId } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
 			const order = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false, cart: { $elemMatch: { menuItemId } } }).lean();
 			if (order) {
@@ -418,6 +438,7 @@ const OrderMutations = {
 				order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 				const { _id, ...newOrder } = order;
 				const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+				updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 				return updatedOrder;
 			} else {
 				throw new Error("Order doesn't exists for your reservation or not found menu item in cart with specified id.");
@@ -427,13 +448,15 @@ const OrderMutations = {
 	removeMenuItemFromOrder: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 			menuItemId: { type: GraphQLInt },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken, menuItemId } = args;
+			let { accountId, tableId, reserveToken, menuItemId } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
 			const order = await Order.findOne({ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId } } }).lean();
 			if (order) {
@@ -450,6 +473,7 @@ const OrderMutations = {
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
 					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+					updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 					return updatedOrder;
 				} else {
 					throw new Error("Menu item edit time expired.");
@@ -462,12 +486,14 @@ const OrderMutations = {
 	removeCartItemsFromOrder: {
 		type: OrderType,
 		args: {
-			accountId: { type: GraphQLInt },
-			tableId: { type: GraphQLInt },
+			accountId: { type: GraphQLString },
+			tableId: { type: GraphQLString },
 			reserveToken: { type: GraphQLString },
 		},
 		async resolve(parent, args){
-			const { accountId, tableId, reserveToken } = args;
+			let { accountId, tableId, reserveToken } = args;
+			accountId = toObjectId(accountId);
+			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
 			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
 			if (order && order.cart && order.cart.length > 0) {
@@ -489,6 +515,7 @@ const OrderMutations = {
 					order.totalItems = order.cart.reduce((total, cartItem) => total + cartItem.itemCount, 0);
 					const { _id, ...newOrder } = order;
 					const updatedOrder = await Order.findOneAndUpdate({ _id }, newOrder, { new: true }).lean();
+					updatedOrder.tempCart = updatedOrder.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0)
 					return updatedOrder;
 				} else {
 					throw new Error("Order cart is empty or all menu items edit time expired..");

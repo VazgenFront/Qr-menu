@@ -13,7 +13,7 @@ module.exports = (express) => {
 	apiRouter.put("/account", AccountController.editAccount);
 
 	apiRouter.get("/style", AccountController.getStyle);
-	apiRouter.put("/style", AccountController.editStyle);
+	// apiRouter.put("/style", AccountController.editStyle);
 
 	apiRouter.get("/menuItems", AccountController.getMenuItems);
 	apiRouter.get("/menuItemsOfType", AccountController.getMenuItemsOfType);
@@ -22,7 +22,7 @@ module.exports = (express) => {
 	apiRouter.delete("/menuItem", AccountController.deleteMenuItem);
 
 	apiRouter.get("/mainDishes", AccountController.getMainDishes);
-	apiRouter.post("/addMainDish", AccountController.addMainDish);
+	// apiRouter.post("/addMainDish", AccountController.addMainDish);
 	apiRouter.post("/removeMainDish", AccountController.removeMainDish);
 
 	apiRouter.post("/menuType", AccountController.addMenuType);
@@ -30,6 +30,7 @@ module.exports = (express) => {
 	apiRouter.put("/defaultMenuType", AccountController.editDefaultMenuType);
 	apiRouter.delete("/menuType", AccountController.deleteMenuType);
 
+	apiRouter.get("/tables", AccountController.getTables);
 	apiRouter.post("/table", AccountController.addTable);
 	apiRouter.put("/table", AccountController.editTable);
 	apiRouter.delete("/table", AccountController.deleteTable);
