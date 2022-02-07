@@ -51,7 +51,9 @@ const RootQuery = new GraphQLObjectType({
         accountId = toObjectId(accountId);
         tableId = toObjectId(tableId);
         const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
-        order.tempCart = order.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0);
+        if (order && order.tempCart) {
+          order.tempCart = order.tempCart.filter(tempCartItem => tempCartItem.itemCount > 0);
+        }
         return order;
       }
     },
