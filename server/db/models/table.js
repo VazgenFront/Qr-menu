@@ -8,6 +8,7 @@ const TableSchema = new Schema({
 	tableId: { type: mongoose.Types.ObjectId, required: true },
 	seatCount: { type: Number, required: true },
 	reserved: { type: Boolean, required: true, default: false },
+	name: { type: String, required: true, default: () => { return `Table ${Date.now()}` } },
 	reserveToken: { type: String },
 	notes: { type: String, required: true },
 }, { versionKey: false });

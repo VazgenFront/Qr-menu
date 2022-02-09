@@ -10,6 +10,7 @@ const TableType = new GraphQLObjectType({
 		_id: {type: GraphQLInt},
 		accountId: {type: GraphQLString},
 		tableId: {type: GraphQLString},
+		name: {type: GraphQLString},
 		seatCount: {type: GraphQLInt},
 		reserved: {type: GraphQLBoolean},
 		notes: {type: GraphQLString},

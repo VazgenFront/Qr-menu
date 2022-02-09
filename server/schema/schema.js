@@ -65,7 +65,7 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args) {
         const { accountId, tableId } = args;
-        const table = await Table.findOne({ accountId, tableId }, { reserveToken: 0 }).lean();
+        const table = await Table.findOne({ accountId, tableId }).lean();
         return table;
       }
     },

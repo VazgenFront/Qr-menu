@@ -9,6 +9,7 @@ const Table = require("../../db/models/table");
 
 const { getLogger } = require("../../helpers/logger")
 const { toObjectId } = require("../../helpers/conversions");
+const mongoose = require("mongoose");
 
 const log = getLogger("default");
 
@@ -450,13 +451,12 @@ const AccountController = {
 
 	addTable: async (req, res) => {
 		try {
-			const { seatCount, notes } = req.body;
+			let { seatCount, name, notes } = req.body;
 			const _id = toObjectId(req.decoded._id);
-			const accountTables = await Table.find({ accountId: _id }).lean();
-			const newTableId = accountTables.reduce((maxId, table) => Math.max(maxId, table.tableId), 0) + 1;
 			const tableEntity = new Table({
 				accountId: _id,
-				tableId: newTableId,
+				tableId: new mongoose.Types.ObjectId(),
+				name,
 				seatCount,
 				notes,
 			})
@@ -477,11 +477,11 @@ const AccountController = {
 
 	editTable: async (req, res) => {
 		try {
-			const { tableId, seatCount, notes } = req.body;
+			const { tableId, seatCount, name, notes } = req.body;
 			const _id = toObjectId(req.decoded._id);
 			const table = await Table.findOneAndUpdate(
 				{ accountId: _id, _id: tableId },
-				{ $set: { seatCount, notes } },
+				{ $set: { seatCount, notes, name } },
 				{ new: true }).lean();
 			res.status(200).send({
 				success: true,
@@ -505,7 +505,7 @@ const AccountController = {
 			if (unpaidOrders.length) {
 				throw new Error("Please close all unpaid orders with specified tableId before delete.");
 			}
-			await Table.deleteOne({ accountId: _id, _id: tableId });
+			await Table.deleteOne({ accountId: _id, tableId });
 			res.status(200).send({
 				success: true,
 			});
