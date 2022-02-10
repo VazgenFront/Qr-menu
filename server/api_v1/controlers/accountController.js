@@ -601,6 +601,10 @@ const AccountController = {
 				{ $set: { isPaid: true, notes } },
 				{ new: true },
 			).lean();
+			await Table.findOneAndUpdate(
+				{ accountId: order.accountId, tableId: order.tableId },
+				{ $set: { reserveToken: null, reserved: false },
+			});
 			res.status(200).send({
 				success: true,
 				order
@@ -608,6 +612,37 @@ const AccountController = {
 		} catch (e) {
 			console.log("closeOrder error", e);
 			log.error("closeOrder error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	closeTable: async (req, res) => {
+		try {
+			const { tableId } = req.body;
+			const _id = toObjectId(req.decoded._id);
+			await Order.updateMany(
+				{
+					tableId,
+					accountId: _id,
+					isPaid: false,
+				},
+				{ $set: { isPaid: true } },
+			);
+			const table = await Table.findOneAndUpdate(
+			{ accountId: _id, tableId },
+			{ $set: { reserveToken: null, reserved: false } },
+			{ new: true },
+			);
+			res.status(200).send({
+				success: true,
+				table
+			});
+		} catch (e) {
+			console.log("closeTable error", e);
+			log.error("closeTable error", e);
 			res.status(500).send({
 				success: false,
 				body: e.message ? e.message : e,

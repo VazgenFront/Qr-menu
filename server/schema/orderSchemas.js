@@ -2,6 +2,7 @@ const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLList, Gra
 const Order = require("../db/models/order");
 const Account = require("../db/models/account");
 const MenuItem = require("../db/models/menuItem");
+const Table = require("../db/models/table");
 const configs = require("../config/configs");
 const { toObjectId } = require("../helpers/conversions");
 
@@ -68,7 +69,20 @@ const OrderType = new GraphQLObjectType({
 		tempTotalItems: { type: GraphQLInt },
 		notes: { type: GraphQLString },
 	}),
-})
+});
+
+
+const validateOrderMutationAvailability = async (accountId, tableId, reserveToken, extraConditions) => {
+	const tableReserved = await Table.findOne({ accountId, tableId, reserveToken }).lean();
+	if (!tableReserved) {
+		throw new Error("Table not reserved by you.");
+	}
+	const order = await Order.findOne({ accountId, tableId, reserveToken, ...extraConditions }).lean();
+	if (order && order.isPaid) {
+		throw new Error("Order is already closed.");
+	}
+	return order;
+}
 
 const OrderMutations = {
 	addToTempCart: {
@@ -98,7 +112,7 @@ const OrderMutations = {
 				throw new Error("Not all menuItems exists.")
 			}
 
-			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 
 			let newOrder;
 			if (order) {
@@ -191,7 +205,7 @@ const OrderMutations = {
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
-			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 
 			if (order) {
 				const tempCart = order.tempCart;
@@ -244,7 +258,7 @@ const OrderMutations = {
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
-			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 
 			if (order) {
 				const tempCart = order.tempCart;
@@ -296,7 +310,7 @@ const OrderMutations = {
 			if (!account || account.status !== "enabled") {
 				throw new Error("Account not active now.");
 			}
-			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 
 			if (order) {
 				const tempCart = order.tempCart;
@@ -340,7 +354,7 @@ const OrderMutations = {
 				throw new Error("Account not active now.");
 			}
 
-			const order = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 			if (order) {
 				let cart = order.cart;
 				let tempCart = order.tempCart;
@@ -417,7 +431,8 @@ const OrderMutations = {
 			accountId = toObjectId(accountId);
 			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
-			const order = await Order.findOne({ accountId, tableId, reserveToken, isPaid: false, cart: { $elemMatch: { menuItemId } } }).lean();
+
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken, { cart: { $elemMatch: { menuItemId } }});
 			if (order) {
 				order.cart = order.cart.reduce((newCart, cartItem) => {
 					const tempCartItemIndex = order.tempCart.findIndex(tempCartItem => tempCartItem.menuItemId === cartItem.menuItemId);
@@ -458,7 +473,7 @@ const OrderMutations = {
 			accountId = toObjectId(accountId);
 			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
-			const order = await Order.findOne({ accountId, tableId, reserveToken, cart: { $elemMatch: { menuItemId } } }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken, { cart: { $elemMatch: { menuItemId } }});
 			if (order) {
 				const menuItemInCart = order.cart.find(cartItem => cartItem.menuItemId === menuItemId);
 				if (menuItemInCart && menuItemInCart.date > allowedDateFrom) {
@@ -495,7 +510,7 @@ const OrderMutations = {
 			accountId = toObjectId(accountId);
 			tableId = toObjectId(tableId);
 			const allowedDateFrom = Date.now() - configs.orderEditDuration;
-			const order = await Order.findOne({ accountId, tableId, reserveToken }).lean();
+			const order = await validateOrderMutationAvailability(accountId, tableId, reserveToken);
 			if (order && order.cart && order.cart.length > 0) {
 				const cartLength = order.cart.length;
 				order.cart = order.cart.reduce((newCart, cartItem) => {

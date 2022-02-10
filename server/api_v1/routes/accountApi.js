@@ -57,6 +57,7 @@ module.exports = (express) => {
 	apiRouter.get("/orders/paid", AccountController.getPaidOrders);
 	apiRouter.get("/orders/unpaid", AccountController.getUnpaidOrders);
 	apiRouter.post("/closeOrder", AccountController.closeOrder);
+	apiRouter.post("/closeTable", AccountController.closeTable);
 
 	return apiRouter;
 };
