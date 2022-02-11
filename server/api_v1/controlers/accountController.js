@@ -570,14 +570,21 @@ const AccountController = {
 
 	getUnpaidOrders: async (req, res) => {
 		try {
+			const { dateFrom, dateTo } = req.query;
 			const _id = toObjectId(req.decoded._id);
+			const tables = await Table.find({ accountId: _id }).lean();
 			const orders = await Order.find({
 				accountId: _id,
 				isPaid: false,
+				dateCreated: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
 			}).lean();
+			console.log(orders)
 			res.status(200).send({
 				success: true,
-				orders,
+				orders: orders && orders.length ? orders.map(order => ({
+					...order,
+					tableName: tables.find(table => table.tableId.toString() === order.tableId.toString() && table.accountId.toString() === req.decoded._id)?.name,
+				})) : [],
 			});
 		} catch (e) {
 			console.log("getUnpaidOrders error", e);
