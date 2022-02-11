@@ -549,11 +549,14 @@ const AccountController = {
 		try {
 			const { dateFrom, dateTo } = req.query;
 			const _id = toObjectId(req.decoded._id);
-			const orders = await Order.find({
+			const findQuery = {
 				accountId: _id,
 				isPaid: true,
-				dateCreated: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
-			}).lean();
+			}
+			if (dateFrom && dateTo) {
+				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			}
+			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
 				success: true,
 				orders,
@@ -573,12 +576,14 @@ const AccountController = {
 			const { dateFrom, dateTo } = req.query;
 			const _id = toObjectId(req.decoded._id);
 			const tables = await Table.find({ accountId: _id }).lean();
-			const orders = await Order.find({
+			const findQuery = {
 				accountId: _id,
 				isPaid: false,
-				dateCreated: { $gte: new Date(dateFrom), $lte: new Date(dateTo) },
-			}).lean();
-			console.log(orders)
+			}
+			if (dateFrom && dateTo) {
+				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			}
+			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
 				success: true,
 				orders: orders && orders.length ? orders.map(order => ({
