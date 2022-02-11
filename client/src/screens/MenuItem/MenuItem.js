@@ -5,7 +5,7 @@ import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_MENU_ITEM, MAKE_ORDER } from "../../queries/queries";
+import { GET_MENU_ITEM, ADD__TEMP__CARD } from "../../queries/queries";
 import "./MenuItem.css";
 
 const MenuItem = () => {
@@ -15,7 +15,7 @@ const MenuItem = () => {
   const { navbarBgColor, navbarTitleColor } = state.styles;
 
   const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
-    useMutation(MAKE_ORDER);
+    useMutation(ADD__TEMP__CARD);
 
   const { data, loading, error } = useQuery(GET_MENU_ITEM, {
     variables: {
@@ -31,13 +31,11 @@ const MenuItem = () => {
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
-    const serverCafeId = Number(cafeId);
-    const serverTableId = Number(tableId);
 
     addOrder({
       variables: {
-        accountId: serverCafeId,
-        tableId: serverTableId,
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },

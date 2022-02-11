@@ -200,6 +200,7 @@ const EditModal = ({
         oldName: prevName.current,
         newName: itemName,
         img: image || selectedType.img,
+        isMainDIsh,
       };
 
   const handleImageChange = async (e) => {
@@ -211,21 +212,23 @@ const EditModal = ({
       // };
       // reader.readAsDataURL(e.target.files[0]);
       const formData = new FormData();
-      formData.append('up-img', e.target.files[0], e.target.files[0].name);
-      const result = await axios.post('http://localhost:4000/api/account/image-upload', formData, {
-        headers: {
-          "x-access-token": token,
-        },
-      });
+      formData.append("up-img", e.target.files[0], e.target.files[0].name);
+      const result = await axios.post(
+        "http://localhost:4000/api/account/image-upload",
+        formData,
+        {
+          headers: {
+            "x-access-token": token,
+          },
+        }
+      );
       if (result && result.data && result.data.url) {
-        console.log(result.data.url);
-        setImage(result.data.url);
+        setImage("http://localhost:4000/" + result.data.url);
       }
     }
   };
 
   const onSave = async () => {
-    console.log("body", body);
     await changeFieldHandler(url, body, token);
     closeModal();
     setNeedRefresh(!needRefresh);
@@ -349,7 +352,7 @@ const AddModal = ({
         img: image,
         currency: "AMD",
       }
-    : { typeName: itemName, img: "" };
+    : { typeName: itemName, img: image };
   const onSave = async () => {
     await addFieldHandler(url, body, token);
     closeModal();
@@ -359,7 +362,7 @@ const AddModal = ({
   return (
     <div className="AddModal">
       <div className="EditModal__img">
-        <UploadImage image={image} setImage={setImage} />
+        <UploadImage image={image} setImage={setImage} token={token} />
       </div>
       <input
         type="text"

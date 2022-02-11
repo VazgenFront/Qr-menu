@@ -2,23 +2,26 @@ import React, { useState } from "react";
 import "./UploadImage.css";
 import FolderIcon from "./folder_icon.png";
 import CloseIcon from "./CloseIcon.svg";
-
-function UploadImage({ image, setImage }) {
+import axios from "axios";
+function UploadImage({ image, setImage, token }) {
   const [isUploaded, setIsUploaded] = useState(false);
-  const [typeFile, setTypeFile] = useState("");
 
-  function handleImageChange(e) {
-    if (e.target.files && e.target.files[0]) {
-      setTypeFile(e.target.files[0].type);
-      let reader = new FileReader();
-
-      reader.onload = function (e) {
-        setImage(e.target.result);
-        setIsUploaded(true);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+  const handleImageChange = async (e) => {
+    const formData = new FormData();
+    formData.append("up-img", e.target.files[0], e.target.files[0].name);
+    const result = await axios.post(
+      "http://localhost:4000/api/account/image-upload",
+      formData,
+      {
+        headers: {
+          "x-access-token": token,
+        },
+      }
+    );
+    if (result && result.data && result.data.url) {
+      setImage("http://localhost:4000/" + result.data.url);
     }
-  }
+  };
 
   return (
     <div className="layout">

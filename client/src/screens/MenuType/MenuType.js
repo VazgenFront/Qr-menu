@@ -6,7 +6,7 @@ import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import ReadMore from "../../components/ReadMore/Readmore";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_MENUTYPE_INFO, MAKE_ORDER } from "../../queries/queries";
+import { GET_MENUTYPE_INFO, ADD__TEMP__CARD } from "../../queries/queries";
 import "./menuTypes.css";
 
 const MenuType = () => {
@@ -18,13 +18,13 @@ const MenuType = () => {
 
   const { data, error, loading } = useQuery(GET_MENUTYPE_INFO, {
     variables: {
-      accountId: Number(cafeId),
+      accountId: cafeId,
       type: menuType,
     },
   });
 
   const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
-    useMutation(MAKE_ORDER);
+    useMutation(ADD__TEMP__CARD);
 
   useEffect(() => {
     data?.menuItemsOfType && setMenuTypes(() => [...data?.menuItemsOfType]);
@@ -34,13 +34,11 @@ const MenuType = () => {
 
   const addToCard = async (id) => {
     const menuItemId = Number(id);
-    const serverCafeId = Number(cafeId);
-    const serverTableId = Number(tableId);
 
     const totalItemsCount = await addOrder({
       variables: {
-        accountId: serverCafeId,
-        tableId: serverTableId,
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },

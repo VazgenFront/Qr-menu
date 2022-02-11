@@ -5,18 +5,16 @@ import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import ReadMore from "../../components/ReadMore/Readmore";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_TABBLE_TOKEN, MAKE_ORDER } from "../../queries/queries";
+import { ADD__TEMP__CARD, GET_TABLE_TOKEN } from "../../queries/queries";
 import "./Cafe.css";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
   const { cafeName, cafeId, tableId } = useParams();
-  const [getToken, { loading: loadingToken }] = useMutation(GET_TABBLE_TOKEN);
+  const [getToken, { loading: loadingToken }] = useMutation(GET_TABLE_TOKEN);
 
-  const [addOrder, { data: addOrderData }] = useMutation(MAKE_ORDER);
+  const [addTempOrder, { data: addOrderData }] = useMutation(ADD__TEMP__CARD);
   const [error, setError] = useState({ hasError: false, errorMessage: "" });
-
-  // localStorage.setItem("token", "ad3d1921-1502-49ee-ad69-5b6ec4e13440");
 
   useEffect(() => {
     localStorage.setItem("cafeName", cafeName);
@@ -29,8 +27,8 @@ const Cafe = () => {
     !localStorage.getItem("token") &&
       getToken({
         variables: {
-          accountId: Number(cafeId),
-          tableId: Number(tableId),
+          accountId: cafeId,
+          tableId: tableId,
         },
       })
         .then((data) =>
@@ -54,23 +52,25 @@ const Cafe = () => {
 
   const addToCard = (id) => {
     const menuItemId = Number(id);
-    const serverCafeId = Number(cafeId);
-    const serverTableId = Number(tableId);
-    addOrder({
+
+    addTempOrder({
       variables: {
-        accountId: serverCafeId,
-        tableId: serverTableId,
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
     })
-      .then((data) => state.getTotalItemsCount(data.data.addOrder.ItemsCount))
+      .then((data) =>
+        state.getTotalItemsCount(data.data.addToTempCart.tempTotalItems)
+      )
       .catch((e) => {
         setError((prevState) => ({
           ...prevState,
           hasError: true,
           errorMessage: e.message,
         }));
+        localStorage.removeItem("token");
       });
   };
 
@@ -85,7 +85,7 @@ const Cafe = () => {
   if (error.errorMessage) {
     return (
       <ErrorMessage
-        error={"Table is reserved"}
+        error={error.errorMessage}
         color={navbarTitleColor}
         background={navbarBgColor}
       />

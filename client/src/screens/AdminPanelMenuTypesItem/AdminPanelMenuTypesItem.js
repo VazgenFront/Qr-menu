@@ -3,46 +3,31 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AdminMenuItemsButtons from "../../components/AdminMenuItemsButtons/AdminMenuItemsButtons";
 import ModalWrapper from "../../components/Modal/Modal";
+import { useToggleModalOpen } from "../../utils";
 import "./AdminPanelMenuTypesItem.css";
 
 const AdminPanelMenuTypesItem = () => {
   const { menuType } = useParams();
-
   const [menuItems, setMenuItems] = useState([]);
-
   const token = localStorage.getItem("adminTkn");
-
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState({});
 
-  // for Adding
-  const openAddModal = () => {
-    setAddModalOpen(true);
-  };
-  const closeAddModal = () => {
-    setAddModalOpen(false);
-  };
-
-  const onAdd = () => {
-    openAddModal();
-  };
-
-  // for Editing
-  const openEditModal = () => {
-    setEditModalOpen(true);
-  };
+  const {
+    addModalOpen,
+    closeAddModal,
+    editModalOpen,
+    closeEditModal,
+    onAdd,
+    openEditModal,
+    editItem,
+  } = useToggleModalOpen();
 
   const onEdit = (e, itm) => {
     openEditModal();
     setSelectedType({
       ...itm,
     });
-  };
-
-  const closeEditModal = () => {
-    setEditModalOpen(false);
   };
 
   const onDelete = async (itm) => {
@@ -64,6 +49,9 @@ const AdminPanelMenuTypesItem = () => {
       })
       .then((data) => {
         setMenuItems(() => [...data.data.menuItems]);
+      })
+      .catch((e) => {
+        window.location = "/admin-panel/auth";
       });
   }, [needRefresh]);
 

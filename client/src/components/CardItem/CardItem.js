@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import React, { useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import {
-  MAKE_ORDER,
+  ADD__TEMP__CARD,
   REDUCE_MENU_ITEM_COUNT,
   REMOVE_CART_ITEM,
 } from "../../queries/queries";
@@ -16,29 +16,23 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
   const state = useContext(ThemeContext);
   const [error, setError] = useState({ hasError: false, errorMessage: "" });
 
-  const [addOrder] = useMutation(MAKE_ORDER);
+  const [addOrder] = useMutation(ADD__TEMP__CARD);
 
-  const [reduceItem, { error: reduceItemError }] = useMutation(
-    REDUCE_MENU_ITEM_COUNT
-  );
+  const [reduceItem, {}] = useMutation(REDUCE_MENU_ITEM_COUNT);
 
-  const [
-    removeCartItem,
-    { loading: loadingRemovueCartItem, error: removueCartItemError },
-  ] = useMutation(REMOVE_CART_ITEM);
+  const [removeCartItem, { loading: loadingRemovueCartItem }] =
+    useMutation(REMOVE_CART_ITEM);
 
   const [count, setCount] = useState(item.itemCount);
   const [price, setPrice] = useState(item.itemTotalPrice);
 
   const addToCard = async (id, type) => {
     const menuItemId = id;
-    const serverCafeId = cafeId;
-    const serverTableId = tableId;
 
     return addOrder({
       variables: {
-        accountId: Number(serverCafeId),
-        tableId: Number(serverTableId),
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         orderList: [{ menuItemId: menuItemId, itemCount: 1 }],
       },
@@ -55,13 +49,11 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
 
   const reduceItemFromCart = async (id) => {
     const menuItemId = Number(id);
-    const serverCafeId = Number(cafeId);
-    const serverTableId = Number(tableId);
 
     return reduceItem({
       variables: {
-        accountId: serverCafeId,
-        tableId: serverTableId,
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         menuItemId: menuItemId,
       },
@@ -78,13 +70,11 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
 
   const removeCartItemFromCart = async (id) => {
     const menuItemId = Number(id);
-    const serverCafeId = Number(cafeId);
-    const serverTableId = Number(tableId);
 
     return removeCartItem({
       variables: {
-        accountId: serverCafeId,
-        tableId: serverTableId,
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
         menuItemId: menuItemId,
       },
@@ -140,15 +130,13 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
     return null;
   }
 
-  console.log("error", error);
-
   return (
     <>
       {count && price ? (
         <div
           className="cart__item"
           key={index}
-          style={{ border: `4px solid ${navbarTitleColor}` }}
+          style={{ border: `4px solid ${navbarTitleColor}`, maxWidth: "280px" }}
         >
           <img src={item.img} alt="img" className="cart__item__img" />
           <div className="cart__item__info">

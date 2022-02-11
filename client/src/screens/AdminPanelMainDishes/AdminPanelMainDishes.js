@@ -8,7 +8,6 @@ const AdminPanelMainDishes = () => {
 
   const [mainDishes, setMainDishes] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
   const [selectedType, setSelectedType] = useState({});
 
@@ -19,6 +18,9 @@ const AdminPanelMainDishes = () => {
       })
       .then((data) => {
         setMainDishes(() => [...data.data.mainDishes]);
+      })
+      .catch((e) => {
+        window.location = "/admin-panel/auth";
       });
   }, [needRefresh]);
 

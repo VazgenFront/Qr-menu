@@ -16,7 +16,7 @@ const NavBar = () => {
   const [menuTypes, setMenuTypes] = useState([]);
   const { loading, error, data } = useQuery(GET_CAFFEE, {
     variables: {
-      _id: Number(cafeId),
+      _id: cafeId,
     },
   });
 
@@ -25,11 +25,13 @@ const NavBar = () => {
   const getTotalItemsCountFnc = async () => {
     await getOrder({
       variables: {
-        accountId: Number(cafeId),
-        tableId: Number(tableId),
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: localStorage.getItem("token"),
       },
-    }).then((data) => state.getTotalItemsCount(data?.data?.order?.totalItems));
+    }).then((data) =>
+      state.getTotalItemsCount(data?.data?.order?.tempTotalItems)
+    );
   };
 
   useEffect(async () => {
@@ -43,7 +45,7 @@ const NavBar = () => {
 
   useEffect(() => {
     state.toggleStyle(style);
-    state.getMenuItems(data?.account?.menuItems);
+    state.getMenuItems(data?.account?.mainDishes);
   }, [style]);
 
   const { fontFamily, logo, navbarBgColor, navbarTitleColor } = style;
