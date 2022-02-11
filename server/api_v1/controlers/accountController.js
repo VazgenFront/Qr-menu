@@ -523,14 +523,13 @@ const AccountController = {
 		try {
 			const { dateFrom, dateTo } = req.query;
 			const _id = toObjectId(req.decoded._id);
-			const dateRange = {
-				$gte: new Date(dateFrom),
-				$lte: new Date(dateTo),
-			};
-			const orders = await Order.find({
+			const findQuery = {
 				accountId: _id,
-				dateCreated: dateRange,
-			}).lean();
+			}
+			if (dateFrom && dateTo) {
+				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			}
+			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
 				success: true,
 				orders,
