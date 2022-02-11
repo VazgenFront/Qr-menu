@@ -27,7 +27,7 @@ const Dashboard = () => {
 
     {
       display: "Tables",
-      to: "/order",
+      to: `/admin-panel/${cafeId}/${cafeName}/dashboard/tables`,
     },
   ];
 

@@ -8,12 +8,12 @@ import {
   Card,
   MenuItem,
   ErrorPage,
-  AdminPage,
   AdminPanelHome,
   AdminPanelMenuTypes,
   AdminPanelMenuItems,
   AdminPanelMenuTypesItem,
   AdminPanelMainDishes,
+  AdminPanelTables,
 } from "./screens/index";
 
 export const appRoutes = [
@@ -58,13 +58,6 @@ export const appRoutes = [
   },
 
   {
-    path: "/admin-panel/dashboard/:cafeId/:cafeName",
-    name: "menuType",
-    exact: true,
-    component: AdminPage,
-  },
-
-  {
     path: "/admin-panel/:cafeId/:cafeName/dashboard/home",
     name: "adminPanelHome",
     exact: true,
@@ -90,6 +83,13 @@ export const appRoutes = [
     name: "adminPanelMenuTypes",
     exact: true,
     component: AdminPanelMenuItems,
+  },
+
+  {
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/tables",
+    name: "adminPanelMenuTypes",
+    exact: true,
+    component: AdminPanelTables,
   },
 
   {

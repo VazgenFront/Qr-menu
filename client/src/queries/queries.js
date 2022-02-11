@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_CAFFEE = gql`
-  query account($_id: Int!) {
+  query account($_id: String!) {
     account(_id: $_id) {
       _id
       username
@@ -13,6 +13,15 @@ export const GET_CAFFEE = gql`
       status
       menuTypes {
         name
+      }
+      mainDishes {
+        _id
+        type
+        name
+        description
+        img
+        price
+        currency
       }
       style {
         _id
@@ -35,22 +44,22 @@ export const GET_CAFFEE = gql`
   }
 `;
 
-export const GET_TABBLE_TOKEN = gql`
-  mutation reserveTable($accountId: Int!, $tableId: Int!) {
+export const GET_TABLE_TOKEN = gql`
+  mutation reserveTable($accountId: String!, $tableId: String!) {
     reserveTable(accountId: $accountId, tableId: $tableId) {
       reserveToken
     }
   }
 `;
 
-export const MAKE_ORDER = gql`
-  mutation addOrder(
-    $accountId: Int!
-    $tableId: Int!
+export const ADD__TEMP__CARD = gql`
+  mutation addToTempCart(
+    $accountId: String!
+    $tableId: String!
     $reserveToken: String!
     $orderList: [OrderListItemInput]!
   ) {
-    addOrder(
+    addToTempCart(
       accountId: $accountId
       tableId: $tableId
       reserveToken: $reserveToken
@@ -59,38 +68,64 @@ export const MAKE_ORDER = gql`
       _id
       accountId
       tableId
-      reserveToken
-      isPaid
-      notes
+      tempCart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
       cart {
         menuItemId
+        itemName
+        img
         itemCount
+        itemPrice
+        itemTotalPrice
+        currency
       }
-      totalItems
+      reserveToken
+      isPaid
       totalPrice
+      totalItems
+      tempTotalPrice
+      tempTotalItems
+      notes
     }
   }
 `;
 
 export const GET_ORDER = gql`
-  query order($accountId: Int!, $tableId: Int!, $reserveToken: String!) {
+  query order($accountId: String!, $tableId: String!, $reserveToken: String!) {
     order(
       accountId: $accountId
       tableId: $tableId
       reserveToken: $reserveToken
     ) {
-      cart {
+      tempCart {
         menuItemId
+        itemName
+        img
         itemCount
         itemPrice
         itemTotalPrice
         currency
-        date
+      }
+      cart {
+        menuItemId
         itemName
         img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
       }
-      totalItems
       totalPrice
+      totalItems
+      tempTotalPrice
+      tempTotalItems
     }
   }
 `;
@@ -111,7 +146,7 @@ export const GET_MENU_ITEM = gql`
 `;
 
 export const GET_MENUTYPE_INFO = gql`
-  query menuItemsOfType($accountId: Int!, $type: String!) {
+  query menuItemsOfType($accountId: String!, $type: String!) {
     menuItemsOfType(accountId: $accountId, type: $type) {
       _id
       type
@@ -126,13 +161,13 @@ export const GET_MENUTYPE_INFO = gql`
 `;
 
 export const REDUCE_MENU_ITEM_COUNT = gql`
-  mutation reduceOneMenuItemCount(
-    $accountId: Int!
-    $tableId: Int!
+  mutation reduceFromTempCartOneMenuItem(
+    $accountId: String!
+    $tableId: String!
     $reserveToken: String!
     $menuItemId: Int!
   ) {
-    reduceOneMenuItemCount(
+    reduceFromTempCartOneMenuItem(
       accountId: $accountId
       tableId: $tableId
       reserveToken: $reserveToken
@@ -141,47 +176,162 @@ export const REDUCE_MENU_ITEM_COUNT = gql`
       _id
       accountId
       tableId
+      tempCart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      cart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
       reserveToken
       isPaid
       totalPrice
       totalItems
+      tempTotalPrice
+      tempTotalItems
       notes
     }
   }
 `;
 
 export const REMOVE_CART_ITEM = gql`
-  mutation removeMenuItemFromOrder(
-    $accountId: Int!
-    $tableId: Int!
+  mutation removeFromTempCartMenuItem(
+    $accountId: String!
+    $tableId: String!
     $reserveToken: String!
     $menuItemId: Int!
   ) {
-    removeMenuItemFromOrder(
+    removeFromTempCartMenuItem(
       accountId: $accountId
       tableId: $tableId
       reserveToken: $reserveToken
       menuItemId: $menuItemId
     ) {
-      __typename
+      _id
+      accountId
+      tableId
+      tempCart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      cart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      reserveToken
+      isPaid
       totalPrice
       totalItems
+      tempTotalPrice
+      tempTotalItems
+      notes
     }
   }
 `;
 
 export const REMOVE_ALL_CART_ITEMS = gql`
-  mutation removeCartItemsFromOrder(
-    $accountId: Int!
-    $tableId: Int!
+  mutation removeTempCartMenuItems(
+    $accountId: String!
+    $tableId: String!
     $reserveToken: String!
   ) {
-    removeCartItemsFromOrder(
+    removeTempCartMenuItems(
       accountId: $accountId
       tableId: $tableId
       reserveToken: $reserveToken
     ) {
-      __typename
+      _id
+      accountId
+      tableId
+      tempCart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      cart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      reserveToken
+      isPaid
+      totalPrice
+      totalItems
+      tempTotalPrice
+      tempTotalItems
+      notes
+    }
+  }
+`;
+
+export const ADD_ORDER = gql`
+  mutation addOrder(
+    $accountId: String!
+    $tableId: String!
+    $reserveToken: String!
+  ) {
+    addOrder(
+      accountId: $accountId
+      tableId: $tableId
+      reserveToken: $reserveToken
+    ) {
+      accountId
+      tableId
+      tempCart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+      }
+      cart {
+        menuItemId
+        itemName
+        img
+        itemCount
+        itemPrice
+        itemTotalPrice
+        currency
+        date
+      }
+      reserveToken
+      isPaid
+      totalPrice
+      totalItems
+      tempTotalPrice
+      tempTotalItems
+      notes
     }
   }
 `;

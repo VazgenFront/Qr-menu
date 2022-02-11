@@ -1,8 +1,131 @@
 .AdminPanelHome {
-  height: 100vh;
   width: 100%;
-  background-color: red;
+  height: 100%;
+  min-height: 100vh;
+  background-color: #989898;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  padding-top: 80px;
+  padding-bottom: 100px;
+}
+
+.order__list {
+  width: 100%;
+  padding: 0px 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.order__item {
+  width: 100%;
+}
+
+.accordion-wrapper-order {
+  width: 100%;
+  margin-top: 20px;
+  background-color: #fff;
+}
+
+.accordion-item-cart {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+  height: auto;
+  max-height: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.accordion-item-cart.collapsed {
+  max-height: 0;
+  transition: max-height 0.35s cubic-bezier(0, 1, 0, 1);
+}
+
+.accordion-title {
+  font-weight: 600;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5em 1.5em;
+  border-radius: 1.5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.accordion-title::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid currentColor;
+}
+
+.accordion-title:hover,
+.accordion-title .open {
+  color: black;
+}
+
+.accordion-title > .open > .accordion-title::after {
+  content: "";
+  border-top: 0;
+  border-bottom: 5px solid;
+}
+
+.accordion-content {
+  padding: 1em 1.5em;
+}
+
+.styled-table {
+  width: 101%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+
+.tables__title {
+  font-size: 28px;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.no__orders {
+  font-size: 28px;
+  color: #fff;
+  text-transform: capitalize;
+  position: absolute;
+  top: 50%;
+  bottom: 50%;
 }

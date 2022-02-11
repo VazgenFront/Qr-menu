@@ -1,22 +1,55 @@
 import { useLazyQuery, useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Accordion } from "../../components/Accordion/Accordion";
 import CardItem from "../../components/CardItem/CardItem";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_ORDER, REMOVE_ALL_CART_ITEMS } from "../../queries/queries";
+import {
+  ADD_ORDER,
+  GET_ORDER,
+  REMOVE_ALL_CART_ITEMS,
+} from "../../queries/queries";
 import "./Card.css";
+
+const Buttons = ({
+  onDeleteAllItems,
+  navbarTitleColor,
+  addTempItemsToCart,
+}) => {
+  return (
+    <div className="cart__btns">
+      <button
+        className="order__btn"
+        style={{ background: navbarTitleColor }}
+        onClick={onDeleteAllItems}
+      >
+        Cancel
+      </button>
+      <button
+        className="order__btn"
+        style={{ background: navbarTitleColor }}
+        onClick={addTempItemsToCart}
+      >
+        Order
+      </button>
+    </div>
+  );
+};
 
 const Card = () => {
   const { tableId, cafeId } = useParams();
+  const [tempCart, setTempCart] = useState([]);
   const [cart, setCart] = useState([]);
+
   const token = localStorage.getItem("token");
   const state = useContext(ThemeContext);
   const [totalPrice, setToTalItemsPrice] = useState(0);
   const [error, setError] = useState({ hasError: false, errorMessage: "" });
 
   const [getOrder, { loading, data }] = useLazyQuery(GET_ORDER);
+  const [MAKE_ORDER, { data: makeOrderData }] = useMutation(ADD_ORDER);
 
   const [removeAllItems] = useMutation(REMOVE_ALL_CART_ITEMS);
   const { getTotalItemsCount } = state;
@@ -25,12 +58,12 @@ const Card = () => {
   const onDeleteAllItems = () => {
     removeAllItems({
       variables: {
-        accountId: Number(cafeId),
-        tableId: Number(tableId),
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: token,
       },
     })
-      .then(() => setCart([]))
+      .then(() => setTempCart([]))
       .then(() => getTotalItemsCount())
       .catch((e) => {
         setError((prevState) => ({
@@ -41,17 +74,36 @@ const Card = () => {
       });
   };
 
+  const addTempItemsToCart = async () => {
+    await MAKE_ORDER({
+      variables: {
+        accountId: cafeId,
+        tableId: tableId,
+        reserveToken: localStorage.getItem("token"),
+      },
+    }).catch((e) => {
+      setError((prevState) => ({
+        ...prevState,
+        hasError: true,
+        errorMessage: e.message,
+      }));
+    });
+  };
+
   useEffect(() => {
     getOrder({
       variables: {
-        accountId: Number(cafeId),
-        tableId: Number(tableId),
+        accountId: cafeId,
+        tableId: tableId,
         reserveToken: token,
       },
     })
       .then((data) => {
-        setToTalItemsPrice(data?.data?.order?.totalPrice);
-        return data?.data?.order && setCart(() => [...data?.data?.order?.cart]);
+        setToTalItemsPrice(data?.data?.order?.tempTotalPrice);
+        if (data.data?.order) {
+          setTempCart(() => [...data?.data?.order?.tempCart]);
+          setCart(() => [...data?.data?.order?.cart]);
+        }
       })
       .catch((e) => {
         setError((prevState) => ({
@@ -60,13 +112,11 @@ const Card = () => {
           errorMessage: e.message,
         }));
       });
-  }, [cafeId, data, getOrder, tableId, token]);
+  }, [cafeId, data, tableId, token, makeOrderData]);
 
   if (loading) {
     return <Spinner color={navbarTitleColor} />;
   }
-
-  console.log("error.errorMessage", error.errorMessage);
 
   if (error.errorMessage) {
     return (
@@ -89,7 +139,14 @@ const Card = () => {
         MY CART
       </span>
       {cart.length > 0 ? (
-        cart.map((item, index) => (
+        <Accordion
+          title={"Yet ordered"}
+          cart={cart}
+          navbarTitleColor={navbarTitleColor}
+        />
+      ) : null}
+      {tempCart.length > 0 ? (
+        tempCart.map((item, index) => (
           <CardItem
             key={index}
             item={item}
@@ -100,33 +157,22 @@ const Card = () => {
         ))
       ) : (
         <span className="emptyCart__title" style={{ color: navbarTitleColor }}>
-          Yout Cart is Empty
+          Your Cart is Empty
         </span>
       )}
 
       {totalPrice ? (
         <span className="totalItems__price">Total Price: {totalPrice} AMD</span>
       ) : null}
-      {cart.length > 0 && Buttons()}
+      {tempCart.length > 0 && (
+        <Buttons
+          navbarTitleColor={navbarTitleColor}
+          onDeleteAllItems={onDeleteAllItems}
+          addTempItemsToCart={addTempItemsToCart}
+        />
+      )}
     </div>
   );
-
-  function Buttons() {
-    return (
-      <div className="cart__btns">
-        <button
-          className="order__btn"
-          style={{ background: navbarTitleColor }}
-          onClick={onDeleteAllItems}
-        >
-          Cancel
-        </button>
-        <button className="order__btn" style={{ background: navbarTitleColor }}>
-          Order
-        </button>
-      </div>
-    );
-  }
 };
 
 export default Card;

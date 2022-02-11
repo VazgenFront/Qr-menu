@@ -3,35 +3,26 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import AdminMenuItemsButtons from "../../components/AdminMenuItemsButtons/AdminMenuItemsButtons";
 import ModalWrapper from "../../components/Modal/Modal";
+import { useToggleModalOpen } from "../../utils";
 import "./AdminPanelMenuTypes.css";
 
 const AdminPanelMenuTypes = () => {
   const { cafeId, cafeName } = useParams();
   const [menuTypes, setMenuTypes] = useState([]);
   const history = useHistory();
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState({});
 
   const token = localStorage.getItem("adminTkn");
 
-  // for Adding
-  const openAddModal = () => {
-    setAddModalOpen(true);
-  };
-  const closeAddModal = () => {
-    setAddModalOpen(false);
-  };
-
-  // for Editing
-  const openEditModal = () => {
-    setEditModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setEditModalOpen(false);
-  };
+  const {
+    addModalOpen,
+    openAddModal,
+    closeAddModal,
+    editModalOpen,
+    openEditModal,
+    closeEditModal,
+  } = useToggleModalOpen();
 
   const onEdit = (e, itm) => {
     openEditModal();
@@ -61,6 +52,7 @@ const AdminPanelMenuTypes = () => {
     setNeedRefresh(!needRefresh);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await axios
       .get("http://localhost:4000/api/account/getAccountData", {
@@ -68,6 +60,9 @@ const AdminPanelMenuTypes = () => {
       })
       .then((data) => {
         setMenuTypes(() => [...data.data.menuTypes]);
+      })
+      .catch((e) => {
+        window.location = "/admin-panel/auth";
       });
   }, [needRefresh]);
 
