@@ -519,6 +519,30 @@ const AccountController = {
 		}
 	},
 
+	getTableOrder: async (req, res) => {
+		try {
+			const { tableId } = req.query;
+			const _id = toObjectId(req.decoded._id);
+			const findQuery = {
+				accountId: _id,
+				tableId,
+				isPaid: false,
+			}
+			const order = await Order.findOne(findQuery).lean();
+			res.status(200).send({
+				success: true,
+				order,
+			});
+		} catch (e) {
+			console.log("getTableOrder error", e);
+			log.error("getTableOrder error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
 	getOrders: async (req, res) => {
 		try {
 			const { dateFrom, dateTo } = req.query;

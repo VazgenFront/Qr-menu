@@ -53,6 +53,7 @@ module.exports = (express) => {
 	apiRouter.put("/table", AccountController.editTable);
 	apiRouter.delete("/table", AccountController.deleteTable);
 
+	apiRouter.get("/tableOrder", AccountController.getTableOrder);
 	apiRouter.get("/orders", AccountController.getOrders);
 	apiRouter.get("/orders/paid", AccountController.getPaidOrders);
 	apiRouter.get("/orders/unpaid", AccountController.getUnpaidOrders);
