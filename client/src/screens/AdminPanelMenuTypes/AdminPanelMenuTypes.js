@@ -45,7 +45,7 @@ const AdminPanelMenuTypes = () => {
   const onDelete = async (itm) => {
     const data = { typeName: itm.name };
 
-    await axios.delete("http://localhost:4000/api/account/menuType", {
+    await axios.delete("/api/account/menuType", {
       data,
       headers: { "x-access-token": token },
     });
@@ -55,7 +55,7 @@ const AdminPanelMenuTypes = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await axios
-      .get("http://localhost:4000/api/account/getAccountData", {
+      .get("/api/account/getAccountData", {
         headers: { "x-access-token": token },
       })
       .then((data) => {

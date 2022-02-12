@@ -30,7 +30,7 @@ const AdminPanelMenuItems = () => {
   const onDelete = async (itm) => {
     const data = { menuItemId: itm._id };
 
-    await axios.delete("http://localhost:4000/api/account/menuItem", {
+    await axios.delete("/api/account/menuItem", {
       data,
       headers: { "x-access-token": token },
     });
@@ -40,7 +40,7 @@ const AdminPanelMenuItems = () => {
 
   useEffect(async () => {
     await axios
-      .get("http://localhost:4000/api/account/menuItems", {
+      .get("/api/account/menuItems", {
         headers: { "x-access-token": token },
       })
       .then((data) => {

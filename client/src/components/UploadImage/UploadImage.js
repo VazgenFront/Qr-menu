@@ -10,7 +10,7 @@ function UploadImage({ image, setImage, token }) {
     const formData = new FormData();
     formData.append("up-img", e.target.files[0], e.target.files[0].name);
     const result = await axios.post(
-      "http://localhost:4000/api/account/image-upload",
+      "/api/account/image-upload",
       formData,
       {
         headers: {
@@ -19,7 +19,7 @@ function UploadImage({ image, setImage, token }) {
       }
     );
     if (result && result.data && result.data.url) {
-      setImage("http://localhost:4000/" + result.data.url);
+      setImage("/" + result.data.url);
     }
   };
 

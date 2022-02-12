@@ -14,7 +14,7 @@ const AdminAuth = () => {
     const password = values.password;
 
     await axios
-      .post("http://localhost:4000/api/account/authenticate", {
+      .post("/api/account/authenticate", {
         username,
         password,
       })

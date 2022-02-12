@@ -14,7 +14,7 @@ const renderMenuTypes = ({
   setNeedRefresh,
   menuType,
 }) => {
-  const url = "http://localhost:4000/api/account/menuType";
+  const url = "/api/account/menuType";
   return (
     <>
       {destiny === "edit" ? (
@@ -52,7 +52,7 @@ const renderMenuItems = ({
   setNeedRefresh,
   menuType,
 }) => {
-  const url = "http://localhost:4000/api/account/menuItem";
+  const url = "/api/account/menuItem";
 
   return (
     <>
@@ -214,7 +214,7 @@ const EditModal = ({
       const formData = new FormData();
       formData.append("up-img", e.target.files[0], e.target.files[0].name);
       const result = await axios.post(
-        "http://localhost:4000/api/account/image-upload",
+        "/api/account/image-upload",
         formData,
         {
           headers: {
@@ -223,7 +223,7 @@ const EditModal = ({
         }
       );
       if (result && result.data && result.data.url) {
-        setImage("http://localhost:4000/" + result.data.url);
+        setImage("/" + result.data.url);
       }
     }
   };

@@ -7,7 +7,7 @@ export const Accordion = ({ title, cart, tempCart, item, setOrders }) => {
 
   const closeOrder = () => {
     axios.post(
-      "http://localhost:4000/api/account/closeTable",
+      "/api/account/closeTable",
       { tableId: item.tableId },
       {
         headers: {

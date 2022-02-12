@@ -13,7 +13,7 @@ const AdminPanelMainDishes = () => {
 
   useEffect(async () => {
     await axios
-      .get("http://localhost:4000/api/account/mainDishes", {
+      .get("/api/account/mainDishes", {
         headers: { "x-access-token": token },
       })
       .then((data) => {

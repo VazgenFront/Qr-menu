@@ -8,7 +8,7 @@ import ThemeContextProvider from "./context/ThemeContext";
 import { useRoutes } from "./routes";
 
 const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
+  uri: "/graphql",
   cache: new InMemoryCache(),
 });
 function App() {

@@ -10,7 +10,7 @@ const AdminPanelHome = () => {
 
   const getOrdersData = async () => {
     await axios
-      .get("http://localhost:4000/api/account/orders/unpaid", {
+      .get("/api/account/orders/unpaid", {
         headers: { "x-access-token": token },
       })
       .then((data) => {

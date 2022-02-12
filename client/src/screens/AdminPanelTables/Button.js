@@ -13,7 +13,7 @@ export const Button = ({ item, token, needRefresh, setNeedRefresh }) => {
 
     if (reserved) {
       axios.post(
-        "http://localhost:4000/api/account/closeTable",
+        "/api/account/closeTable",
         { tableId: item.tableId },
         {
           headers: {
@@ -27,7 +27,7 @@ export const Button = ({ item, token, needRefresh, setNeedRefresh }) => {
 
   const getTableOrder = () => {
     axios
-      .get("http://localhost:4000/api/account/tableOrder", {
+      .get("/api/account/tableOrder", {
         headers: { "x-access-token": token },
         params: { tableId: item.tableId },
       })

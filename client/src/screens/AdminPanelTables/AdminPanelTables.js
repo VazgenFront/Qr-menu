@@ -10,7 +10,7 @@ const AdminPanelTables = () => {
 
   useEffect(async () => {
     await axios
-      .get("http://localhost:4000/api/account/tables", {
+      .get("/api/account/tables", {
         headers: { "x-access-token": token },
       })
       .then((data) => {

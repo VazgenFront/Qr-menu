@@ -7,11 +7,20 @@ const log4js = require('./helpers/logger');
 const corsHandler = require('./helpers/corsHandler');
 const schema = require('./schema/schema');
 const log = log4js.getLogger();
+const path = require("path");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(corsHandler);
+
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, './client/build')));
+
+// All remaining requests return the React app, so it can handle routing.
+app.get('*', function(request, response) {
+    response.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+});
 
 app.use('/up-images', express.static('up-images'));
 
