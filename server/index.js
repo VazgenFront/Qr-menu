@@ -12,7 +12,7 @@ const path = require("path");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(corsHandler);
+// app.use(corsHandler);
 
 // Priority serve any static files.
 app.use(express.static(path.resolve(__dirname, './client/build')));
