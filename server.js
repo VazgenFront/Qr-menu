@@ -15,11 +15,11 @@ app.use(bodyParser.json());
 app.use(corsHandler);
 
 // Priority serve any static files.
-app.use(express.static(path.resolve(__dirname, './client/build')));
+app.use(express.static('./client/build'));
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function(request, response) {
-    response.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+    response.sendFile('./client/build', 'index.html');
 });
 
 app.use('/up-images', express.static('up-images'));
