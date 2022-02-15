@@ -65,13 +65,13 @@ const AccountType = new GraphQLObjectType({
 			name: "mainDishes",
 			async resolve(parent) {
 				const accountId = parent._id;
-				const menuItems = await MenuItem.find({ accountId, isMainDish: true }).lean();
+				const menuItems = await MenuItem.find({ accountId }).lean();
 				const grouped = groupBy(menuItems, 'type');
 				return Object.entries(grouped).map((group) => ({
 					type: group[0],
 					menuItemsCount: group[1].length,
-					mainItems: group[1]
-				}))
+					mainItems: group[1].filter(menuItem => menuItem.isMainDish === true),
+				}));
 			}
 		}
 	}),
