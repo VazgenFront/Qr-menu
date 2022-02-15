@@ -30,6 +30,17 @@ const RootQuery = new GraphQLObjectType({
         return menuItem;
       }
     },
+    searchMenuItem: {
+      type: new GraphQLList(MenuItemType),
+      args: { accountId: { type: GraphQLString }, namePart: { type: GraphQLString } },
+      async resolve(parent, args) {
+        let { accountId, namePart } = args;
+        accountId = toObjectId(accountId);
+        namePart = '.*' + namePart + ".*";
+        const menuItems = await MenuItem.find({ accountId, name: { $regex: namePart, $options: 'i' } }).lean();
+        return menuItems;
+      }
+    },
     menuItemsOfType: {
       type: new GraphQLList(MenuItemType),
       args: { accountId: { type: GraphQLString }, type: { type: GraphQLString } },
