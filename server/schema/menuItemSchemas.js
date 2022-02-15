@@ -1,4 +1,4 @@
-const {GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFloat, GraphQLBoolean } = require("graphql");
+const {GraphQLObjectType, GraphQLList, GraphQLInt, GraphQLString, GraphQLFloat, GraphQLBoolean } = require("graphql");
 
 const MenuItemType = new GraphQLObjectType({
 	name: 'MenuItem',
@@ -15,6 +15,16 @@ const MenuItemType = new GraphQLObjectType({
 	}),
 })
 
+const MainDishTypeAndList = new GraphQLObjectType({
+	name: 'MainDishTypeAndList',
+	fields: () => ({
+		type: {type: GraphQLString},
+		menuItemsCount: {type: GraphQLInt},
+		mainItems: {type: new GraphQLList(MenuItemType)},
+	}),
+})
+
 module.exports = {
 	MenuItemType,
+	MainDishTypeAndList,
 }

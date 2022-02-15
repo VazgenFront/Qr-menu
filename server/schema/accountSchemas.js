@@ -2,7 +2,14 @@ const {GraphQLString, GraphQLInt, GraphQLObjectType, GraphQLList } = require("gr
 const Style = require("../db/models/style");
 const MenuItem = require("../db/models/menuItem");
 const { StyleType } = require("./styleSchemas");
-const { MenuItemType } = require("./menuItemSchemas");
+const { MenuItemType, MainDishTypeAndList } = require("./menuItemSchemas");
+
+const groupBy = function(xs, key) {
+	return xs.reduce(function(rv, x) {
+		(rv[x[key]] = rv[x[key]] || []).push(x);
+		return rv;
+	}, {});
+};
 
 const AccountType = new GraphQLObjectType({
 	name: 'Account',
@@ -54,12 +61,17 @@ const AccountType = new GraphQLObjectType({
 			}
 		},
 		mainDishes: {
-			type: new GraphQLList(MenuItemType),
+			type: new GraphQLList(MainDishTypeAndList),
 			name: "mainDishes",
 			async resolve(parent) {
 				const accountId = parent._id;
 				const menuItems = await MenuItem.find({ accountId, isMainDish: true }).lean();
-				return menuItems;
+				const grouped = groupBy(menuItems, 'type');
+				return Object.entries(grouped).map((group) => ({
+					type: group[0],
+					menuItemsCount: group[1].length,
+					mainItems: group[1]
+				}))
 			}
 		}
 	}),
