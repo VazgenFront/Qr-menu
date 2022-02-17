@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { secret, tokenExpirationTimeInMinutes } = require('../../config/configs')
 
+const AccountValidator = require("../validators/accountValidator");
+
 const Account = require("../../db/models/account");
 const MenuItem = require("../../db/models/menuItem");
 const Order = require("../../db/models/order");
@@ -16,7 +18,7 @@ const log = getLogger("default");
 const AccountController = {
 	authenticate: async (req, res) => {
 		try {
-			const { username, password } = req.body;
+			const { username, password } = AccountValidator.authenticate(req.body);
 			const account = await Account.findOne({ username }).lean();
 			if (!account || password !== account.password) {
 				throw new Error("Username or password is incorrect.")
@@ -69,7 +71,7 @@ const AccountController = {
 
 	getAccountData: async (req, res) => {
 		try {
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const account = await Account.findOne({ _id }).lean();
 			res.status(200).send({
 				success: true,
@@ -88,14 +90,9 @@ const AccountController = {
 
 	editAccount: async (req, res) => {
 		try {
-			const { name, img, typeId, subTypeId } = req.body;
-			const _id = toObjectId(req.decoded._id);
-			const updateQuery = {};
-			if (typeof name === "string") updateQuery.name = name;
-			if (typeof img === "string") updateQuery.img = img;
-			if (typeof typeId === "string") updateQuery.typeId = typeId;
-			if (typeof subTypeId === "string") updateQuery.subTypeId = subTypeId;
-			const account = await Account.findOneAndUpdate({ _id }, { $set: updateQuery }, { new: true }).lean();
+			const updateParams = AccountValidator.editAccount(req.body);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const account = await Account.findOneAndUpdate({ _id }, { $set: updateParams }, { new: true }).lean();
 			res.status(200).send({
 				success: true,
 				...account,
@@ -113,7 +110,7 @@ const AccountController = {
 
 	getStyle: async (req, res) => {
 		try {
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const account = await Account.findOne({ _id }).lean();
 			if (!account.styleId) {
 				throw new Error("Account don't have style configured. Use default style indeed.")
@@ -136,13 +133,14 @@ const AccountController = {
 
 	editStyle: async (req, res) => {
 		try {
-			const { navbarBgColor, navbarTitleColor, logo, mostBookedBorder, fontFamily } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { params, allParamsProvided } = req.body;
 			const account = await Account.findOne({ _id }).lean();
 			if (!account.styleId) {
-				const styleEntity = new Style({
-					navbarBgColor, navbarTitleColor, logo, mostBookedBorder, fontFamily
-				})
+				if (!allParamsProvided) {
+					throw new Error("New style must have all parameters provided.")
+				}
+				const styleEntity = new Style(params)
 				const style = await styleEntity.save();
 				await Account.findOneAndUpdate({ _id }, { $set: { styleId: style._id } });
 				res.status(200).send({
@@ -152,7 +150,7 @@ const AccountController = {
 			} else {
 				const style = await Style.findOneAndUpdate(
 					{ _id: account.styleId },
-					{ $set: {navbarBgColor, navbarTitleColor, logo, mostBookedBorder, fontFamily } },
+					{ $set: params },
 					{ new: true },
 				).lean();
 				res.status(200).send({
