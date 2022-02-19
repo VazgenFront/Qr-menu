@@ -7,7 +7,7 @@ const { AccountType } = require("./accountSchemas");
 const { MenuItemType } = require("./menuItemSchemas");
 const { OrderType, OrderMutations } = require("./orderSchemas");
 const { TableType, TableMutations } = require("./tableSchemas");
-const { toObjectId } = require("../helpers/conversions");
+const { toObjectId, findCommon } = require("../helpers/conversions");
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -38,6 +38,25 @@ const RootQuery = new GraphQLObjectType({
         accountId = toObjectId(accountId);
         namePart = '.*' + namePart + ".*";
         const menuItems = await MenuItem.find({ accountId, name: { $regex: namePart, $options: 'i' } }).lean();
+        if (menuItems.length > 0) {
+          const namepartLowercase = namePart.toLowerCase();
+          menuItems.sort((a, b) => {
+            const aName = a.name.toLowerCase();
+            const bName = b.name.toLowerCase();
+            const aMatch = findCommon(aName, namepartLowercase);
+            const bMatch = findCommon(bName, namepartLowercase);
+
+            return bMatch.length - aMatch.length;
+          });
+
+          menuItems.sort((a, b) => {
+            const aMatch = findCommon(a.name, namePart);
+            const bMatch = findCommon(b.name, namePart);
+
+            return bMatch.length - aMatch.length;
+          });
+          return menuItems;
+        }
         return menuItems;
       }
     },

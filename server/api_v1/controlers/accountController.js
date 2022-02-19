@@ -170,10 +170,10 @@ const AccountController = {
 
 	addMenuItem: async (req, res) => {
 		try {
-			const { type, name, description, img, price, currency, isMainDish } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const params = AccountValidator.addMenuItem(req.body);
 			const menuItemEntity = new MenuItem({
-				accountId: _id, type, name, description, img, price, currency, isMainDish,
+				accountId: _id, ...params,
 			})
 			const menuItem = await menuItemEntity.save();
 			res.status(200).send({
@@ -192,7 +192,7 @@ const AccountController = {
 
 	getMenuItems: async (req, res) => {
 		try {
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const menuItems = await MenuItem.find({ accountId: _id });
 			res.status(200).send({
 				success: true,
@@ -210,8 +210,8 @@ const AccountController = {
 
 	getMenuItemsOfType: async (req, res) => {
 		try {
-			const { type } = req.query;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const type = AccountValidator.getMenuItemsOfType(req.query);
 			const menuItems = await MenuItem.find({ accountId: _id, type });
 			res.status(200).send({
 				success: true,
@@ -229,11 +229,11 @@ const AccountController = {
 
 	editMenuItem: async (req, res) => {
 		try {
-			const { id, type, name, description, img, price, currency, isMainDish } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { id, updateParams } = AccountValidator.editMenuItem(req.body);
 			const menuItem =  await MenuItem.findOneAndUpdate(
-				{_id: id, accountId: _id},
-				{ $set: { type, name, description, img, price, currency, isMainDish } },
+				{ _id: id, accountId: _id },
+				{ $set: updateParams },
 				{ new: true },
 			).lean();
 			res.status(200).send({
@@ -252,8 +252,8 @@ const AccountController = {
 
 	deleteMenuItem: async (req, res) => {
 		try {
-			const { menuItemId } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const menuItemId = AccountValidator.menuItemId(req.body);
 			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, "cart.menuItemId": menuItemId }).lean();
 			if (unpaidOrders.length) {
 				throw new Error("Please close all unpaid orders with specified menu item before delete.");
@@ -274,8 +274,8 @@ const AccountController = {
 
 	addMainDish: async (req, res) => {
 		try {
-			const { menuItemId } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const menuItemId = AccountValidator.menuItemId(req.body);
 			const menuItem = await MenuItem.findOneAndUpdate(
 				{ _id: menuItemId, accountId: _id },
 				{ $set: { isMainDish: true } },
@@ -299,7 +299,7 @@ const AccountController = {
 
 	getMainDishes: async (req, res) => {
 		try {
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const mainDishes = await MenuItem.find({ accountId: _id, isMainDish: true }).lean();
 			res.status(200).send({
 				success: true,
@@ -317,8 +317,8 @@ const AccountController = {
 
 	removeMainDish: async (req, res) => {
 		try {
-			const { menuItemId } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const menuItemId = AccountValidator.menuItemId(req.body);
 			await MenuItem.updateOne({ _id: menuItemId, accountId: _id }, { $set: { isMainDish: false } });
 			res.status(200).send({
 				success: true,
@@ -335,11 +335,11 @@ const AccountController = {
 
 	addMenuType: async (req, res) => {
 		try {
-			const { typeName, img } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const params = AccountValidator.addMenuType(req.body);
 			const account = await Account.findOneAndUpdate(
 				{ _id },
-				{ $addToSet: { menuTypes: { name: typeName, img } } },
+				{ $addToSet: { menuTypes: params } },
 				{ new: true },
 			).lean();
 			res.status(200).send({
@@ -358,8 +358,8 @@ const AccountController = {
 
 	editMenuType: async (req, res) => {
 		try {
-			const { oldName, newName, img } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { oldName, newName, img } = AccountValidator.editMenuType(req.body);
 			const account = await Account.findOneAndUpdate(
 				{ _id, menuTypes: { $elemMatch: { name: oldName } } },
 				{ $set: { "menuTypes.$.name": newName, "menuTypes.$.img": img } },
@@ -382,8 +382,8 @@ const AccountController = {
 
 	editDefaultMenuType: async (req, res) => {
 		try {
-			const { newName } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const newName = AccountValidator.editDefaultMenuType(req.body);
 			const account = await Account.findOneAndUpdate(
 				{ _id },
 				{ $set: { defaultMenuType: newName } },
@@ -402,6 +402,8 @@ const AccountController = {
 			});
 		}
 	},
+
+	// TODO: Do other validation down from here
 
 	deleteMenuType: async (req, res) => {
 		try {

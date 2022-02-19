@@ -71,7 +71,7 @@ const AccountType = new GraphQLObjectType({
 					type: group[0],
 					menuItemsCount: group[1].length,
 					mainItems: group[1].filter(menuItem => menuItem.isMainDish === true),
-				}));
+				})).filter(group => group.mainItems.length > 0);
 			}
 		}
 	}),

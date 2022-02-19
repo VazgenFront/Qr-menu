@@ -122,7 +122,7 @@ const AccountValidator = {
 			if (!isString(body.fontFamily)) {
 				throw new Error("Invalid parameter subTypeId.")
 			}
-			params.fontFamily = `body.fontFamily, ${defaultFontFamily}`;
+			params.fontFamily = `${body.fontFamily}, ${defaultFontFamily}`;
 		}
 		const allParamsProvided = !!body.navbarBgColor && !!body.navbarTitleColor && !!body.logo && !!body.mostBookedBorder && !!body.fontFamily;
 
@@ -132,6 +132,151 @@ const AccountValidator = {
 		};
 	},
 
+	addMenuItem(body) {
+		if (!body.type) {
+			throw new Error("Missing parameter type.")
+		}
+		if (!validator.isLength(body.type, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter type.")
+		}
+		if (!body.name) {
+			throw new Error("Missing parameter name.")
+		}
+		if (!validator.isLength(body.name, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter name.")
+		}
+		if (!body.description) {
+			throw new Error("Missing parameter description.")
+		}
+		if (!validator.isLength(body.description, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter description.")
+		}
+		if (!body.img) {
+			throw new Error("Missing parameter img.")
+		}
+		if (!isString(body.img)) {
+			throw new Error("Invalid parameter img.")
+		}
+		if (!body.price) {
+			throw new Error("Missing parameter price.")
+		}
+		if (!validator.isNumeric(String(body.price))) {
+			throw new Error("Invalid parameter price.")
+		}
+		if (!body.currency) {
+			throw new Error("Missing parameter currency.")
+		}
+		if (!validator.isLength(body.currency, { min: 1, max: 3 })) {
+			throw new Error("Invalid parameter currency.")
+		}
+		if (!body.isMainDish) {
+			throw new Error("Missing parameter isMainDish.")
+		}
+		if (!validator.isBoolean(String(body.isMainDish))) {
+			throw new Error("Invalid parameter isMainDish.")
+		}
+		const params = {
+			type: body.type,
+			name: body.name,
+			description: body.description,
+			img: body.img,
+			price: body.price,
+			currency: body.currency,
+			isMainDish: Boolean(body.isMainDish),
+		};
+		return params;
+	},
+
+	editMenuItem(body) {
+		const params = this.addMenuItem(body);
+		if (!body.id) {
+			throw new Error("Missing parameter id.")
+		}
+		if (!validator.isNumeric(String(body.id))) {
+			throw new Error("Invalid parameter id.")
+		}
+		return {
+			updateParams: params,
+			id: body.id,
+		}
+	},
+
+	getMenuItemsOfType: (query) => {
+		if (!query.type) {
+			throw new Error("Missing parameter type.")
+		}
+		if (!validator.isLength(query.type, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter type.")
+		}
+		return query.type;
+	},
+
+	menuItemId: (body) => {
+		if (!body.menuItemId) {
+			throw new Error("Missing parameter menuItemId.")
+		}
+		if (!validator.isNumeric(String(body.menuItemId))) {
+			throw new Error("Invalid parameter menuItemId.")
+		}
+		return body.menuItemId;
+	},
+
+	addMenuType: (body) => {
+		if (!body.typeName) {
+			throw new Error("Missing parameter typeName.")
+		}
+		if (!validator.isLength(body.typeName, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter typeName.")
+		}
+		if (!body.img) {
+			throw new Error("Missing parameter img.")
+		}
+		if (!isString(body.img)) {
+			throw new Error("Invalid parameter img.")
+		}
+
+		return {
+			name: body.typeName,
+			img: body.img,
+		}
+	},
+
+	editMenuType: (body) => {
+		if (!body.oldName) {
+			throw new Error("Missing parameter oldName.")
+		}
+		if (!validator.isLength(body.oldName, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter oldName.")
+		}
+		if (!body.newName) {
+			throw new Error("Missing parameter newName.")
+		}
+		if (!validator.isLength(body.newName, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter newName.")
+		}
+		if (!body.img) {
+			throw new Error("Missing parameter img.")
+		}
+		if (!isString(body.img)) {
+			throw new Error("Invalid parameter img.")
+		}
+
+		return {
+			oldName: body.oldName,
+			newName: body.newName,
+			img: body.img,
+		}
+	},
+
+	editDefaultMenuType: (body) => {
+		if (!body.newName) {
+			throw new Error("Missing parameter newName.")
+		}
+		if (!validator.isLength(body.newName, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter newName.")
+		}
+		return body.newName;
+	}
 };
 
 module.exports = AccountValidator;
