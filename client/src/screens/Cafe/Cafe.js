@@ -1,20 +1,29 @@
 import { useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import ReadMore from "../../components/ReadMore/Readmore";
+import SearchInput from "../../components/SearchInput/SearchInput";
+import DetailPage from "../../components/DetailPage/DetailPage";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
 import { ADD__TEMP__CARD, GET_TABLE_TOKEN } from "../../queries/queries";
+import arrowLeft from "./arrowLeft.png";
 import "./Cafe.css";
+import { Swipper } from "./Swipper";
 
 const Cafe = () => {
   const state = useContext(ThemeContext);
   const { cafeName, cafeId, tableId } = useParams();
-  const [getToken, { loading: loadingToken }] = useMutation(GET_TABLE_TOKEN);
 
+  const [getToken, { loading: loadingToken }] = useMutation(GET_TABLE_TOKEN);
   const [addTempOrder, { data: addOrderData }] = useMutation(ADD__TEMP__CARD);
+
   const [error, setError] = useState({ hasError: false, errorMessage: "" });
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
+  const [detilIsOpen, setDetailIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState({});
 
   useEffect(() => {
     localStorage.setItem("cafeName", cafeName);
@@ -48,9 +57,12 @@ const Cafe = () => {
   mockedInfo.push(state.menuItems);
   const newMockedTypes = mockedInfo.flat();
 
-  const { fontFamily, navbarTitleColor, navbarBgColor } = state.styles;
+  const { navbarTitleColor, navbarBgColor } = state.styles;
 
-  const addToCard = (id) => {
+  const addToCard = (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
     const menuItemId = Number(id);
 
     addTempOrder({
@@ -94,62 +106,95 @@ const Cafe = () => {
 
   return (
     <>
-      {isEmpty ? null : (
-        <div
-          className="cafeInfo__box"
-          style={{ fontFamily: fontFamily, background: navbarBgColor }}
-        >
-          <span className="cafeInfo__title" style={{ color: navbarTitleColor }}>
-            Dishes of the day
-          </span>
-          <div className="cafeInfo__recommended">
-            {newMockedTypes.map((item, index) => (
-              <div
-                className="cafeInfo__menuItem"
-                key={index}
-                style={{ border: `4px solid ${navbarTitleColor}` }}
-              >
-                <img
-                  src={item?.img}
-                  alt="img"
-                  className="cafeInfo__menuItem__img"
-                />
-                <span
-                  className="cafeInfo__menuItems__name"
-                  style={{ color: navbarTitleColor }}
-                >
-                  {item?.name}
-                </span>
-                <span
-                  className="cafeInfo__menuItem__description"
-                  style={{ color: navbarTitleColor }}
-                >
-                  {item?.description.length < 100 ? (
-                    <p>{item?.description}</p>
-                  ) : (
-                    <ReadMore>{item?.description}</ReadMore>
-                  )}
-                </span>
-                <div className="buying__info">
-                  <span
-                    className="cafeInfo__menuItem__price"
-                    style={{ color: navbarTitleColor }}
+      <SearchInput
+        setSearchValue={setSearchValue}
+        searchValue={searchValue}
+        accountId={cafeId}
+        setSearchResult={setSearchResult}
+      />
+      {searchResult.length && searchValue ? (
+        <div className="cafeInfo__box">
+          <div className="search__result">
+            {searchResult?.map((item, index) => {
+              return (
+                <div className="cafeInfo__menuItem" key={index}>
+                  <div
+                    className="menuType__item"
+                    style={{ marginLeft: index % 2 === 1 ? "20px" : null }}
                   >
-                    {item?.price} AMD
-                  </span>
-                  <button
-                    className="add__card_button"
-                    style={{ background: navbarTitleColor }}
-                    onClick={() => addToCard(item?._id)}
-                  >
-                    Buy
-                  </button>
+                    <div className="item__img__container">
+                      <img src={item.img} alt="" />
+                    </div>
+                    <span className="mainDish__item__name">{item.name}</span>
+                    <span className="mainDish__item__price">
+                      {item.price} {item.currency}
+                    </span>
+                    <span className="mainDish__item__description">
+                      <ReadMore>{item.description}</ReadMore>
+                    </span>
+                    <button
+                      className="order__btn"
+                      onClick={(e) => addToCard(e, item._id)}
+                    >
+                      Order
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        </div>
+      ) : (isEmpty && !searchValue) || detilIsOpen ? null : (
+        <div className="cafeInfo__box">
+          <div className="cafeInfo__recommended">
+            {newMockedTypes.map((item, index) => {
+              return (
+                <div
+                  className="cafeInfo__menuItem"
+                  style={{ padding: detilIsOpen ? null : "0px 30px 0px 30px" }}
+                  key={index}
+                >
+                  <div className="mainDish__info">
+                    <div className="mainDish__name">{item.type}</div>
+
+                    <div className="link__to__Type">
+                      <NavLink
+                        exact
+                        to={{
+                          pathname: `/${cafeName}/${cafeId}/${tableId}/menuType/${item.type}`,
+                        }}
+                      >
+                        See All {item.menuItemsCount}
+                        <img
+                          src={arrowLeft}
+                          alt="img"
+                          style={{ marginLeft: "6px" }}
+                        />
+                      </NavLink>
+                    </div>
+                  </div>
+                  <Swipper
+                    items={item.mainItems}
+                    addToCard={addToCard}
+                    setDetailIsOpen={setDetailIsOpen}
+                    setSelectedItem={setSelectedItem}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
+      {detilIsOpen ? (
+        <DetailPage
+          cafeId={cafeId}
+          tableId={tableId}
+          selectedItem={selectedItem}
+          setDetailIsOpen={setDetailIsOpen}
+          detilIsOpen={detilIsOpen}
+          className="detail_page"
+        />
+      ) : null}
     </>
   );
 };

@@ -15,13 +15,18 @@ export const GET_CAFFEE = gql`
         name
       }
       mainDishes {
-        _id
         type
-        name
-        description
-        img
-        price
-        currency
+        menuItemsCount
+        mainItems {
+          _id
+          accountId
+          name
+          description
+          img
+          price
+          currency
+          isMainDish
+        }
       }
       style {
         _id
@@ -332,6 +337,21 @@ export const ADD_ORDER = gql`
       tempTotalPrice
       tempTotalItems
       notes
+    }
+  }
+`;
+
+export const SEARCH_ITEM = gql`
+  query searchMenuItem($accountId: String!, $namePart: String!) {
+    searchMenuItem(accountId: $accountId, namePart: $namePart) {
+      _id
+      accountId
+      name
+      img
+      price
+      currency
+      isMainDish
+      description
     }
   }
 `;

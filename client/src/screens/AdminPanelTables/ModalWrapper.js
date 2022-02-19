@@ -17,7 +17,6 @@ export const ModalWrapper = ({ modalIsOpen, closeModal, tableCart }) => {
   };
 
   const { cart, tempCart } = tableCart;
-  console.log("cart", cart);
   return (
     <>
       <Modal
