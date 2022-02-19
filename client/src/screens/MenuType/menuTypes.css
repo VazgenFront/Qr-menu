@@ -7,6 +7,7 @@
   flex-direction: column;
   align-items: center;
   padding-bottom: 100px;
+  background: #E5E5E5;
 }
 
 .menuType__title {
@@ -19,6 +20,11 @@
 
 .menuType__recommended {
   margin-top: 20px;
+}
+
+.menuType__box {
+  display: grid;
+  grid-template-columns: auto auto;
 }
 
 .menuType__menuItem {
@@ -53,4 +59,19 @@
   font-size: 14px;
   max-width: 235px;
   width: 100%;
+}
+
+.menuType__item {
+  width: 155px;
+  padding: 54px 0px 16px 0px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 20px;
+  margin-top: 50px;
+  padding-left: 12px;
+  padding-right: 12px;
+  position: relative;
 }

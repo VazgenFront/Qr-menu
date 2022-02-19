@@ -13,6 +13,7 @@ class ThemeContextProvider extends Component {
       card: localStorage.getItem("card") || [],
       tableId: localStorage.getItem("tableId") || null,
       totalItemsCount: 0,
+      menuType: "",
     };
   }
 
@@ -43,6 +44,10 @@ class ThemeContextProvider extends Component {
     this.setState({ totalItemsCount: totalItemsCountParams });
   };
 
+  getMenuTypeName = (name) => {
+    this.setState({ menuType: name });
+  };
+
   render() {
     return (
       <ThemeContext.Provider
@@ -54,6 +59,7 @@ class ThemeContextProvider extends Component {
           getCafeId: this.getCafeId,
           getTableId: this.getTableId,
           getTotalItemsCount: this.getTotalItemsCount,
+          getMenuTypeName: this.getMenuTypeName,
         }}
       >
         {this.props.children}

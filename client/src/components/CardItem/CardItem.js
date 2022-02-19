@@ -5,6 +5,7 @@ import {
   ADD__TEMP__CARD,
   REDUCE_MENU_ITEM_COUNT,
   REMOVE_CART_ITEM,
+  GET_TABLE_TOKEN,
 } from "../../queries/queries";
 import { ThemeContext } from "../../context/ThemeContext";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
@@ -17,6 +18,7 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
   const [error, setError] = useState({ hasError: false, errorMessage: "" });
 
   const [addOrder] = useMutation(ADD__TEMP__CARD);
+  const [getToken, { loading: loadingToken }] = useMutation(GET_TABLE_TOKEN);
 
   const [reduceItem, {}] = useMutation(REDUCE_MENU_ITEM_COUNT);
 
@@ -39,6 +41,13 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
     })
       .then((data) => data.data?.addOrder?.totalItems)
       .catch((e) => {
+        localStorage.removeItem("token");
+        getToken({
+          variables: {
+            accountId: cafeId,
+            tableId: tableId,
+          },
+        });
         setError((prevState) => ({
           ...prevState,
           hasError: true,
@@ -60,6 +69,13 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
     })
       .then((data) => data.data?.reduceOneMenuItemCount?.totalItems)
       .catch((e) => {
+        localStorage.removeItem("token");
+        getToken({
+          variables: {
+            accountId: cafeId,
+            tableId: tableId,
+          },
+        });
         setError((prevState) => ({
           ...prevState,
           hasError: true,
@@ -81,6 +97,13 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
     })
       .then((data) => data.data?.removeMenuItemFromOrder?.totalItems)
       .catch((e) => {
+        localStorage.removeItem("token");
+        getToken({
+          variables: {
+            accountId: cafeId,
+            tableId: tableId,
+          },
+        });
         setError((prevState) => ({
           ...prevState,
           hasError: true,
@@ -112,7 +135,7 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
     state.getTotalItemsCount(totalItemsCount);
   };
 
-  if (loadingRemovueCartItem) {
+  if (loadingRemovueCartItem || loadingToken) {
     return <Spinner color={navbarTitleColor} />;
   }
 
@@ -121,13 +144,9 @@ const CardItem = ({ item, index, navbarTitleColor, navbarBgColor }) => {
       <ErrorMessage
         color={navbarTitleColor}
         background={navbarBgColor}
-        error={"Something Went Wrong"}
+        error={error.errorMessage}
       />
     );
-  }
-
-  if (!count || !price) {
-    return null;
   }
 
   return (

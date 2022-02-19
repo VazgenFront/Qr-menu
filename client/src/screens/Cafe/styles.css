@@ -1,0 +1,104 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.slide {
+  display: inline-block;
+  width: 180px;
+  height: 100px;
+  padding: 54px 0px 16px 0px;
+  margin-bottom: 2rem;
+  background-color: tomato;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.item__img__container {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 10px solid #ffffff;
+  top: -30px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item__img__container img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.swiper-slide {
+  width: 155px;
+  background: #ffffff;
+  border-radius: 20px;
+  margin-top: 50px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.thumbs {
+  width: 10px;
+  height: 60px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.mainDish__item__name {
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  width: 100%;
+  line-height: 17px;
+  text-align: left;
+  text-transform: uppercase;
+  color: #3f3f3f;
+}
+
+.mainDish__item__price {
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 17px;
+  margin-top: 20px;
+  width: 100%;
+  text-align: left;
+  text-transform: uppercase;
+  color: #784f2d;
+}
+
+.mainDish__item__description {
+  margin-top: 10px;
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 10px;
+  line-height: 12px;
+  color: #808080;
+  text-align: left;
+}
+
+.order__btn {
+  width: 123px;
+  height: 27px;
+  margin-top: 10px;
+  background: #784f2d;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 15px;
+  font-family: "Roboto", sans-serif;
+  text-align: center;
+  color: #ffffff;
+}

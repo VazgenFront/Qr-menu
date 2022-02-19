@@ -1,176 +1,108 @@
 import { useLazyQuery, useMutation } from "@apollo/client";
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Accordion } from "../../components/Accordion/Accordion";
-import CardItem from "../../components/CardItem/CardItem";
-import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
-import Spinner from "../../components/Spinner/Spinner";
-import { ThemeContext } from "../../context/ThemeContext";
-import {
-  ADD_ORDER,
-  GET_ORDER,
-  REMOVE_ALL_CART_ITEMS,
-} from "../../queries/queries";
+import { useEffect, useState } from "react";
+import ActiveOrderWrapper from "../../components/ActiveOrderWrapper/ActiveOrderWrapper.js";
+import PreOrderWrapper from "../../components/PreOrderWrapper/PreOrderWrapper.js";
+import { ADD_ORDER, GET_ORDER } from "../../queries/queries";
 import "./Card.css";
 
-const Buttons = ({
-  onDeleteAllItems,
-  navbarTitleColor,
-  addTempItemsToCart,
-}) => {
-  return (
-    <div className="cart__btns">
-      <button
-        className="order__btn"
-        style={{ background: navbarTitleColor }}
-        onClick={onDeleteAllItems}
-      >
-        Cancel
-      </button>
-      <button
-        className="order__btn"
-        style={{ background: navbarTitleColor }}
-        onClick={addTempItemsToCart}
-      >
-        Order
-      </button>
-    </div>
-  );
-};
-
 const Card = () => {
-  const { tableId, cafeId } = useParams();
-  const [tempCart, setTempCart] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [preOrderOpen, setPreOrderOpen] = useState(true);
+  const [orderOpen, setOrderOpen] = useState(false);
+  const [allOrders, setAllOrders] = useState({
+    preOrders: [],
+    activeOrders: [],
+  });
+  const [totalTempCartPrice, setTotalTempCartPrice] = useState(0);
+  const [needRefresh, setNeedRefresh] = useState(false);
 
-  const token = localStorage.getItem("token");
-  const state = useContext(ThemeContext);
-  const [totalPrice, setToTalItemsPrice] = useState(0);
-  const [error, setError] = useState({ hasError: false, errorMessage: "" });
+  const reserveToken = localStorage.getItem("token");
+  const cafeId = localStorage.getItem("cafeId");
+  const tableId = localStorage.getItem("tableId");
 
-  const [getOrder, { loading, data }] = useLazyQuery(GET_ORDER);
-  const [MAKE_ORDER, { data: makeOrderData }] = useMutation(ADD_ORDER);
-
-  const [removeAllItems] = useMutation(REMOVE_ALL_CART_ITEMS);
-  const { getTotalItemsCount } = state;
-  const { navbarTitleColor, navbarBgColor } = state.styles;
-
-  const onDeleteAllItems = () => {
-    removeAllItems({
-      variables: {
-        accountId: cafeId,
-        tableId: tableId,
-        reserveToken: token,
-      },
-    })
-      .then(() => setTempCart([]))
-      .then(() => getTotalItemsCount())
-      .catch((e) => {
-        setError((prevState) => ({
-          ...prevState,
-          hasError: true,
-          errorMessage: e.message,
-        }));
-      });
+  const preOpenOrder = () => {
+    setPreOrderOpen(true);
+    setOrderOpen(false);
   };
 
-  const addTempItemsToCart = async () => {
-    await MAKE_ORDER({
-      variables: {
-        accountId: cafeId,
-        tableId: tableId,
-        reserveToken: localStorage.getItem("token"),
-      },
-    }).catch((e) => {
-      setError((prevState) => ({
-        ...prevState,
-        hasError: true,
-        errorMessage: e.message,
-      }));
-    });
+  const openOrder = () => {
+    setOrderOpen(true);
+    setPreOrderOpen(false);
   };
+
+  const [getOrder, { loading }] = useLazyQuery(GET_ORDER);
+  const [addOrderToCart] = useMutation(ADD_ORDER);
 
   useEffect(() => {
     getOrder({
       variables: {
         accountId: cafeId,
-        tableId: tableId,
-        reserveToken: token,
+        tableId,
+        reserveToken,
       },
-    })
-      .then((data) => {
-        setToTalItemsPrice(data?.data?.order?.tempTotalPrice);
-        if (data.data?.order) {
-          setTempCart(() => [...data?.data?.order?.tempCart]);
-          setCart(() => [...data?.data?.order?.cart]);
-        }
-      })
-      .catch((e) => {
-        setError((prevState) => ({
+    }).then((data) => {
+      const { tempCart, cart } = data?.data?.order;
+      setTotalTempCartPrice(data?.data?.order?.tempTotalPrice);
+      setPreOrderOpen(preOrderOpen);
+      setOrderOpen(orderOpen);
+      setAllOrders((prevState) => {
+        return {
           ...prevState,
-          hasError: true,
-          errorMessage: e.message,
-        }));
+          preOrders: tempCart,
+          activeOrders: cart,
+        };
       });
-  }, [cafeId, data, tableId, token, makeOrderData]);
+    });
+  }, [needRefresh]);
 
-  if (loading) {
-    return <Spinner color={navbarTitleColor} />;
-  }
+  const { preOrders, activeOrders } = allOrders;
 
-  if (error.errorMessage) {
-    return (
-      <ErrorMessage
-        color={navbarTitleColor}
-        background={navbarBgColor}
-        error={"Something Went Wrong"}
-      />
-    );
-  }
+  const orderTempCart = async () => {
+    addOrderToCart({
+      variables: {
+        accountId: cafeId,
+        tableId,
+        reserveToken,
+      },
+    });
+  };
 
   return (
-    <div
-      className="card_box"
-      style={{
-        background: navbarBgColor,
-      }}
-    >
-      <span className="card__title" style={{ color: navbarTitleColor }}>
-        MY CART
-      </span>
-      {cart.length > 0 ? (
-        <Accordion
-          title={"Yet ordered"}
-          cart={cart}
-          navbarTitleColor={navbarTitleColor}
-        />
-      ) : null}
-      {tempCart.length > 0 ? (
-        tempCart.map((item, index) => (
-          <CardItem
-            key={index}
-            item={item}
-            index={index}
-            navbarTitleColor={navbarTitleColor}
-            navbarBgColor={navbarBgColor}
+    <div className="Card">
+      <div className="card_box">
+        <div className="order__box">
+          <span
+            className={`order_item ${preOrderOpen && "active"}`}
+            onClick={preOpenOrder}
+          >
+            Pre-ordered
+          </span>
+          <span
+            className={`order_item ${orderOpen && "active"}`}
+            style={{ marginLeft: "30px" }}
+            onClick={openOrder}
+          >
+            Ordered
+          </span>
+        </div>
+        {preOrderOpen && !orderOpen && (
+          <PreOrderWrapper
+            preOrders={preOrders}
+            needRefresh={needRefresh}
+            setNeedRefresh={setNeedRefresh}
           />
-        ))
-      ) : (
-        <span className="emptyCart__title" style={{ color: navbarTitleColor }}>
-          Your Cart is Empty
-        </span>
-      )}
-
-      {totalPrice ? (
-        <span className="totalItems__price">Total Price: {totalPrice} AMD</span>
-      ) : null}
-      {tempCart.length > 0 && (
-        <Buttons
-          navbarTitleColor={navbarTitleColor}
-          onDeleteAllItems={onDeleteAllItems}
-          addTempItemsToCart={addTempItemsToCart}
-        />
-      )}
+        )}
+        {orderOpen && !preOrderOpen && (
+          <ActiveOrderWrapper activeOrders={activeOrders} />
+        )}
+      </div>
+      <div className="order__wrapper">
+        <div className="temp__total__price">
+          Total: {totalTempCartPrice} AMD
+        </div>
+        <button className="temp__order__cart" onClick={orderTempCart}>
+          Order
+        </button>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import "./Readmore.css";
 
-const ReadMore = ({ children }) => {
+const ReadMore = ({ children, isName }) => {
   const text = children;
   const [isReadMore, setIsReadMore] = useState(true);
   const toggleReadMore = () => {
@@ -10,21 +10,7 @@ const ReadMore = ({ children }) => {
   };
   const state = useContext(ThemeContext);
   const { navbarTitleColor } = state.styles;
-  return (
-    <p className="text">
-      {isReadMore ? text.slice(0, 150) : text}
-      <span
-        onClick={toggleReadMore}
-        className="read-or-hide"
-        style={{
-          color: navbarTitleColor,
-          borderBottom: `1px solid ${navbarTitleColor}`,
-        }}
-      >
-        {isReadMore ? "read more" : " show less"}
-      </span>
-    </p>
-  );
+  return <p className="text">{text.slice(0, 60)}...</p>;
 };
 
 export default ReadMore;

@@ -1,0 +1,114 @@
+.PreOrderWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.preorder__item {
+  background: #ffffff;
+  border-radius: 20px;
+  margin-top: 20px;
+  padding: 16px;
+  display: flex;
+  width: 330px;
+  max-width: 330px;
+}
+
+.preorder__item__img {
+  width: 143px;
+  height: 143px;
+  border-radius: 10px;
+}
+
+.preorder__item__info__box {
+  width: 200px;
+  height: 100px;
+  margin-left: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preorder__item__info__name {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #3f3f3f;
+}
+
+.preorder__item__info__description {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 15px;
+  margin-top: 8px;
+  color: #808080;
+  transform: rotate(0deg);
+}
+
+.preorder__item__info__pricequant {
+  width: 100%;
+  height: 30px;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.minus_box {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dddddd;
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: hsl(0, 0%, 87%);
+}
+
+.plus_box {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dddddd;
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #dddddd;
+  margin-left: 20px;
+  color: hsl(0, 0%, 87%);
+}
+
+.preorder__item__info__price {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: left;
+  margin-top: 10px;
+  text-transform: uppercase;
+  color: #784f2d;
+}
+
+.name__cancel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cancel__btn {
+  width: 15px;
+  height: 15px;
+  margin-top: -5px;
+}

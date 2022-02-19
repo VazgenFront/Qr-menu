@@ -8,10 +8,10 @@ export const Button = ({ item, token, needRefresh, setNeedRefresh }) => {
   const { addModalOpen, openAddModal, closeAddModal } = useToggleModalOpen();
 
   const getTables = (e) => {
-    setNeedRefresh(!needRefresh);
     e.preventDefault();
 
     if (reserved) {
+      setNeedRefresh(true);
       axios.post(
         "http://localhost:4000/api/account/closeTable",
         { tableId: item.tableId },

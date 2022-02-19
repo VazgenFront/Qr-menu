@@ -1,20 +1,21 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import BuyingInfo from "../../components/BuyingInfo/BuyingInfo";
+import DetailPage from "../../components/DetailPage/DetailPage";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import ReadMore from "../../components/ReadMore/Readmore";
 import Spinner from "../../components/Spinner/Spinner";
 import { ThemeContext } from "../../context/ThemeContext";
-import { GET_MENUTYPE_INFO, ADD__TEMP__CARD } from "../../queries/queries";
+import { ADD__TEMP__CARD, GET_MENUTYPE_INFO } from "../../queries/queries";
 import "./menuTypes.css";
 
 const MenuType = () => {
   const { cafeId, menuType, tableId } = useParams();
+  const state = useContext(ThemeContext);
 
   const [menuTypes, setMenuTypes] = useState([]);
-
-  const state = useContext(ThemeContext);
+  const [detilIsOpen, setDetailIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState({});
 
   const { data, error, loading } = useQuery(GET_MENUTYPE_INFO, {
     variables: {
@@ -22,12 +23,12 @@ const MenuType = () => {
       type: menuType,
     },
   });
-
   const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
     useMutation(ADD__TEMP__CARD);
 
   useEffect(() => {
     data?.menuItemsOfType && setMenuTypes(() => [...data?.menuItemsOfType]);
+    menuType && state.getMenuTypeName(menuType);
   }, [data]);
 
   const { navbarTitleColor, navbarBgColor } = state.styles;
@@ -47,6 +48,15 @@ const MenuType = () => {
     state.getTotalItemsCount(totalItemsCount);
   };
 
+  const onDetailOpen = (item) => {
+    setDetailIsOpen(true);
+    setSelectedItem(() => {
+      return {
+        ...item,
+      };
+    });
+  };
+
   if (loading) {
     return <Spinner color={navbarTitleColor} />;
   }
@@ -61,42 +71,46 @@ const MenuType = () => {
   }
 
   return (
-    <div className="menuTypes__box" style={{ background: navbarBgColor }}>
-      <div className="cafeInfo__recommended">
-        {menuTypes.map((item, index) => (
-          <div
-            className="menuType__menuItem"
-            key={index}
-            style={{
-              background: navbarBgColor,
-              border: `4px solid ${navbarTitleColor}`,
-            }}
-          >
-            <img
-              src={item?.img}
-              alt="img"
-              className="menuType__menuItem__img"
-            />
-            <span
-              className="menuType__menuItems__name"
-              style={{ color: navbarTitleColor }}
-            >
-              {item?.name}
-            </span>
-            <span
-              className="menuType__menuItem__description"
-              style={{ color: navbarTitleColor }}
-            >
-              <ReadMore>{item?.description}</ReadMore>
-            </span>
-            <BuyingInfo
-              navbarTitleColor={navbarTitleColor}
-              item={item}
-              addToCard={addToCard}
-            />
-          </div>
-        ))}
+    <div className="menuTypes__box">
+      <div className="menuType__box">
+        {menuTypes && !detilIsOpen
+          ? menuTypes.map((item, index) => (
+              <div
+                className="menuType__item"
+                style={{ marginLeft: index % 2 === 1 ? "20px" : null }}
+                onClick={() => onDetailOpen(item)}
+              >
+                <div className="item__img__container">
+                  <img src={item.img} alt="" />
+                </div>
+                <span className="mainDish__item__name">{item.name}</span>
+                <span className="mainDish__item__price">
+                  {item.price} {item.currency}
+                </span>
+                <span className="mainDish__item__description">
+                  <ReadMore>{item.description}</ReadMore>
+                </span>
+                <button
+                  className="order__btn"
+                  onClick={() => addToCard(item._id)}
+                >
+                  Order
+                </button>
+              </div>
+            ))
+          : null}
       </div>
+
+      {detilIsOpen ? (
+        <DetailPage
+          cafeId={cafeId}
+          tableId={tableId}
+          selectedItem={selectedItem}
+          setDetailIsOpen={setDetailIsOpen}
+          detilIsOpen={detilIsOpen}
+          className="detail_page"
+        />
+      ) : null}
     </div>
   );
 };
