@@ -1,6 +1,7 @@
+const moment = require("moment");
 const validator = require("validator");
-const { toObjectId } = require("../../helpers/conversions");
 const { rgbRegex, rgbaRegex, defaultFontFamily } = require("../../config/parameters");
+const { toObjectId } = require("../../helpers/conversions");
 
 const isString = (str) => typeof str === "string";
 
@@ -268,6 +269,16 @@ const AccountValidator = {
 		}
 	},
 
+	deleteMenuType: (body) => {
+		if (!body.typeName) {
+			throw new Error("Missing parameter typeName.")
+		}
+		if (!validator.isLength(body.typeName, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter typeName.")
+		}
+		return body.typeName;
+	},
+
 	editDefaultMenuType: (body) => {
 		if (!body.newName) {
 			throw new Error("Missing parameter newName.")
@@ -276,7 +287,133 @@ const AccountValidator = {
 			throw new Error("Invalid parameter newName.")
 		}
 		return body.newName;
-	}
+	},
+
+	addTable(body) {
+		if (!body.name) {
+			throw new Error("Missing parameter name.")
+		}
+		if (!validator.isLength(body.name, { min: 2, max: 30 })) {
+			throw new Error("Invalid parameter name.")
+		}
+		if (!body.seatCount) {
+			throw new Error("Missing parameter seatCount.")
+		}
+		if (!validator.isNumeric(String(body.seatCount))) {
+			throw new Error("Invalid parameter seatCount.")
+		}
+		if (!body.notes) {
+			throw new Error("Missing parameter notes.")
+		}
+		if (!isString(body.notes)) {
+			throw new Error("Invalid parameter notes.")
+		}
+		return {
+			name: body.name,
+			seatCount: Number(body.seatCount),
+			notes: body.notes,
+		}
+	},
+
+	editTable(body) {
+		const params = this.addTable(body);
+		if (!body.tableId) {
+			throw new Error("Missing parameter tableId.")
+		}
+		if (!validator.isMongoId(body.tableId)) {
+			throw new Error("Invalid parameter tableId.")
+		}
+		return {
+			tableId: toObjectId(body.tableId),
+			updateParams: params,
+		}
+	},
+
+	deleteTable(body) {
+		if (!body.tableId) {
+			throw new Error("Missing parameter tableId.")
+		}
+		if (!validator.isMongoId(body.tableId)) {
+			throw new Error("Invalid parameter tableId.")
+		}
+		return toObjectId(body.tableId);
+	},
+
+	getTableOrder: (query) => {
+		if (!query.tableId) {
+			throw new Error("Missing parameter tableId.")
+		}
+		if (!validator.isMongoId(query.tableId)) {
+			throw new Error("Invalid parameter tableId.")
+		}
+		return toObjectId(query.tableId);
+	},
+
+	getOrders: (query) => {
+		const params = {};
+		if (query.dateFrom) {
+			if (!moment(query.dateFrom, moment.ISO_8601).isValid()) {
+				throw new Error("Invalid parameter dateFrom.")
+			}
+		}
+		if (query.dateTo) {
+			if (!moment(query.dateTo, moment.ISO_8601).isValid()) {
+				throw new Error("Invalid parameter dateTo.")
+			}
+		}
+		if (query.dateFrom && query.dateTo) {
+			params.dateRange = {
+				$gte: new Date(query.dateFrom),
+				$lte: new Date(query.dateTo),
+			}
+		} else if (query.dateFrom) {
+			params.dateRange = {
+				$gte: new Date(query.dateFrom),
+			}
+		} else if (query.dateTo) {
+			params.dateRange = {
+				$lte: new Date(query.dateTo),
+			}
+		} else {
+			return {
+				dateRange: null
+			};
+		}
+		return {
+			dateRange: params.dateRange,
+		}
+	},
+
+	closeOrder: (body) => {
+		if (!body.orderId) {
+			throw new Error("Missing parameter orderId.")
+		}
+		if (!validator.isNumeric(String(body.orderId))) {
+			throw new Error("Invalid parameter orderId.")
+		}
+		if (!body.notes) {
+			throw new Error("Missing parameter notes.")
+		}
+		if (!isString(body.notes)) {
+			throw new Error("Invalid parameter notes.")
+		}
+
+		return {
+			orderId: Number(body.orderId),
+			notes: body.notes,
+		}
+	},
+
+	closeTable: (body) => {
+		if (!body.tableId) {
+			throw new Error("Missing parameter tableId.")
+		}
+		if (!validator.isMongoId(body.tableId)) {
+			throw new Error("Invalid parameter tableId.")
+		}
+
+		return toObjectId(body.tableId);
+	},
 };
 
 module.exports = AccountValidator;

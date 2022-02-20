@@ -403,12 +403,10 @@ const AccountController = {
 		}
 	},
 
-	// TODO: Do other validation down from here
-
 	deleteMenuType: async (req, res) => {
 		try {
-			const { typeName } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const typeName = AccountValidator.deleteMenuType(req.body);
 			console.log({_id, typeName})
 			const account = await Account.findOneAndUpdate(
 				{ _id },
@@ -432,7 +430,7 @@ const AccountController = {
 
 	getTables: async (req, res) => {
 		try {
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const accountTables = await Table.find({ accountId: _id }).lean();
 
 			res.status(200).send({
@@ -451,8 +449,8 @@ const AccountController = {
 
 	addTable: async (req, res) => {
 		try {
-			let { seatCount, name, notes } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { name, seatCount, notes } = AccountValidator.addTable(req.body);
 			const tableEntity = new Table({
 				accountId: _id,
 				tableId: new mongoose.Types.ObjectId(),
@@ -477,11 +475,11 @@ const AccountController = {
 
 	editTable: async (req, res) => {
 		try {
-			const { tableId, seatCount, name, notes } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { tableId, updateParams } = req.body;
 			const table = await Table.findOneAndUpdate(
-				{ accountId: _id, _id: tableId },
-				{ $set: { seatCount, notes, name } },
+				{ accountId: _id, tableId },
+				{ $set: updateParams },
 				{ new: true }).lean();
 			res.status(200).send({
 				success: true,
@@ -499,8 +497,8 @@ const AccountController = {
 
 	deleteTable: async (req, res) => {
 		try {
-			const { tableId } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const tableId = AccountValidator.deleteTable(req.body);
 			const unpaidOrders = await Order.find({ accountId: _id, isPaid: false, tableId }).lean();
 			if (unpaidOrders.length) {
 				throw new Error("Please close all unpaid orders with specified tableId before delete.");
@@ -521,8 +519,8 @@ const AccountController = {
 
 	getTableOrder: async (req, res) => {
 		try {
-			const { tableId } = req.query;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const tableId = AccountValidator.getTableOrder(req.query);
 			const findQuery = {
 				accountId: _id,
 				tableId,
@@ -545,13 +543,13 @@ const AccountController = {
 
 	getOrders: async (req, res) => {
 		try {
-			const { dateFrom, dateTo } = req.query;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const dateRange = AccountValidator.getOrders(req.query);
 			const findQuery = {
 				accountId: _id,
 			}
-			if (dateFrom && dateTo) {
-				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			if (dateRange) {
+				findQuery.dateCreated = dateRange;
 			}
 			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
@@ -570,14 +568,14 @@ const AccountController = {
 
 	getPaidOrders: async (req, res) => {
 		try {
-			const { dateFrom, dateTo } = req.query;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const dateRange = AccountValidator.getOrders(req.query);
 			const findQuery = {
 				accountId: _id,
 				isPaid: true,
 			}
-			if (dateFrom && dateTo) {
-				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			if (dateRange) {
+				findQuery.dateCreated = dateRange;
 			}
 			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
@@ -596,15 +594,15 @@ const AccountController = {
 
 	getUnpaidOrders: async (req, res) => {
 		try {
-			const { dateFrom, dateTo } = req.query;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const dateRange = AccountValidator.getOrders(req.query);
 			const tables = await Table.find({ accountId: _id }).lean();
 			const findQuery = {
 				accountId: _id,
 				isPaid: false,
 			}
-			if (dateFrom && dateTo) {
-				findQuery.dateCreated = { $gte: new Date(dateFrom), $lte: new Date(dateTo) };
+			if (dateRange) {
+				findQuery.dateCreated = dateRange;
 			}
 			const orders = await Order.find(findQuery).lean();
 			res.status(200).send({
@@ -626,8 +624,8 @@ const AccountController = {
 
 	closeOrder: async (req, res) => {
 		try {
-			const { orderId, notes } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { orderId, notes } = AccountValidator.closeOrder(req.body);
 			const order = await Order.findOneAndUpdate(
 				{
 					_id: orderId,
@@ -656,8 +654,8 @@ const AccountController = {
 
 	closeTable: async (req, res) => {
 		try {
-			const { tableId } = req.body;
-			const _id = toObjectId(req.decoded._id);
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const tableId = AccountValidator.closeTable(req.body);
 			await Order.updateMany(
 				{
 					tableId,
