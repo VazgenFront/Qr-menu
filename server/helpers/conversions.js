@@ -45,7 +45,32 @@ const findCommon = (str1 = '', str2 = '') => {
 	return res;
 };
 
+const sortMenuItems = (menuItems, namePart) => {
+	if (menuItems.length > 0) {
+		const namepartLowercase = namePart.toLowerCase();
+		menuItems.sort((a, b) => {
+			const aName = a.name.toLowerCase();
+			const bName = b.name.toLowerCase();
+			const aMatch = findCommon(aName, namepartLowercase);
+			const bMatch = findCommon(bName, namepartLowercase);
+
+			return bMatch.length - aMatch.length;
+		});
+
+		menuItems.sort((a, b) => {
+			const aMatch = findCommon(a.name, namePart);
+			const bMatch = findCommon(b.name, namePart);
+
+			return bMatch.length - aMatch.length;
+		});
+		return menuItems;
+	} else {
+		return [];
+	}
+}
+
 module.exports = {
 	toObjectId,
 	findCommon,
+	sortMenuItems,
 }

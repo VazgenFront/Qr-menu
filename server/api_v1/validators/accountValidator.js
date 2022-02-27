@@ -188,6 +188,27 @@ const AccountValidator = {
 		return params;
 	},
 
+	getMenuItems(query) {
+		const params = {
+			offset: 0,
+			limit: 0,
+		}
+
+		if (query.page && query.pageLimit
+			&& validator.isNumeric(String(query.page)) && validator.isNumeric(String(query.pageLimit))
+			&& Number(query.page) >= 1 && Number(query.pageLimit) >= 1
+		) {
+			params.limit = parseInt(query.pageLimit);
+			params.offset = params.limit * (parseInt(query.page) - 1);
+		}
+
+		if (query.namePart) {
+			params.namePart = query.namePart;
+		}
+
+		return params;
+	},
+
 	editMenuItem(body) {
 		const params = this.addMenuItem(body);
 		if (!body.id) {
@@ -202,14 +223,18 @@ const AccountValidator = {
 		}
 	},
 
-	getMenuItemsOfType: (query) => {
+	getMenuItemsOfType (query) {
+		const params = this.getMenuItems(query);
 		if (!query.type) {
 			throw new Error("Missing parameter type.")
 		}
 		if (!validator.isLength(query.type, { min: 2, max: 30 })) {
 			throw new Error("Invalid parameter type.")
 		}
-		return query.type;
+		return {
+			...params,
+			type: query.type,
+		};
 	},
 
 	menuItemId: (body) => {

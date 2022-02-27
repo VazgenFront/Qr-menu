@@ -10,7 +10,7 @@ const Style = require("../../db/models/style");
 const Table = require("../../db/models/table");
 
 const { getLogger } = require("../../helpers/logger")
-const { toObjectId } = require("../../helpers/conversions");
+const { toObjectId, sortMenuItems } = require("../../helpers/conversions");
 const mongoose = require("mongoose");
 
 const log = getLogger("default");
@@ -193,11 +193,20 @@ const AccountController = {
 	getMenuItems: async (req, res) => {
 		try {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
-			const menuItems = await MenuItem.find({ accountId: _id });
-			res.status(200).send({
-				success: true,
-				menuItems,
-			});
+			const { namePart, limit, offset } = AccountValidator.getMenuItems(req.query);
+			const menuItems = await MenuItem.find({ accountId: _id }).skip(offset).limit(limit).sort({ _id: -1 });
+			if (namePart) {
+				const sortedMenuItems = sortMenuItems(menuItems, namePart);
+				res.status(200).send({
+					success: true,
+					menuItems: sortedMenuItems,
+				});
+			} else {
+				res.status(200).send({
+					success: true,
+					menuItems,
+				});
+			}
 		} catch (e) {
 			console.log("getMenuItems error", e);
 			log.error("getMenuItems error", e);
@@ -211,12 +220,20 @@ const AccountController = {
 	getMenuItemsOfType: async (req, res) => {
 		try {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
-			const type = AccountValidator.getMenuItemsOfType(req.query);
-			const menuItems = await MenuItem.find({ accountId: _id, type });
-			res.status(200).send({
-				success: true,
-				menuItems,
-			});
+			const { type, namePart, limit, offset } = AccountValidator.getMenuItemsOfType(req.query);
+			const menuItems = await MenuItem.find({ accountId: _id, type }).skip(offset).limit(limit).sort({ _id: -1 });
+			if (namePart) {
+				const sortedMenuItems = sortMenuItems(menuItems, namePart);
+				res.status(200).send({
+					success: true,
+					menuItems: sortedMenuItems,
+				});
+			} else {
+				res.status(200).send({
+					success: true,
+					menuItems,
+				});
+			}
 		} catch (e) {
 			console.log("getMenuItemsOfType error", e);
 			log.error("getMenuItemsOfType error", e);
