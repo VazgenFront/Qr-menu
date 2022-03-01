@@ -92,6 +92,39 @@ const AccountValidator = {
 		return params;
 	},
 
+	dashboardStatistics: (query) => {
+		if (query.daysBefore) {
+			if (!validator.isNumeric(query.daysBefore)) {
+				throw new Error("Invalid parameter daysBefore.")
+			}
+			return {
+				startDate: moment().subtract(parseInt(query.daysBefore), "days").toDate(),
+				endDate: new Date(),
+			};
+		} else {
+			if (!query.startDate) {
+				throw new Error("Missing parameter startDate.")
+			}
+			if (!query.endDate) {
+				throw new Error("Missing parameter endDate.")
+			}
+			if (!moment(query.startDate, "YYYY-MM-DD").isValid()) {
+				throw new Error("Invalid parameter startDate.")
+			}
+			if (!moment(query.endDate, "YYYY-MM-DD").isValid()) {
+				throw new Error("Invalid parameter endDate.")
+			}
+			if (!moment(query.startDate).isBefore(moment(query.endDate))) {
+				throw new Error("Parameter startDate must be before endDate.")
+			}
+
+			return {
+				startDate: new Date(query.startDate),
+				endDate: new Date(query.endDate),
+			}
+		}
+	},
+
 	editStyle: (body) => {
 		const params = {};
 

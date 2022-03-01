@@ -34,7 +34,7 @@ const TableMutations = {
 			const reserveToken = uuidv4();
 			const table = await Table.findOneAndUpdate(
 				{ accountId, tableId, reserved: false },
-				{ reserved: true, reserveToken },
+				{ reserved: true, reserveToken, lastReserved: new Date() },
 				{ new: true }
 			).lean();
 			if (table) {

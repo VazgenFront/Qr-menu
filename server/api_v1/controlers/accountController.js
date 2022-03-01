@@ -10,7 +10,7 @@ const Style = require("../../db/models/style");
 const Table = require("../../db/models/table");
 
 const { getLogger } = require("../../helpers/logger")
-const { toObjectId, sortMenuItems } = require("../../helpers/conversions");
+const { sortMenuItems, sortMenuItemsMainDishesFirst } = require("../../helpers/conversions");
 const mongoose = require("mongoose");
 
 const log = getLogger("default");
@@ -90,8 +90,8 @@ const AccountController = {
 
 	editAccount: async (req, res) => {
 		try {
-			const updateParams = AccountValidator.editAccount(req.body);
 			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const updateParams = AccountValidator.editAccount(req.body);
 			const account = await Account.findOneAndUpdate({ _id }, { $set: updateParams }, { new: true }).lean();
 			res.status(200).send({
 				success: true,
@@ -101,6 +101,35 @@ const AccountController = {
 		} catch (e) {
 			console.log("editAccount error", e);
 			log.error("editAccount error", e);
+			res.status(500).send({
+				success: false,
+				body: e.message ? e.message : e,
+			});
+		}
+	},
+
+	dashboardStatistics: async (req, res) => {
+		try {
+			const { _id } = AccountValidator.getAccountId(req.decoded);
+			const { startDate, endDate } = AccountValidator.dashboardStatistics(req.query);
+			const account = await Account.findOne({ _id }).lean();
+			if (!account) {
+				throw new Error("Account not found.")
+			}
+			const menuItemsCount = await MenuItem.countDocuments({ accountId: _id }).lean();
+			const orders = await Order.find({ accountId: _id, isPaid: true, dateCreated: { $gte: startDate, $lte: endDate } }).lean();
+			const totalRevenue = orders.reduce((total, order) => {
+				return total + order.totalPrice;
+			}, 0);
+			res.status(200).send({
+				success: true,
+				menuItemsCount,
+				ordersCount: orders.length,
+				totalRevenue,
+			});
+		} catch (e) {
+			console.log("getStyle error", e);
+			log.error("getStyle error", e);
 			res.status(500).send({
 				success: false,
 				body: e.message ? e.message : e,
@@ -195,18 +224,17 @@ const AccountController = {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const { namePart, limit, offset } = AccountValidator.getMenuItems(req.query);
 			const menuItems = await MenuItem.find({ accountId: _id }).skip(offset).limit(limit).sort({ _id: -1 });
+			let sortedMenuItemsMainDishesFirst;
 			if (namePart) {
-				const sortedMenuItems = sortMenuItems(menuItems, namePart);
-				res.status(200).send({
-					success: true,
-					menuItems: sortedMenuItems,
-				});
+				const sortedMenuItems = sortMenuItems(menuItems, namePart)
+				sortedMenuItemsMainDishesFirst = sortMenuItemsMainDishesFirst(sortedMenuItems);
 			} else {
-				res.status(200).send({
-					success: true,
-					menuItems,
-				});
+				sortedMenuItemsMainDishesFirst = sortMenuItemsMainDishesFirst(menuItems);
 			}
+			res.status(200).send({
+				success: true,
+				menuItems: sortedMenuItemsMainDishesFirst,
+			});
 		} catch (e) {
 			console.log("getMenuItems error", e);
 			log.error("getMenuItems error", e);
@@ -222,18 +250,17 @@ const AccountController = {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
 			const { type, namePart, limit, offset } = AccountValidator.getMenuItemsOfType(req.query);
 			const menuItems = await MenuItem.find({ accountId: _id, type }).skip(offset).limit(limit).sort({ _id: -1 });
+			let sortedMenuItemsMainDishesFirst;
 			if (namePart) {
-				const sortedMenuItems = sortMenuItems(menuItems, namePart);
-				res.status(200).send({
-					success: true,
-					menuItems: sortedMenuItems,
-				});
+				const sortedMenuItems = sortMenuItems(menuItems, namePart)
+				sortedMenuItemsMainDishesFirst = sortMenuItemsMainDishesFirst(sortedMenuItems);
 			} else {
-				res.status(200).send({
-					success: true,
-					menuItems,
-				});
+				sortedMenuItemsMainDishesFirst = sortMenuItemsMainDishesFirst(menuItems);
 			}
+			res.status(200).send({
+				success: true,
+				menuItems: sortedMenuItemsMainDishesFirst,
+			});
 		} catch (e) {
 			console.log("getMenuItemsOfType error", e);
 			log.error("getMenuItemsOfType error", e);

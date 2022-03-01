@@ -30,6 +30,8 @@ module.exports = (express) => {
 	apiRouter.get("/getAccountData", AccountController.getAccountData);
 	apiRouter.put("/account", AccountController.editAccount);
 
+	apiRouter.get("/dashboardStatistics", AccountController.dashboardStatistics);
+
 	apiRouter.get("/style", AccountController.getStyle);
 	// apiRouter.put("/style", AccountController.editStyle);
 

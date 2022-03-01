@@ -69,8 +69,27 @@ const sortMenuItems = (menuItems, namePart) => {
 	}
 }
 
+const sortMenuItemsMainDishesFirst = (menuItems) => {
+	if (menuItems.length) {
+		menuItems.sort((a, b) => {
+			if (a.isMainDish === !b.isMainDish) {
+				if (a.isMainDish) {
+					return -1;
+				}
+				return 1;
+			} else {
+				return 0;
+			}
+		});
+		return menuItems;
+	} else {
+		return [];
+	}
+}
+
 module.exports = {
 	toObjectId,
 	findCommon,
 	sortMenuItems,
+	sortMenuItemsMainDishesFirst,
 }
