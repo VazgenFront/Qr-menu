@@ -104,6 +104,18 @@ const Cafe = () => {
     );
   }
 
+  const onDetailOpen = (e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    setSelectedItem(() => {
+      return {
+        ...item,
+      };
+    });
+    setDetailIsOpen(true);
+  };
+
   return (
     <>
       <SearchInput
@@ -112,12 +124,16 @@ const Cafe = () => {
         accountId={cafeId}
         setSearchResult={setSearchResult}
       />
-      {searchResult.length && searchValue ? (
-        <div className="cafeInfo__box">
+      {searchResult.length && searchValue !== 0 ? (
+        <div className="cafeInfo__box" style={{ paddingLeft: "30px" }}>
           <div className="search__result">
             {searchResult?.map((item, index) => {
               return (
-                <div className="cafeInfo__menuItem" key={index}>
+                <div
+                  className="cafeInfo__menuItem"
+                  key={index}
+                  onClick={(e) => onDetailOpen(e, item)}
+                >
                   <div
                     className="menuType__item"
                     style={{ marginLeft: index % 2 === 1 ? "20px" : null }}
@@ -129,7 +145,10 @@ const Cafe = () => {
                     <span className="mainDish__item__price">
                       {item.price} {item.currency}
                     </span>
-                    <span className="mainDish__item__description">
+                    <span
+                      className="mainDish__item__description"
+                      style={{ width: "100%" }}
+                    >
                       <ReadMore>{item.description}</ReadMore>
                     </span>
                     <button
@@ -151,7 +170,7 @@ const Cafe = () => {
               return (
                 <div
                   className="cafeInfo__menuItem"
-                  style={{ padding: detilIsOpen ? null : "0px 30px 0px 30px" }}
+                  style={{ padding: detilIsOpen ? null : "0px 27px 0px 27px" }}
                   key={index}
                 >
                   <div className="mainDish__info">
@@ -192,7 +211,7 @@ const Cafe = () => {
           selectedItem={selectedItem}
           setDetailIsOpen={setDetailIsOpen}
           detilIsOpen={detilIsOpen}
-          className="detail_page"
+          getTotalItemsCount={state.getTotalItemsCount}
         />
       ) : null}
     </>

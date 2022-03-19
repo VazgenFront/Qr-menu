@@ -9,7 +9,7 @@ import AdminPanelHome from "./AdminPanelHome/AdminPanelHome.js";
 import AdminPanelMenuTypes from "./AdminPanelMenuTypes/AdminPanelMenuTypes.js";
 import AdminPanelMenuItems from "./AdminPanelMenuItems/AdminPanelMenuItems.js";
 import AdminPanelMenuTypesItem from "./AdminPanelMenuTypesItem/AdminPanelMenuTypesItem.js";
-import AdminPanelMainDishes from "./AdminPanelMainDishes/AdminPanelMainDishes.js";
+// import AdminPanelMainDishes from "./AdminPanelMainDishes/AdminPanelMainDishes.js";
 import AdminPanelTables from "./AdminPanelTables/AdminPanelTables.js";
 
 export {
@@ -24,6 +24,6 @@ export {
   AdminPanelMenuTypes,
   AdminPanelMenuItems,
   AdminPanelMenuTypesItem,
-  AdminPanelMainDishes,
+  // AdminPanelMainDishes,
   AdminPanelTables,
 };

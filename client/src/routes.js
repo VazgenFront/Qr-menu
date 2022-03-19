@@ -12,7 +12,6 @@ import {
   AdminPanelMenuTypes,
   AdminPanelMenuItems,
   AdminPanelMenuTypesItem,
-  AdminPanelMainDishes,
   AdminPanelTables,
 } from "./screens/index";
 
@@ -79,13 +78,6 @@ export const appRoutes = [
   },
 
   {
-    path: "/admin-panel/:cafeId/:cafeName/dashboard/menuItem",
-    name: "adminPanelMenuTypes",
-    exact: true,
-    component: AdminPanelMenuItems,
-  },
-
-  {
     path: "/admin-panel/:cafeId/:cafeName/dashboard/tables",
     name: "adminPanelMenuTypes",
     exact: true,
@@ -93,10 +85,10 @@ export const appRoutes = [
   },
 
   {
-    path: "/admin-panel/:cafeId/:cafeName/dashboard/mainDishes",
+    path: "/admin-panel/:cafeId/:cafeName/dashboard/menuItems",
     name: "adminPanelMenuTypes",
     exact: true,
-    component: AdminPanelMainDishes,
+    component: AdminPanelMenuItems,
   },
 
   {

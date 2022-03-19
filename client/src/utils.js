@@ -24,6 +24,7 @@ export const useSelectedItem = () => {
 export const useToggleModalOpen = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [moreIsOpen, setMoreIsOpen] = useState(false);
 
   const openAddModal = () => {
     setAddModalOpen(true);
@@ -44,6 +45,18 @@ export const useToggleModalOpen = () => {
     openAddModal();
   };
 
+  const onEdit = () => {
+    openEditModal();
+  };
+
+  const openMore = () => {
+    setMoreIsOpen(true);
+  };
+
+  const closeMore = () => {
+    setMoreIsOpen(false);
+  };
+
   return {
     addModalOpen,
     openAddModal,
@@ -52,5 +65,9 @@ export const useToggleModalOpen = () => {
     openEditModal,
     closeEditModal,
     onAdd,
+    onEdit,
+    openMore,
+    closeMore,
+    moreIsOpen,
   };
 };

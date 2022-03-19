@@ -1,39 +1,69 @@
-.sidebar {
-  height: 100vh;
-  width: 320px;
-  background-color: #fff;
+.DashBoard {
+  min-width: 300px;
+  max-width: 300px;
+  min-height: 100%;
+  background: #3746aa;
+  box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0px 0px 0px;
 }
-
-.sidebar__logo {
-  display: grid;
-  place-items: center;
-  height: 120px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  font-family: "Mochiy Pop P one", sans-serif;
+.cafeNameLink {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 30px;
   text-transform: capitalize;
+  line-height: 37px;
+  text-decoration: none;
+  color: #ffffff;
 }
 
-.sidebar__menu {
+.menus {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  list-style-type: none;
+  width: 100%;
+}
+
+.menuItem {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
   position: relative;
-}
-
-.sidebar__menu__item {
+  min-width: 200px;
+  font-size: 20px;
+  line-height: 24px;
+  color: #ffffff;
+  height: 64px;
   display: flex;
   align-items: center;
-  place-content: flex-start;
-  padding: 1rem 3rem;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #555555;
-  transition: color 0.3s ease-in-out;
-}
-
-a {
+  cursor: pointer;
   text-decoration: none;
-  color: unset;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.sidebar__menu__item__icon {
-  margin-right: 1rem;
+.dash__img {
+  width: 25px;
+  height: 20px;
+  position: absolute;
+  left: 32px;
+  margin-right: 14px;
+}
+
+.dash__name {
+  position: absolute;
+  left: 72px;
+  top: 21px;
+}
+
+.activee::before {
+  width: 100%;
+  height: 100%;
+  content: "";
+  background: #ffffff;
+  opacity: 0.2;
 }

@@ -8,11 +8,12 @@ const AdminAuth = () => {
   // eslint-disable-next-line no-unused-vars
   const [token, setToken] = useState("");
   const [authError, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = async (values) => {
+    setIsLoading(true);
     const username = values.login;
     const password = values.password;
-
     await axios
       .post("http://localhost:4000/api/account/authenticate", {
         username,
@@ -24,9 +25,13 @@ const AdminAuth = () => {
         localStorage.setItem("cafeName", username);
         await setToken(res.data.body.token);
         localStorage.setItem("adminTkn", res.data.body.token);
+        setIsLoading(false);
         window.location.href = `/admin-panel/${styleId}/${username}/dashboard/home`;
       })
-      .catch(() => setError(true));
+      .catch(() => {
+        setError(true);
+        setIsLoading(false);
+      });
 
     values.login = "";
     values.password = "";

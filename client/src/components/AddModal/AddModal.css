@@ -1,0 +1,103 @@
+.uploadImage__wrapper {
+  width: 285px;
+  height: 200px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.upload__place {
+  display: none;
+}
+
+.uploadImage__wrapper:hover .upload__place {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chooseImgBtn {
+  width: 220px;
+  height: 30px;
+  background: #3746aa;
+  box-shadow: 0px 4px 10px rgba(55, 70, 170, 0.3);
+  border-radius: 50px;
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.name__val {
+  display: flex;
+  flex-direction: column;
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  margin-top: 30px;
+  font-size: 14px;
+  line-height: 17px;
+  color: #3f3f3f;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+}
+
+.adding__name {
+  width: 285px;
+  margin-top: 6px;
+  padding: 0px 0px 0px 12px;
+  height: 36px;
+  left: 30px;
+  top: 283px;
+  border: 1px solid #d4d5db;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.addItem__box {
+  width: 210px;
+  display: flex;
+  margin: 30px auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addItem__btn {
+  width: 105px;
+  height: 40px;
+  background: #3746aa;
+  box-shadow: 0px 4px 10px rgba(55, 70, 170, 0.3);
+  border-radius: 50px;
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.cancel__name__btn {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  cursor: pointer;
+  color: #3f3f3f;
+}

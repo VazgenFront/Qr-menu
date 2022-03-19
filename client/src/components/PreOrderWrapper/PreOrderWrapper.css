@@ -33,9 +33,10 @@
   font-weight: bold;
   font-size: 16px;
   line-height: 19px;
-  text-align: center;
+  text-align: left;
   text-transform: uppercase;
   color: #3f3f3f;
+  width: max-content;
 }
 
 .preorder__item__info__description {

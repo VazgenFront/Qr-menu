@@ -1,5 +1,8 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import dash from "./dashboard.svg";
+import menu from "./menuItems.svg";
+import allItems from "./allItems.svg";
+import tables from "./tables.svg";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -8,42 +11,55 @@ const Dashboard = () => {
 
   const sidebarNavItems = [
     {
-      display: "Home",
+      name: "DashBoard",
       to: `/admin-panel/${cafeId}/${cafeName}/dashboard/home`,
+      img: dash,
     },
 
     {
-      display: "MenuTypes",
+      name: "Menu Types",
       to: `/admin-panel/${cafeId}/${cafeName}/dashboard/menuTypes`,
-    },
-    {
-      display: "MenuItems",
-      to: `/admin-panel/${cafeId}/${cafeName}/dashboard/menuItem`,
-    },
-    {
-      display: "MainDishes",
-      to: `/admin-panel/${cafeId}/${cafeName}/dashboard/mainDishes`,
+      img: menu,
     },
 
     {
-      display: "Tables",
+      name: "All Items",
+      to: `/admin-panel/${cafeId}/${cafeName}/dashboard/menuItems`,
+      img: allItems,
+    },
+
+    {
+      name: "Tables",
       to: `/admin-panel/${cafeId}/${cafeName}/dashboard/tables`,
+      img: tables,
     },
   ];
 
   return (
-    <div className="sidebar">
-      <div className="sidebar__logo">{cafeName}</div>
-      <div className="sidebar__menu">
-        <div className="sidebar__menu__indicator"></div>
-        {sidebarNavItems.map((item, index) => (
-          <Link to={item.to} key={index}>
-            <div className="sidebar__menu__item">
-              <div className="sidebar__menu__item__text">{item.display}</div>
-            </div>
-          </Link>
-        ))}
+    <div className="DashBoard">
+      <div className="cafeName">
+        <Link
+          to={`/admin-panel/1/${cafeName}/dashboard/home`}
+          className="cafeNameLink"
+        >
+          {cafeName}
+        </Link>
       </div>
+      <ul className="menus">
+        {sidebarNavItems.map(({ name, to, img }, index) => {
+          return (
+            <NavLink
+              className="menuItem"
+              to={to}
+              key={index}
+              activeClassName="activee"
+            >
+              <img src={img} alt={img} className="dash__img" />
+              <span className='dash__name' >{name}</span>
+            </NavLink>
+          );
+        })}
+      </ul>
     </div>
   );
 };
