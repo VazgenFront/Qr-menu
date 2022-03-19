@@ -23,17 +23,21 @@ const MenuType = () => {
       type: menuType,
     },
   });
-  const [addOrder, { loading: loadingAddOrder, error: addOrderDataError }] =
-    useMutation(ADD__TEMP__CARD);
+
+  const [addOrder, { error: addOrderDataError }] = useMutation(ADD__TEMP__CARD);
 
   useEffect(() => {
     data?.menuItemsOfType && setMenuTypes(() => [...data?.menuItemsOfType]);
     menuType && state.getMenuTypeName(menuType);
   }, [data]);
 
-  const { navbarTitleColor, navbarBgColor } = state.styles;
+  const { navbarTitleColor } = state.styles;
 
-  const addToCard = async (id) => {
+  const addToCard = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+
     const menuItemId = Number(id);
 
     const totalItemsCount = await addOrder({
@@ -76,6 +80,7 @@ const MenuType = () => {
         {menuTypes && !detilIsOpen
           ? menuTypes.map((item, index) => (
               <div
+                key={index}
                 className="menuType__item"
                 style={{ marginLeft: index % 2 === 1 ? "20px" : null }}
                 onClick={() => onDetailOpen(item)}
@@ -92,7 +97,7 @@ const MenuType = () => {
                 </span>
                 <button
                   className="order__btn"
-                  onClick={() => addToCard(item._id)}
+                  onClick={(e) => addToCard(e, item._id)}
                 >
                   Order
                 </button>

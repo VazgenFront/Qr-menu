@@ -1,47 +1,136 @@
 .AdminPanelMenuTypes {
   min-height: 100vh;
-  min-height: 100%;
+  height: 100%;
   width: 100%;
-  background-color: #989898;
-  padding-top: 80px;
+  background-color: #e5e5e5;
   display: flex;
+  flex-direction: column;
+}
+
+.line {
+  width: 100%;
+  height: 100px;
+  background: #ffffff;
+  box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.1);
+}
+
+.menuTypes_info__box {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 30px;
+}
+
+.menuTypes__text__box {
+  display: flex;
+  flex-direction: column;
+}
+.admin__title {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 37px;
+  color: #3746aa;
+  margin-bottom: 10px;
+}
+
+.admin__text {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  max-width: 518px;
+  min-width: 518px;
+  line-height: 19px;
+  color: #98999e;
+}
+
+.addMenuType {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #3746aa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 100px;
+  font-size: 30px;
+  font-weight: bold;
+  color: #ffffff;
 }
 
 .menuTypes {
   width: 100%;
-  padding: 0px 80px;
+  padding: 0px 30px 80px 30px;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
 }
 
 .menuType {
-  width: 360px;
-  height: 450px;
+  max-width: 340px;
+  height: 289px;
+  background: #ffffff;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.06);
   border-radius: 20px;
-  border: 4px solid #707070;
-  box-shadow: rgba(0, 0, 0, 0.801) 0px 16px 16px 0px;
+  padding: 30px;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  font-size: 20px;
-  color: #fff;
-  text-transform: capitalize;
+  justify-content: center;
+  align-items: center;
 }
 
 .menuTypes__item {
-  margin-top: 20px;
   width: 360px;
+  margin-top: 30px;
   height: 100%;
+  display: flex;
 }
 
 .menuType__img {
-  width: 100%;
-  height: 350px;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  margin-bottom: 35px;
+  width: 280px;
+  height: 195px;
+  background-size: cover;
+  border-radius: 16px;
+}
+
+.detailed {
+  width: 280px;
+  height: 195px;
+  display: none;
+}
+
+.menuType__img:hover .detailed {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 999;
+}
+
+.circle__btn {
+  width: 56px;
+  height: 56px;
+  background: #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.tpe {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  margin-top: 14px;
+  color: #3746aa;
+  text-transform: capitalize;
 }
 
 .add__menuType__box {

@@ -1,12 +1,11 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./AdminPanelTables.css";
-import { Button } from "./Button";
+import TableItem from "./TableItem.js";
 
 const AdminPanelTables = () => {
-  const token = localStorage.getItem("adminTkn");
   const [tables, setTables] = useState([]);
-  const [needRefresh, setNeedRefresh] = useState(false);
+  const token = localStorage.getItem("adminTkn");
 
   useEffect(async () => {
     await axios
@@ -15,37 +14,30 @@ const AdminPanelTables = () => {
       })
       .then((data) => {
         setTables(() => [...data.data.accountTables]);
-      })
-      .catch((e) => {
-        window.location = "/admin-panel/auth";
       });
-  }, [needRefresh]);
+    // .catch((e) => {
+    //   window.location = "/admin-panel/auth";
+    // });
+  }, []);
+
+  console.log("tables", tables);
 
   return (
     <div className="AdminPanelTables">
-      <span className="menu__types__item__title">Tables</span>
-      <div className="menuTypes">
-        {tables.map((item, idx) => (
-          <div className="menuTypes__item" key={idx}>
-            <div
-              className="table"
-              key={idx}
-              style={{
-                background: item.reserved ? "red" : "#13aa52",
-                marginTop: "40px",
-              }}
-            >
-              <span> {item.name}</span>
-            </div>
-            <div className="btn__box" style={{ justifyContent: "center" }}>
-              <Button
-                setNeedRefresh={setNeedRefresh}
-                needRefresh={needRefresh}
-                item={item}
-                token={token}
-              />
-            </div>
-          </div>
+      <div className="line"></div>
+      <div className="menuTypes_info__box">
+        <div className="menuTypes__text__box">
+          <span className="admin__title">Tables</span>
+          <span className="admin__text">
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry.
+          </span>
+        </div>
+        <div className="addMenuType">+</div>
+      </div>
+      <div className="tables">
+        {tables.map((item, index) => (
+          <TableItem item={item} index={index} />
         ))}
       </div>
     </div>

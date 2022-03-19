@@ -1,42 +1,12 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import ModalWrapper from "../../components/Modal/Modal";
-import AdminMenuItemsButtons from "../../components/AdminMenuItemsButtons/AdminMenuItemsButtons";
 import "./AdminPanelMenuItems.css";
-import { useToggleModalOpen } from "../../utils";
+import search from "./search.png";
 
 const AdminPanelMenuItems = () => {
-  const [menuItems, setMenuItems] = useState([]);
+  const [allItems, setAllItems] = useState([]);
+
   const token = localStorage.getItem("adminTkn");
-  const [needRefresh, setNeedRefresh] = useState(false);
-  const [selectedType, setSelectedType] = useState({});
-
-  const {
-    addModalOpen,
-    closeAddModal,
-    editModalOpen,
-    openEditModal,
-    closeEditModal,
-    onAdd,
-  } = useToggleModalOpen();
-
-  const onEdit = (e, itm) => {
-    openEditModal();
-    setSelectedType({
-      ...itm,
-    });
-  };
-
-  const onDelete = async (itm) => {
-    const data = { menuItemId: itm._id };
-
-    await axios.delete("http://localhost:4000/api/account/menuItem", {
-      data,
-      headers: { "x-access-token": token },
-    });
-
-    setNeedRefresh(!needRefresh);
-  };
 
   useEffect(async () => {
     await axios
@@ -44,62 +14,62 @@ const AdminPanelMenuItems = () => {
         headers: { "x-access-token": token },
       })
       .then((data) => {
-        setMenuItems(() => [...data.data.menuItems]);
-      })
-      .catch((e) => {
-        window.location = "/admin-panel/auth";
+        setAllItems(() => [...data.data.menuItems]);
       });
-  }, [needRefresh]);
+    // .catch((e) => {
+    //   window.location = "/admin-panel/auth";
+    // });
+  }, []);
+
 
   return (
     <div className="AdminPanelMenuItems">
-      <span className="menu__types__item__title">All Menu Items</span>
-      <div className="menuItems__box">
-        {menuItems.map((item, idx) => (
-          <div className="menuTypes__item" key={idx}>
-            <div className="menuType" key={idx} style={{ marginTop: "40px" }}>
+      <div className="line"></div>
+      <div className="menuTypes_info__box">
+        <div className="menuTypes__text__box">
+          <span className="admin__title">All Items</span>
+          <span className="admin__text">
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry.
+          </span>
+          <div className="searchInput">
+            <input type="text" className="search__item" />
+            <img src={search} alt="img" className="search__img" />
+          </div>
+        </div>
+        <div className="addMenuType">+</div>
+      </div>
+      <div className="menuItems">
+        {allItems.map((item, idx) => (
+          <div className="menuItem_item" key={idx}>
+            <div className="menuItm">
+              {item.isMainDish ? (
+                <div className="mainDish">MAIN DISH</div>
+              ) : null}
               <img className="menuType__img" src={item.img} alt="img" />
-              <span style={{ marginTop: "-12px" }}>{item.name}</span>
-              <span style={{ marginTop: "12px" }}>
-                {item.price} {item.currency}
+              <span className="type">
+                Name: <span className="tpe__server">{item.name}</span>{" "}
+              </span>
+              <span className="type">
+                Price:{" "}
+                <span className="tpe__server">
+                  {item.price} {item.currency}
+                </span>{" "}
+              </span>
+              <span className="type">
+                Menu: <span className="tpe__server">{item.type}</span>{" "}
+              </span>
+              <span className="type">
+                Description:{" "}
+                <span className="tpe__server">
+                  {item.description.slice(0, 72)}{" "}
+                  {item.description.length > 72 ? "..." : null}
+                </span>{" "}
               </span>
             </div>
-            <AdminMenuItemsButtons
-              item={item}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
           </div>
         ))}
-        <div
-          className="add__menuType__box"
-          onClick={onAdd}
-          style={{ marginTop: "58px" }}
-        >
-          +
-        </div>
       </div>
-      {editModalOpen ? (
-        <ModalWrapper
-          modalIsOpen={true}
-          destiny={"edit"}
-          closeModal={closeEditModal}
-          token={token}
-          selectedType={selectedType}
-          setNeedRefresh={setNeedRefresh}
-          needRefresh={needRefresh}
-        />
-      ) : null}
-      {addModalOpen ? (
-        <ModalWrapper
-          modalIsOpen={true}
-          token={token}
-          destiny={"add"}
-          closeModal={closeAddModal}
-          setNeedRefresh={setNeedRefresh}
-          needRefresh={needRefresh}
-        />
-      ) : null}
     </div>
   );
 };

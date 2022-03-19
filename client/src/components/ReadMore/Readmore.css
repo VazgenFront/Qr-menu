@@ -7,11 +7,10 @@
 
 .text {
   display: inline;
-  width: 100%;
   font-size: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   min-height: 50px;
 }
 

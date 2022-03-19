@@ -1,24 +1,83 @@
 .aboutUs_box {
-  background: #06042b;
+  background: #3746aa;
   width: 100%;
   height: 100%;
   min-height: 100vh;
+}
+
+.vector__img__up {
+  width: 100%;
+  min-height: 550px;
+  background-image: url("./vector-up.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0px 30px 0px 30px;
+}
+
+.vector__img__down {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  background-image: url("./vector-down.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   justify-content: center;
 }
 
-.aboutus_img {
-  width: 58%;
-  max-height: 150px;
-  margin-bottom: 20px;
+.about__us__img {
+  width: 180px;
+  height: 150px;
+  margin-top: 130px;
 }
 
-.aboutus_title {
-  color: #fff;
+.welcome__title {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 60px;
+  text-align: left;
+  font-size: 16px;
+  line-height: 19px;
+  color: #ffffff;
+}
+
+.welcome__text {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  width: 100%;
+  text-align: left;
+  margin-top: 40px;
+  font-size: 16px;
+  line-height: 20px;
+  color: #ffffff;
+}
+
+.enjoy__txt {
+  font-family: proxima-nova, sans-serif;
+  width: 100%;
+  text-align: left;
+  font-style: normal;
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+
+.steps__txt {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  max-width: 300px;
+  font-size: 18px;
+  line-height: 22px;
   text-align: center;
-  max-width: 88%;
-  font-size: 20px;
-  line-height: 32px;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  margin-top: 100px;
 }

@@ -15,10 +15,10 @@ const AdminPanelHome = () => {
       })
       .then((data) => {
         setOrders(() => [...data.data.orders]);
-      })
-      .catch((e) => {
-        window.location = "/admin-panel/auth";
       });
+    // .catch((e) => {
+    //   window.location = "/admin-panel/auth";
+    // });
   };
 
   useEffect(async () => {
@@ -31,6 +31,7 @@ const AdminPanelHome = () => {
 
   return (
     <div className="AdminPanelHome">
+      <div className="line"></div>
       <span className="tables__title">Order</span>
       {finalOrder.length ? (
         <div className="order__list">

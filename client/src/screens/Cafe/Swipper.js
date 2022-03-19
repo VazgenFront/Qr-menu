@@ -43,7 +43,7 @@ export const Swipper = ({
         <div className="item__img__container">
           <img src={item.img} alt="img" />
         </div>
-        <span className="mainDish__item__name">{item.name}</span>
+        <span className="mainDish__item__name">{item.name.slice(0, 8)}...</span>
         <span className="mainDish__item__description">
           <ReadMore>{item.description}</ReadMore>
         </span>
@@ -60,7 +60,7 @@ export const Swipper = ({
 
   return (
     <React.Fragment>
-      <Swiper spaceBetween={50} slidesPerView={2}>
+      <Swiper spaceBetween={20} slidesPerView={2}>
         {slides2}
       </Swiper>
     </React.Fragment>

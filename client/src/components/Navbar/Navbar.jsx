@@ -1,22 +1,27 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { NavLink, useHistory } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { GET_CAFFEE, GET_ORDER } from "../../queries/queries";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import Spinner from "../Spinner/Spinner";
 import cart from "./cart.png";
 import "./Navbar.css";
-import { NavLink } from "react-router-dom";
 
 const NavBar = () => {
   const state = useContext(ThemeContext);
-  const { cafeId, cafeName, tableId, totalItemsCount } = state;
+  const { cafeId, cafeName, tableId, totalItemsCount, menuType } = state;
   const [style, setStyle] = useState({});
+  const [title, setTitle] = useState("");
+
   const { loading, error, data } = useQuery(GET_CAFFEE, {
     variables: {
       _id: cafeId,
     },
   });
+
+  const isInMenuType = window.location.pathname.includes("menuType");
+  const isInCart = window.location.pathname.includes("card");
 
   const [getOrder, { data: dt }] = useLazyQuery(GET_ORDER);
 
@@ -41,9 +46,17 @@ const NavBar = () => {
   }, [data, totalItemsCount, dt, state.totalItemsCount]);
 
   useEffect(() => {
+    if (isInMenuType) {
+      setTitle(menuType);
+    } else if (isInCart) {
+      setTitle("My List");
+    } else {
+      setTitle(cafeName);
+    }
+
     state.toggleStyle(style);
     state.getMenuItems(data?.account?.mainDishes);
-  }, [style]);
+  }, [style, window.location.pathname]);
 
   const { logo, navbarBgColor, navbarTitleColor } = style;
 
@@ -72,20 +85,20 @@ const NavBar = () => {
         >
           <img src={logo} alt="img" className="navbar__logo" />
         </NavLink>
-        <div className="navbar__cafe__title">{cafeName}</div>
-        <div className="cart__box">
+        <div className="navbar__cafe__title">{title}</div>
+        <NavLink
+          exact
+          to={{
+            pathname: `/${cafeName}/${cafeId}/${tableId}/card`,
+          }}
+        >
+          <div className="cart__box">
             <img src={cart} alt="img" className="cart__circle__img" />
             {totalItemsCount ? (
-              <NavLink
-                exact
-                to={{
-                  pathname: `/${cafeName}/${cafeId}/${tableId}/card`,
-                }}
-              >
-                <div className="cart__count__circle">{totalItemsCount}</div>
-              </NavLink>
+              <div className="cart__count__circle">{totalItemsCount}</div>
             ) : null}
-        </div>
+          </div>
+        </NavLink>
       </div>
     </div>
   );
