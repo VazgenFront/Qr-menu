@@ -360,16 +360,10 @@ const AccountValidator = {
 		if (!validator.isNumeric(String(body.seatCount))) {
 			throw new Error("Invalid parameter seatCount.")
 		}
-		if (!body.notes) {
-			throw new Error("Missing parameter notes.")
-		}
-		if (!isString(body.notes)) {
-			throw new Error("Invalid parameter notes.")
-		}
 		return {
 			name: body.name,
 			seatCount: Number(body.seatCount),
-			notes: body.notes,
+			notes: body.notes || `New table created at ${new Date().toString()}`,
 		}
 	},
 
