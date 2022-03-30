@@ -457,7 +457,7 @@ const AccountController = {
 				{ $pull: { menuTypes: { name: typeName } } },
 				{ upsert: false, new: true },
 			).lean();
-			// await MenuItem.updateMany({ accountId: _id, type: typeName }, { $set: { type: account.defaultMenuType } });
+			await MenuItem.deleteMany({ accountId: _id, type: typeName });
 			res.status(200).send({
 				success: true,
 				account,
