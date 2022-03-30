@@ -494,7 +494,7 @@ const AccountController = {
 	addTable: async (req, res) => {
 		try {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
-			const { name, seatCount, notes } = AccountValidator.addTable(req.body);
+			const { name, seatCount, notes } = AccountValidator.addTable(req.body, req.body.notes);
 			const tableEntity = new Table({
 				accountId: _id,
 				tableId: new mongoose.Types.ObjectId(),
@@ -520,7 +520,7 @@ const AccountController = {
 	editTable: async (req, res) => {
 		try {
 			const { _id } = AccountValidator.getAccountId(req.decoded);
-			const { tableId, updateParams } = req.body;
+			const { tableId, updateParams } = AccountValidator.editTable(req.body);
 			const table = await Table.findOneAndUpdate(
 				{ accountId: _id, tableId },
 				{ $set: updateParams },

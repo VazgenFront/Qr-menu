@@ -347,7 +347,7 @@ const AccountValidator = {
 		return body.newName;
 	},
 
-	addTable(body) {
+	addTable(body, notes) {
 		if (!body.name) {
 			throw new Error("Missing parameter name.")
 		}
@@ -363,12 +363,12 @@ const AccountValidator = {
 		return {
 			name: body.name,
 			seatCount: Number(body.seatCount),
-			notes: body.notes || `New table created at ${new Date().toString()}`,
+			notes: notes || `New table created at ${new Date().toString()}`,
 		}
 	},
 
 	editTable(body) {
-		const params = this.addTable(body);
+		const params = this.addTable(body, `Table edited at ${new Date().toString()}`);
 		if (!body.tableId) {
 			throw new Error("Missing parameter tableId.")
 		}
